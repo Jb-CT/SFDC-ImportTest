@@ -20,11 +20,11 @@
  * See the Apex Language Reference for more information about Testing and Code Coverage.
  */
 /**
- * @class CleverTapServiceTest
+ * @class DataProcessorTest
  * @description Test class for DataProcessor to verify record processing and API integration
  */
 @isTest
-private class CleverTapServiceTest {
+private class DataProcessorTest {
     
     /**
      * @description Sets up test data and metadata for all test methods

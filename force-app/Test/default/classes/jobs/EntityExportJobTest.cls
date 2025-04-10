@@ -1,40 +1,10 @@
 /**
- * This class contains unit tests for validating the behavior of Apex classes
- * and triggers.
- *
- * Unit tests are class methods that verify whether a particular piece
- * of code is working properly. Unit test methods take no arguments,
- * commit no data to the database, and are flagged with the testMethod
- * keyword in the method definition.
- *
- * All test methods in an org are executed whenever Apex code is deployed
- * to a production org to confirm correctness, ensure code
- * coverage, and prevent regressions. All Apex classes are
- * required to have at least 75% code coverage in order to be deployed
- * to a production org. In addition, all triggers must have some code coverage.
- * 
- * The @isTest class annotation indicates this class only contains test
- * methods. Classes defined with the @isTest annotation do not count against
- * the org size limit for all Apex scripts.
- *
- * See the Apex Language Reference for more information about Testing and Code Coverage.
- */
-/**
- * @class CleverTapSyncQueueableTest
+ * @class EntityExportJobTest
  * @description Test class for EntityExportJob to ensure proper queueing and processing of records.
  */
 @isTest
-private class CleverTapSyncQueueableTest {
+private class EntityExportJobTest {
     
-    // Counters for tracking DataProcessor calls - at the class level
-    private static Integer leadCallCount = 0;
-    private static Integer contactCallCount = 0;
-    private static Integer accountCallCount = 0;
-    private static Integer opportunityCallCount = 0;
-    
-    /**
-     * @description Setup test data for all test methods
-     */
     @testSetup
     static void setupTestData() {
         // Create test account
@@ -71,297 +41,99 @@ private class CleverTapSyncQueueableTest {
         insert testOpportunity;
     }
     
-    /**
-     * @description Tests constructor with a single Lead record
-     */
-    @isTest
-    static void testConstructorSingleLead() {
-        // Get a test lead
-        Lead testLead = [SELECT Id, FirstName, LastName, Email FROM Lead LIMIT 1];
-        
-        // Test constructor with single record
-        Test.startTest();
-        EntityExportJob queueable = new EntityExportJob(testLead);
-        Test.stopTest();
-        
-        // Verify the queueable was initialized correctly
-        System.assertNotEquals(null, queueable, 'Queueable should be successfully initialized');
-    }
-    
-    /**
-     * @description Tests constructor with a list of Lead records
-     */
-    @isTest
-    static void testConstructorMultipleLeads() {
-        // Get test leads
-        List<Lead> testLeads = [SELECT Id, FirstName, LastName, Email FROM Lead LIMIT 10];
-        
-        // Test constructor with multiple records
-        Test.startTest();
-        EntityExportJob queueable = new EntityExportJob(testLeads);
-        Test.stopTest();
-        
-        // Verify the queueable was initialized correctly
-        System.assertNotEquals(null, queueable, 'Queueable should be successfully initialized');
-    }
-    
-    /**
-     * @description Tests constructor with a single Contact record
-     */
-    @isTest
-    static void testConstructorSingleContact() {
-        // Get a test contact
-        Contact testContact = [SELECT Id, FirstName, LastName, Email FROM Contact LIMIT 1];
-        
-        // Test constructor with single record
-        Test.startTest();
-        EntityExportJob queueable = new EntityExportJob(testContact);
-        Test.stopTest();
-        
-        // Verify the queueable was initialized correctly
-        System.assertNotEquals(null, queueable, 'Queueable should be successfully initialized');
-    }
-    
-    /**
-     * @description Tests constructor with a single Account record
-     */
-    @isTest
-    static void testConstructorSingleAccount() {
-        // Get a test account
-        Account testAccount = [SELECT Id, Name FROM Account LIMIT 1];
-        
-        // Test constructor with single record
-        Test.startTest();
-        EntityExportJob queueable = new EntityExportJob(testAccount);
-        Test.stopTest();
-        
-        // Verify the queueable was initialized correctly
-        System.assertNotEquals(null, queueable, 'Queueable should be successfully initialized');
-    }
-    
-    /**
-     * @description Tests constructor with a single Opportunity record
-     */
-    @isTest
-    static void testConstructorSingleOpportunity() {
-        // Get a test opportunity
-        Opportunity testOpportunity = [SELECT Id, Name FROM Opportunity LIMIT 1];
-        
-        // Test constructor with single record
-        Test.startTest();
-        EntityExportJob queueable = new EntityExportJob(testOpportunity);
-        Test.stopTest();
-        
-        // Verify the queueable was initialized correctly
-        System.assertNotEquals(null, queueable, 'Queueable should be successfully initialized');
-    }
-    
-    /**
-     * @description Tests constructor with null records
-     */
-    @isTest
-    static void testConstructorNullRecords() {
-        // Test constructor with null records
-        Test.startTest();
-        EntityExportJob queueable = new EntityExportJob((List<SObject>)null);
-        Test.stopTest();
-        
-        // Verify the queueable was initialized correctly
-        System.assertNotEquals(null, queueable, 'Queueable should be successfully initialized with null records');
-    }
-    
-    /**
-     * @description Tests constructor with empty records list
-     */
-    @isTest
-    static void testConstructorEmptyRecords() {
-        // Test constructor with empty list
-        Test.startTest();
-        EntityExportJob queueable = new EntityExportJob(new List<SObject>());
-        Test.stopTest();
-        
-        // Verify the queueable was initialized correctly
-        System.assertNotEquals(null, queueable, 'Queueable should be successfully initialized with empty records');
-    }
-    
-    /**
-     * @description Mock HTTPResponse generator
-     */
-    private class MockHttpResponseGenerator implements HttpCalloutMock {
-        public HTTPResponse respond(HTTPRequest req) {
-            HttpResponse res = new HttpResponse();
-            res.setHeader('Content-Type', 'application/json');
-            res.setBody('{"status":"success"}');
-            res.setStatusCode(200);
-            return res;
-        }
-    }
-    
-    /**
-     * Helper method to mock the execution of DataProcessor for leads
-     */
-    private static void mockLeadService(Lead lead) {
-        leadCallCount++;
-    }
-    
-    /**
-     * Helper method to mock the execution of DataProcessor for contacts
-     */
-    private static void mockContactService(Contact contact) {
-        contactCallCount++;
-    }
-    
-    /**
-     * Helper method to mock the execution of DataProcessor for accounts
-     */
-    private static void mockAccountService(Account account) {
-        accountCallCount++;
-    }
-    
-    /**
-     * Helper method to mock the execution of DataProcessor for opportunities
-     */
-    private static void mockOpportunityService(Opportunity opportunity) {
-        opportunityCallCount++;
-    }
-    
-    /**
-     * @description Tests execute method with Lead records
-     */
     @isTest
     static void testExecuteWithLeads() {
-        // Reset counters
-        leadCallCount = 0;
+        // Create test data
+        Lead testLead = [SELECT Id, FirstName, LastName, Email, Company FROM Lead LIMIT 1];
         
-        // Get test leads
-        List<Lead> testLeads = [SELECT Id, FirstName, LastName, Email FROM Lead LIMIT 1];
+        // Create a mock service via TestModule
+        MockCleverTapService mockService = new MockCleverTapService();
+        TestModule testModule = new TestModule(mockService);
         
-        // Set up HTTP mock
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        
-        // Mock DataProcessor.sendLeadToCleverTap
+        // Execute the queueable with test module
         Test.startTest();
-        
-        // Instead of executing the real queueable, simulate its execution with our mock
-        for (Lead lead : testLeads) {
-            mockLeadService(lead);
-        }
-        
+        EntityExportJob queueable = new EntityExportJob(testLead, testModule);
+        queueable.execute(null);
         Test.stopTest();
         
-        // Verify lead DataProcessor was called
-        System.assertEquals(1, leadCallCount, 'DataProcessor should be called once for the Lead');
+        // Verify the mock was called correctly
+        System.assertEquals(1, mockService.leadCallCount, 'Lead service should be called once');
+        System.assertEquals(0, mockService.contactCallCount, 'Contact service should not be called');
+        System.assertEquals(1, mockService.processedRecords.size(), 'One record should be processed');
+        System.assertEquals(testLead.Id, mockService.processedRecords[0].Id, 'Correct record should be processed');
     }
     
-    /**
-     * @description Tests execute method with Contact records
-     */
     @isTest
     static void testExecuteWithContacts() {
-        // Reset counters
-        contactCallCount = 0;
+        // Create test data
+        Contact testContact = [SELECT Id, FirstName, LastName, Email FROM Contact LIMIT 1];
         
-        // Get test contacts
-        List<Contact> testContacts = [SELECT Id, FirstName, LastName, Email FROM Contact LIMIT 1];
+        // Create a mock service via TestModule
+        MockCleverTapService mockService = new MockCleverTapService();
+        TestModule testModule = new TestModule(mockService);
         
-        // Set up HTTP mock
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        
-        // Mock DataProcessor.sendContactToCleverTap
+        // Execute the queueable with test module
         Test.startTest();
-        
-        // Instead of executing the real queueable, simulate its execution with our mock
-        for (Contact contact : testContacts) {
-            mockContactService(contact);
-        }
-        
+        EntityExportJob queueable = new EntityExportJob(testContact, testModule);
+        queueable.execute(null);
         Test.stopTest();
         
-        // Verify contact DataProcessor was called
-        System.assertEquals(1, contactCallCount, 'DataProcessor should be called once for the Contact');
+        // Verify the mock was called correctly
+        System.assertEquals(0, mockService.leadCallCount, 'Lead service should not be called');
+        System.assertEquals(1, mockService.contactCallCount, 'Contact service should be called once');
+        System.assertEquals(1, mockService.processedRecords.size(), 'One record should be processed');
+        System.assertEquals(testContact.Id, mockService.processedRecords[0].Id, 'Correct record should be processed');
     }
     
-    /**
-     * @description Tests execute method with Account records
-     */
     @isTest
-    static void testExecuteWithAccounts() {
-        // Reset counters
-        accountCallCount = 0;
+    static void testExecuteWithMultipleRecords() {
+        // Get multiple contacts
+        List<Contact> testContacts = new List<Contact>{
+            new Contact(FirstName = 'Test1', LastName = 'Contact1', Email = 'test1@example.com'),
+            new Contact(FirstName = 'Test2', LastName = 'Contact2', Email = 'test2@example.com')
+        };
+        insert testContacts;
         
-        // Get test accounts
-        List<Account> testAccounts = [SELECT Id, Name FROM Account LIMIT 1];
+        // Create a mock service via TestModule
+        MockCleverTapService mockService = new MockCleverTapService();
+        TestModule testModule = new TestModule(mockService);
         
-        // Set up HTTP mock
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        
-        // Mock DataProcessor.sendAccountToCleverTap
+        // Execute the queueable with test module and multiple records
         Test.startTest();
+        EntityExportJob queueable = new EntityExportJob(testContacts, testModule);
+        queueable.execute(null);
         
-        // Instead of executing the real queueable, simulate its execution with our mock
-        for (Account account : testAccounts) {
-            mockAccountService(account);
-        }
-        
+        // Since we can't easily test queueable chaining in unit tests, 
+        // manually process the second record
+        EntityExportJob secondQueueable = new EntityExportJob(new List<Contact>{testContacts[1]}, testModule);
+        secondQueueable.execute(null);
         Test.stopTest();
         
-        // Verify account DataProcessor was called
-        System.assertEquals(1, accountCallCount, 'DataProcessor should be called once for the Account');
+        // Verify the mock was called correctly
+        System.assertEquals(0, mockService.leadCallCount, 'Lead service should not be called');
+        System.assertEquals(2, mockService.contactCallCount, 'Contact service should be called twice');
+        System.assertEquals(2, mockService.processedRecords.size(), 'Two records should be processed');
     }
     
-    /**
-     * @description Tests execute method with Opportunity records
-     */
     @isTest
-    static void testExecuteWithOpportunities() {
-        // Reset counters
-        opportunityCallCount = 0;
+    static void testIntegrationHandlerWithMock() {
+        // Get test lead
+        Lead testLead = [SELECT Id FROM Lead LIMIT 1];
         
-        // Get test opportunities
-        List<Opportunity> testOpportunities = [SELECT Id, Name FROM Opportunity LIMIT 1];
+        // Create a mock service via TestModule
+        MockCleverTapService mockService = new MockCleverTapService();
+        TestModule testModule = new TestModule(mockService);
         
-        // Set up HTTP mock
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        
-        // Mock DataProcessor.sendOpportunityToCleverTap
+        // Set the module in the integration handler
         Test.startTest();
+        IntegrationHandler.setDIModule(testModule);
         
-        // Instead of executing the real queueable, simulate its execution with our mock
-        for (Opportunity opportunity : testOpportunities) {
-            mockOpportunityService(opportunity);
-        }
-        
+        // Process the lead through the integration handler
+        IntegrationHandler.processLeads(new List<Lead>{testLead});
         Test.stopTest();
         
-        // Verify opportunity DataProcessor was called
-        System.assertEquals(1, opportunityCallCount, 'DataProcessor should be called once for the Opportunity');
-    }
-    
-    /**
-     * @description Tests execute method with empty records
-     */
-    @isTest
-    static void testExecuteWithEmptyRecords() {
-        // Reset counters
-        leadCallCount = 0;
-        contactCallCount = 0;
-        accountCallCount = 0;
-        opportunityCallCount = 0;
-        
-        // Set up HTTP mock
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
-        
-        // Mock empty execution
-        Test.startTest();
-        
-        // Nothing to execute with empty records
-        
-        Test.stopTest();
-        
-        // Verify no services were called
-        System.assertEquals(0, leadCallCount, 'DataProcessor should not be called for Lead');
-        System.assertEquals(0, contactCallCount, 'DataProcessor should not be called for Contact');
-        System.assertEquals(0, accountCallCount, 'DataProcessor should not be called for Account');
-        System.assertEquals(0, opportunityCallCount, 'DataProcessor should not be called for Opportunity');
+        // Here we can only verify that no exceptions were thrown since
+        // the asynchronous job won't complete in the test context
+        System.assert(true, 'No exceptions were thrown during processing');
     }
 }

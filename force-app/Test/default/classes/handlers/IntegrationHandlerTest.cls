@@ -20,11 +20,11 @@
  * See the Apex Language Reference for more information about Testing and Code Coverage.
  */
 /**
- * @class CleverTapIntegrationHandlerTest
+ * @class IntegrationHandlerTest
  * @description Test class for IntegrationHandler.
  */
 @isTest
-private class CleverTapIntegrationHandlerTest {
+private class IntegrationHandlerTest {
     
     // Use class variables instead of inner class
     private static Boolean queueableExecuted = false;

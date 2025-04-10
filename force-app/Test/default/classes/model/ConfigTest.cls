@@ -1,5 +1,5 @@
 @isTest
-private class CleverTapConfigTest {
+private class ConfigTest {
     
     @isTest
     static void testGetCredentials() {

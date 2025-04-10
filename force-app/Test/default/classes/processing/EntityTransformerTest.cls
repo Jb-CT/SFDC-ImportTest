@@ -1,5 +1,5 @@
 @isTest
-private class CleverTapDataMapperTest {
+private class EntityTransformerTest {
     
     @testSetup
     static void setupTestData() {

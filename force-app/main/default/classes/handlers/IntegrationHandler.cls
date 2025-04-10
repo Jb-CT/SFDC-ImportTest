@@ -3,6 +3,19 @@
  * @description Handles integration operations between Salesforce and CleverTap by delegating record processing to appropriate services.
  */
 public with sharing class IntegrationHandler {
+    
+    // Default to production module for normal operation
+    private static DIModule diModule = new ProductionModule();
+    
+    /**
+     * @description Sets the dependency injection module (primarily for testing)
+     * @param module The DIModule to use
+     */
+    @TestVisible
+    private static void setDIModule(DIModule module) {
+        diModule = module;
+    }
+    
     /**
      * @description Processes a list of SObject records by enqueuing them for asynchronous CleverTap integration.
      * @param records The list of SObject records to process.
@@ -12,8 +25,8 @@ public with sharing class IntegrationHandler {
             return;
         }
         
-        // Use the generic queueable class for all object types
-        System.enqueueJob(new EntityExportJob(records));
+        // Use the generic queueable class for all object types with DIModule
+        System.enqueueJob(new EntityExportJob(records, diModule));
     }
     
     /**

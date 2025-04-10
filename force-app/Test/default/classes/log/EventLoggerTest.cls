@@ -1,5 +1,5 @@
 @isTest
-private class CleverTapEventLoggerTest {
+private class EventLoggerTest {
     
     @testSetup
     static void setupTestData() {

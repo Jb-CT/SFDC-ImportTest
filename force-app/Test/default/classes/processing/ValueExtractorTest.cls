@@ -1,5 +1,5 @@
 @isTest
-private class CleverTapDataConverterTest {
+private class ValueExtractorTest {
     
     @isTest
     static void testConvertFieldValueText() {

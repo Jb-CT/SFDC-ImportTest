@@ -1,5 +1,5 @@
 @isTest
-private class CleverTapHistoricalSyncBatchTest {
+private class HistoricalSyncBatchTest {
     
     // Set up test data
     @testSetup
