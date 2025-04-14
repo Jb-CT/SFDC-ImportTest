@@ -3,7 +3,6 @@
  * @description Validates CleverTap credentials by making an API call before saving them
  */
 public with sharing class CredentialValidator {
-    
     /**
      * @description Validates CleverTap credentials by making a connection test API call
      * @param region The CleverTap region (US, EU, IN, etc.)
@@ -11,8 +10,7 @@ public with sharing class CredentialValidator {
      * @param passcode The CleverTap Passcode
      * @return ValidationResult Object containing validation status and message
      */
-    @AuraEnabled
-    public static ValidationResult validateCredentials(String region, String accountId, String passcode) {
+    public ValidationResult validateCredentials(String region, String accountId, String passcode) {
         if (String.isBlank(accountId) || String.isBlank(passcode) || String.isBlank(region)) {
             return new ValidationResult(false, 'All credential fields are required');
         }
@@ -55,7 +53,7 @@ public with sharing class CredentialValidator {
      * @param res The HTTP response
      * @return ValidationResult Object containing validation status and message
      */
-    private static ValidationResult processValidationResponse(HttpResponse res) {
+    private ValidationResult processValidationResponse(HttpResponse res) {
         Integer statusCode = res.getStatusCode();
         String responseBody = res.getBody();
         
@@ -100,7 +98,7 @@ public with sharing class CredentialValidator {
      * @param region The CleverTap region code
      * @return String The base URL for the region
      */
-    private static String getRegionBaseUrl(String region) {
+    private String getRegionBaseUrl(String region) {
         Map<String, String> regionUrls = new Map<String, String>{
             'US' => 'https://us1.api.clevertap.com',
             'EU' => 'https://eu1.api.clevertap.com',

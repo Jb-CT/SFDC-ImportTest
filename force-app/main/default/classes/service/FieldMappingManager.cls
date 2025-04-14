@@ -4,15 +4,13 @@
  * Handles CRUD operations for CleverTap_Mapping__c records.
  */
 public with sharing class FieldMappingManager {
-    
     /**
      * @description Gets existing field mappings for a sync configuration
      * @param syncId The ID of the sync configuration
      * @return List of field mappings
      * @throws AuraHandledException If there is an error accessing the mappings
      */
-    @AuraEnabled
-    public static List<CleverTap_Mapping__c> getExistingMappings(Id syncId) {
+    public List<CleverTap_Mapping__c> getExistingMappings(Id syncId) {
         if (!CleverTap_Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             throw new AuraHandledException('You do not have access to field mappings');
         }
@@ -30,8 +28,7 @@ public with sharing class FieldMappingManager {
      * @param mappingData JSON string containing mapping data
      * @throws AuraHandledException If there is an error creating or validating the mappings
      */
-    @AuraEnabled
-    public static void saveFieldMappings(String mappingData) {
+    public void saveFieldMappings(String mappingData) {
         Savepoint sp = Database.setSavepoint();
         try {
             checkMappingPermissions();
@@ -56,7 +53,7 @@ public with sharing class FieldMappingManager {
      * @description Checks if the current user has permissions to create and delete field mappings
      * @throws AuraHandledException If the user does not have sufficient permissions
      */
-    private static void checkMappingPermissions() {
+    private void checkMappingPermissions() {
         if (!CleverTap_Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isCreateable() ||
             !CleverTap_Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {
             throw new AuraHandledException('Insufficient permissions to manage field mappings');
@@ -68,7 +65,7 @@ public with sharing class FieldMappingManager {
      * @param mappingData The mapping data string to validate
      * @throws AuraHandledException If the mapping data is blank
      */
-    private static void validateMappingData(String mappingData) {
+    private void validateMappingData(String mappingData) {
         if (String.isBlank(mappingData)) {
             throw new AuraHandledException('Mapping data cannot be empty');
         }
@@ -80,7 +77,7 @@ public with sharing class FieldMappingManager {
      * @return Map<String, Object> The parsed mapping data
      * @throws AuraHandledException If the JSON is invalid
      */
-    private static Map<String, Object> parseMappingJson(String mappingData) {
+    private Map<String, Object> parseMappingJson(String mappingData) {
         try {
             return (Map<String, Object>)JSON.deserializeUntyped(mappingData);
         } catch (Exception e) {
@@ -94,7 +91,7 @@ public with sharing class FieldMappingManager {
      * @return Id The validated syncId
      * @throws AuraHandledException If the syncId is missing or invalid
      */
-    private static Id validateSyncId(Map<String, Object> mappingsMap) {
+    private Id validateSyncId(Map<String, Object> mappingsMap) {
         try {
             Id syncId = (Id)mappingsMap.get('syncId');
             if (syncId == null) {
@@ -112,7 +109,7 @@ public with sharing class FieldMappingManager {
      * @return List<Object> The validated mappings list
      * @throws AuraHandledException If the mappings list is missing or empty
      */
-    private static List<Object> validateMappingsList(Map<String, Object> mappingsMap) {
+    private List<Object> validateMappingsList(Map<String, Object> mappingsMap) {
         List<Object> mappingsObj = (List<Object>)mappingsMap.get('mappings');
         if (mappingsObj == null || mappingsObj.isEmpty()) {
             throw new AuraHandledException('No mappings provided');
@@ -126,7 +123,7 @@ public with sharing class FieldMappingManager {
      * @param mappingsObj The list of mapping objects
      * @throws AuraHandledException If there is an error processing the mappings
      */
-    private static void processFieldMappings(Id syncId, List<Object> mappingsObj) {
+    private void processFieldMappings(Id syncId, List<Object> mappingsObj) {
         // Delete existing mappings
         deleteExistingMappings(syncId);
         
@@ -142,7 +139,7 @@ public with sharing class FieldMappingManager {
      * @param syncId The ID of the sync configuration
      * @throws AuraHandledException If there is an error deleting the mappings
      */
-    private static void deleteExistingMappings(Id syncId) {
+    private void deleteExistingMappings(Id syncId) {
         try {
             delete [SELECT Id FROM CleverTap_Mapping__c WHERE Sync_Configuration__c = :syncId];
         } catch (Exception e) {
@@ -157,7 +154,7 @@ public with sharing class FieldMappingManager {
      * @return List<CleverTap_Mapping__c> The list of new mapping records
      * @throws AuraHandledException If there is an error creating the mappings
      */
-    private static List<CleverTap_Mapping__c> createNewMappings(Id syncId, List<Object> mappingsObj) {
+    private List<CleverTap_Mapping__c> createNewMappings(Id syncId, List<Object> mappingsObj) {
         List<CleverTap_Mapping__c> newMappings = new List<CleverTap_Mapping__c>();
         
         for(Object mappingObj : mappingsObj) {
@@ -176,7 +173,7 @@ public with sharing class FieldMappingManager {
      * @return CleverTap_Mapping__c The new mapping record
      * @throws AuraHandledException If the mapping is invalid
      */
-    private static CleverTap_Mapping__c createMappingRecord(Id syncId, Map<String, Object> mapping) {
+    private CleverTap_Mapping__c createMappingRecord(Id syncId, Map<String, Object> mapping) {
         // Validate required fields
         String targetField = (String)mapping.get('CleverTap_Field__c');
         String sourceField = (String)mapping.get('Salesforce_Field__c');
@@ -202,7 +199,7 @@ public with sharing class FieldMappingManager {
      * @param newMappings The list of mapping records to insert
      * @throws AuraHandledException If there is an error inserting the mappings
      */
-    private static void insertMappings(List<CleverTap_Mapping__c> newMappings) {
+    private void insertMappings(List<CleverTap_Mapping__c> newMappings) {
         try {
             insert newMappings;
         } catch (Exception e) {

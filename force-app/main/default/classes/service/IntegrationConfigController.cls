@@ -9,6 +9,17 @@ public with sharing class IntegrationConfigController {
         'ID' => 'https://aps3.api.clevertap.com/1/upload'
     };
     
+    // Singleton instance for credential validator
+    private static CredentialValidator credentialValidator {
+        get {
+            if(credentialValidator == null) {
+                credentialValidator = new CredentialValidator();
+            }
+            return credentialValidator;
+        }
+        set;
+    }
+    
     @AuraEnabled(cacheable=true)
     public static List<CleverTap_Config__c> getConfigurations() {
         try {
@@ -41,7 +52,7 @@ public with sharing class IntegrationConfigController {
     public static CredentialValidator.ValidationResult validateCredentials(
         String region, String accountId, String passcode
     ) {
-        return CredentialValidator.validateCredentials(region, accountId, passcode);
+        return credentialValidator.validateCredentials(region, accountId, passcode);
     }
 
     @AuraEnabled

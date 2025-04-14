@@ -1,10 +1,9 @@
 /**
  * @class MockCleverTapService
- * @description Mock implementation of ICleverTapService for testing
+ * @description Mock implementation of DataProcessor for testing
  */
 @IsTest
-public class MockCleverTapService implements ICleverTapService {
-    
+public class MockCleverTapService implements DataProcessor {
     // Counters to track method calls
     public Integer leadCallCount = 0;
     public Integer contactCallCount = 0;

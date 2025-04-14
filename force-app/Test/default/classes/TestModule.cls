@@ -4,7 +4,6 @@
  */
 @IsTest
 public class TestModule implements DIModule {
-    
     // The mock service to return
     private MockCleverTapService mockService;
     
@@ -25,9 +24,9 @@ public class TestModule implements DIModule {
     
     /**
      * @description Provides the mock CleverTap service
-     * @return ICleverTapService A mock implementation of the CleverTap service
+     * @return DataProcessor A mock implementation of the CleverTap service
      */
-    public ICleverTapService provideCleverTapService() {
+    public DataProcessor provideCleverTapService() {
         return mockService;
     }
     

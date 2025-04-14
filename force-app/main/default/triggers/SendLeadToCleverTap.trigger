@@ -52,6 +52,6 @@ trigger SendLeadToCleverTap on Lead (after insert, after update) {
     }
 
     if (!leadsToProcess.isEmpty()) {
-        IntegrationHandler.processLeads(leadsToProcess);
+        IntegrationHandler.getInstance().processLeads(Trigger.new);
     }
 }

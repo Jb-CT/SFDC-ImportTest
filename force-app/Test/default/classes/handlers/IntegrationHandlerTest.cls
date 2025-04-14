@@ -25,7 +25,7 @@
  */
 @isTest
 private class IntegrationHandlerTest {
-    
+    static IntegrationHandler integrationHandler = new IntegrationHandler();
     // Use class variables instead of inner class
     private static Boolean queueableExecuted = false;
     
@@ -76,7 +76,7 @@ private class IntegrationHandlerTest {
         
         // Test
         Test.startTest();
-        IntegrationHandler.processLeads(leads);
+        integrationHandler.processLeads(leads);
         // In a test context, queueable jobs are executed synchronously at the end of Test.stopTest()
         Test.stopTest();
         
@@ -94,7 +94,7 @@ private class IntegrationHandlerTest {
         
         // Test
         Test.startTest();
-        IntegrationHandler.processContacts(contacts);
+        integrationHandler.processContacts(contacts);
         Test.stopTest();
         
         // For contact tests, we can only verify that no exceptions were thrown
@@ -111,7 +111,7 @@ private class IntegrationHandlerTest {
         
         // Test
         Test.startTest();
-        IntegrationHandler.processAccounts(accounts);
+        integrationHandler.processAccounts(accounts);
         Test.stopTest();
         
         // For account tests, we can only verify that no exceptions were thrown
@@ -128,7 +128,7 @@ private class IntegrationHandlerTest {
         
         // Test
         Test.startTest();
-        IntegrationHandler.processOpportunities(opportunities);
+        integrationHandler.processOpportunities(opportunities);
         Test.stopTest();
         
         // For opportunity tests, we can only verify that no exceptions were thrown
@@ -145,7 +145,7 @@ private class IntegrationHandlerTest {
         
         // Test
         Test.startTest();
-        IntegrationHandler.processRecords(nullRecords);
+        integrationHandler.processRecords(nullRecords);
         Test.stopTest();
         
         // For null record tests, we can only verify that no exceptions were thrown
@@ -162,7 +162,7 @@ private class IntegrationHandlerTest {
         
         // Test
         Test.startTest();
-        IntegrationHandler.processRecords(emptyRecords);
+        integrationHandler.processRecords(emptyRecords);
         Test.stopTest();
         
         // For empty record tests, we can only verify that no exceptions were thrown
@@ -180,7 +180,7 @@ private class IntegrationHandlerTest {
         
         // Test
         Test.startTest();
-        IntegrationHandler.processRecords(mixedRecords);
+        integrationHandler.processRecords(mixedRecords);
         Test.stopTest();
         
         // For generic record tests, we can only verify that no exceptions were thrown

@@ -3,7 +3,6 @@
  * @description Helper class for mapping Salesforce records to CleverTap format.
  */
 public with sharing class EntityTransformer {
-    
     /**
      * @description Inner class to hold connection mappings
      */
@@ -11,14 +10,13 @@ public with sharing class EntityTransformer {
         public String connectionId { get; set; }
         public Map<String, Object> payload { get; set; }
     }
-    
     /**
      * @description Maps a Salesforce record to CleverTap format
      * @param record The Salesforce record to map
      * @param recordType The type of record
      * @return The mapped record in CleverTap format
      */
-    public static Map<String, Object> mapToCleverTap(SObject record, String recordType) {
+    public Map<String, Object> mapToCleverTap(SObject record, String recordType) {
         if (record == null) {
             return null;
         }
@@ -42,7 +40,7 @@ public with sharing class EntityTransformer {
      * @param recordType The type of record
      * @return List of mapped records with their corresponding configurations
      */
-    public static List<ConnectionMapping> mapToMultipleConnections(SObject record, String recordType) {
+    public List<ConnectionMapping> mapToMultipleConnections(SObject record, String recordType) {
         if (record == null) {
             return new List<ConnectionMapping>();
         }
@@ -108,7 +106,7 @@ public with sharing class EntityTransformer {
      * @param recordType The record type
      * @return List of sync configurations
      */
-    private static List<CleverTap_Sync_Configuration__c> getAllSyncConfigurations(String recordType) {
+    private List<CleverTap_Sync_Configuration__c> getAllSyncConfigurations(String recordType) {
         // Check CRUD permissions
         if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return new List<CleverTap_Sync_Configuration__c>();
@@ -127,7 +125,7 @@ public with sharing class EntityTransformer {
      * @param configId The configuration ID
      * @return List of field mappings
      */
-    private static List<CleverTap_Mapping__c> getFieldMappingsForConfig(Id configId) {
+    private List<CleverTap_Mapping__c> getFieldMappingsForConfig(Id configId) {
         // Check CRUD permissions
         if (!CleverTap_Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return new List<CleverTap_Mapping__c>();
@@ -146,7 +144,7 @@ public with sharing class EntityTransformer {
      * @param recordType The record type
      * @return List of field mappings
      */
-    private static List<CleverTap_Mapping__c> getFieldMappings(String recordType) {
+    private List<CleverTap_Mapping__c> getFieldMappings(String recordType) {
         // Check CRUD permissions
         if (!CleverTap_Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() || 
             !CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
@@ -170,7 +168,7 @@ public with sharing class EntityTransformer {
      * @param recordType The record type
      * @return The sync configuration
      */
-    private static CleverTap_Sync_Configuration__c getSyncConfiguration(String recordType) {
+    private CleverTap_Sync_Configuration__c getSyncConfiguration(String recordType) {
         // Check CRUD permissions
         if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return null;
@@ -192,7 +190,7 @@ public with sharing class EntityTransformer {
      * @param fieldMappings The list of field mappings
      * @return The identity mapping
      */
-    private static CleverTap_Mapping__c findIdentityMapping(List<CleverTap_Mapping__c> fieldMappings) {
+    private CleverTap_Mapping__c findIdentityMapping(List<CleverTap_Mapping__c> fieldMappings) {
         for (CleverTap_Mapping__c mapping : fieldMappings) {
             if (mapping.Is_Mandatory__c && mapping.CleverTap_Field__c == 'customer_id') {
                 return mapping;
@@ -206,7 +204,7 @@ public with sharing class EntityTransformer {
      * @param fieldMappings The list of field mappings
      * @return The event name mapping
      */
-    private static CleverTap_Mapping__c findEventNameMapping(List<CleverTap_Mapping__c> fieldMappings) {
+    private CleverTap_Mapping__c findEventNameMapping(List<CleverTap_Mapping__c> fieldMappings) {
         for (CleverTap_Mapping__c mapping : fieldMappings) {
             if (mapping.Is_Mandatory__c && mapping.CleverTap_Field__c == 'evtName') {
                 return mapping;
@@ -221,7 +219,7 @@ public with sharing class EntityTransformer {
      * @param identityMapping The identity mapping
      * @return The identity value
      */
-    private static String getIdentityValue(SObject record, CleverTap_Mapping__c identityMapping) {
+    private String getIdentityValue(SObject record, CleverTap_Mapping__c identityMapping) {
         return String.valueOf(record.get(identityMapping.Salesforce_Field__c));
     }
     
@@ -231,8 +229,11 @@ public with sharing class EntityTransformer {
      * @param fieldMappings The field mappings
      * @return The profile data map
      */
-    private static Map<String, Object> createProfileData(SObject record, List<CleverTap_Mapping__c> fieldMappings) {
+    private Map<String, Object> createProfileData(SObject record, List<CleverTap_Mapping__c> fieldMappings) {
         Map<String, Object> profileData = new Map<String, Object>();
+        
+        // Create an instance of ValueExtractor
+        ValueExtractor valueExtractor = new ValueExtractor();
         
         // Process only the explicitly mapped fields
         for (CleverTap_Mapping__c mapping : fieldMappings) {
@@ -250,7 +251,7 @@ public with sharing class EntityTransformer {
             }
             
             // Convert and add the field value to the profile data
-            Object convertedValue = ValueExtractor.convertFieldValue(
+            Object convertedValue = valueExtractor.convertFieldValue(
                 fieldValue, mapping.Data_Type__c
             );
             profileData.put(mapping.CleverTap_Field__c, convertedValue);
@@ -267,8 +268,8 @@ public with sharing class EntityTransformer {
      * @param isEvent Whether this should be sent as an event
      * @return The final payload
      */
-    private static Map<String, Object> createFinalPayload(String identityValue, Map<String, Object> profileData, 
-                                                         String eventName, Boolean isEvent) {
+    private Map<String, Object> createFinalPayload(String identityValue, Map<String, Object> profileData, 
+                                                 String eventName, Boolean isEvent) {
         Map<String, Object> payload = new Map<String, Object>();
         payload.put('identity', identityValue);
         

@@ -1,3 +1,3 @@
 trigger SendContactToCleverTap on Contact (after insert, after update) {
-    IntegrationHandler.processContacts(Trigger.new);
+    IntegrationHandler.getInstance().processContacts(Trigger.new);
 }

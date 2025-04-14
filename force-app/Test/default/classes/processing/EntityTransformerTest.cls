@@ -1,6 +1,7 @@
 @isTest
 private class EntityTransformerTest {
-    
+    static EntityTransformer entityTransformer = new EntityTransformer();
+
     @testSetup
     static void setupTestData() {
         // Create test account
@@ -139,7 +140,7 @@ private class EntityTransformerTest {
         
         // Test mapping
         Test.startTest();
-        Map<String, Object> result = EntityTransformer.mapToCleverTap(testLead, 'Lead');
+        Map<String, Object> result = entityTransformer.mapToCleverTap(testLead, 'Lead');
         Test.stopTest();
         
         // Verify mapping
@@ -161,7 +162,7 @@ private class EntityTransformerTest {
         
         // Test mapping
         Test.startTest();
-        Map<String, Object> result = EntityTransformer.mapToCleverTap(testContact, 'Contact');
+        Map<String, Object> result = entityTransformer.mapToCleverTap(testContact, 'Contact');
         Test.stopTest();
         
         // Verify mapping
@@ -182,17 +183,17 @@ private class EntityTransformerTest {
         
         // Test mapping to multiple connections
         Test.startTest();
-        List<EntityTransformer.ConnectionMapping> results = EntityTransformer.mapToMultipleConnections(testLead, 'Lead');
+        List<entityTransformer.ConnectionMapping> results = entityTransformer.mapToMultipleConnections(testLead, 'Lead');
         Test.stopTest();
         
         // Verify mappings for multiple connections
         System.assertEquals(2, results.size(), 'Should have mappings for 2 connections');
         
         // Check the profile mapping
-        EntityTransformer.ConnectionMapping profileMapping = null;
-        EntityTransformer.ConnectionMapping eventMapping = null;
+        entityTransformer.ConnectionMapping profileMapping = null;
+        entityTransformer.ConnectionMapping eventMapping = null;
         
-        for (EntityTransformer.ConnectionMapping mapping : results) {
+        for (entityTransformer.ConnectionMapping mapping : results) {
             Map<String, Object> payload = mapping.payload;
             if (payload.get('type') == 'profile') {
                 profileMapping = mapping;
@@ -217,7 +218,7 @@ private class EntityTransformerTest {
     static void testMapToCleverTapWithNull() {
         // Test with null record
         Test.startTest();
-        Map<String, Object> result = EntityTransformer.mapToCleverTap(null, 'Lead');
+        Map<String, Object> result = entityTransformer.mapToCleverTap(null, 'Lead');
         Test.stopTest();
         
         // Verify result is null
@@ -231,7 +232,7 @@ private class EntityTransformerTest {
         
         // Test mapping
         Test.startTest();
-        Map<String, Object> result = EntityTransformer.mapToCleverTap(testAccount, 'Account');
+        Map<String, Object> result = entityTransformer.mapToCleverTap(testAccount, 'Account');
         Test.stopTest();
         
         // Verify result is null
@@ -255,7 +256,7 @@ private class EntityTransformerTest {
         
         // Test mapping
         Test.startTest();
-        Map<String, Object> result = EntityTransformer.mapToCleverTap(testAccount, 'Account');
+        Map<String, Object> result = entityTransformer.mapToCleverTap(testAccount, 'Account');
         Test.stopTest();
         
         // Verify result is null (no mandatory customer_id mapping exists)
@@ -274,7 +275,7 @@ private class EntityTransformerTest {
         
         // Test mapping
         Test.startTest();
-        Map<String, Object> result = EntityTransformer.mapToCleverTap(leadWithoutEmail, 'Lead');
+        Map<String, Object> result = entityTransformer.mapToCleverTap(leadWithoutEmail, 'Lead');
         Test.stopTest();
         
         // Verify result is null

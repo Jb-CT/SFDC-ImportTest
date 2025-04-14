@@ -4,7 +4,6 @@
  */
 @isTest
 private class IntegrationSyncControllerTest {
-    
     /**
      * @description Setup test data for all test methods
      */

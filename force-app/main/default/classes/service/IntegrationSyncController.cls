@@ -5,6 +5,37 @@
  */
 public with sharing class IntegrationSyncController {
     
+    // Create a singleton pattern to get instances
+    private static SyncConfigurationManager syncConfigManager {
+        get {
+            if(syncConfigManager == null) {
+                syncConfigManager = new SyncConfigurationManager();
+            }
+            return syncConfigManager;
+        }
+        set;
+    }
+    
+    private static FieldMappingManager fieldMappingManager {
+        get {
+            if(fieldMappingManager == null) {
+                fieldMappingManager = new FieldMappingManager();
+            }
+            return fieldMappingManager;
+        }
+        set;
+    }
+    
+    private static SchemaUtility schemaUtility {
+        get {
+            if(schemaUtility == null) {
+                schemaUtility = new SchemaUtility();
+            }
+            return schemaUtility;
+        }
+        set;
+    }
+    
     /**
      * @description Gets all sync configurations for a specific connection
      * @param connectionId The ID of the connection
@@ -12,7 +43,7 @@ public with sharing class IntegrationSyncController {
      */
     @AuraEnabled(cacheable=true)
     public static List<SyncConfigurationManager.SyncConfigWrapper> getSyncConfigurations(String connectionId) {
-        return SyncConfigurationManager.getSyncConfigurations(connectionId);
+        return syncConfigManager.getSyncConfigurations(connectionId);
     }
 
     /**
@@ -23,7 +54,7 @@ public with sharing class IntegrationSyncController {
      */
     @AuraEnabled(cacheable=true)
     public static List<Map<String, String>> getPicklistValues(String objectName, String fieldName) {
-        return SchemaUtility.getPicklistValues(objectName, fieldName);
+        return schemaUtility.getPicklistValues(objectName, fieldName);
     }
 
     /**
@@ -32,7 +63,7 @@ public with sharing class IntegrationSyncController {
      */
     @AuraEnabled
     public static void saveFieldMappings(String mappingData) {
-        FieldMappingManager.saveFieldMappings(mappingData);
+        fieldMappingManager.saveFieldMappings(mappingData);
     }
     
     /**
@@ -41,7 +72,7 @@ public with sharing class IntegrationSyncController {
      */
     @AuraEnabled
     public static void deleteSyncConfiguration(String syncId) {
-        SyncConfigurationManager.deleteSyncConfiguration(syncId);
+        syncConfigManager.deleteSyncConfiguration(syncId);
     }
 
     /**
@@ -51,7 +82,7 @@ public with sharing class IntegrationSyncController {
      */
     @AuraEnabled
     public static List<CleverTap_Mapping__c> getExistingMappings(Id syncId) {
-        return FieldMappingManager.getExistingMappings(syncId);
+        return fieldMappingManager.getExistingMappings(syncId);
     }
 
     /**
@@ -61,7 +92,7 @@ public with sharing class IntegrationSyncController {
      */
     @AuraEnabled
     public static void updateSyncStatus(String syncId, String status) {
-        SyncConfigurationManager.updateSyncStatus(syncId, status);
+        syncConfigManager.updateSyncStatus(syncId, status);
     }
 
     /**
@@ -71,7 +102,7 @@ public with sharing class IntegrationSyncController {
      */
     @AuraEnabled
     public static String createSyncConfiguration(String syncData) {
-        return SyncConfigurationManager.createSyncConfiguration(syncData);
+        return syncConfigManager.createSyncConfiguration(syncData);
     }
     
     /**
@@ -81,7 +112,7 @@ public with sharing class IntegrationSyncController {
      */
     @AuraEnabled(cacheable=true)
     public static List<Map<String, String>> getSalesforceFields(String objectName) {
-        return SchemaUtility.getAccessibleFields(objectName);
+        return schemaUtility.getAccessibleFields(objectName);
     }
 
     /**
@@ -91,7 +122,7 @@ public with sharing class IntegrationSyncController {
      */
     @AuraEnabled(cacheable=true)
     public static SyncConfigurationManager.SyncConfigWrapper getSyncConfigurationById(String syncId) {
-        return SyncConfigurationManager.getSyncConfigurationById(syncId);
+        return syncConfigManager.getSyncConfigurationById(syncId);
     }
 
     /**
@@ -102,7 +133,7 @@ public with sharing class IntegrationSyncController {
      */
     @AuraEnabled
     public static SyncConfigurationManager.SyncConfigWrapper updateSyncConfiguration(String syncId, String syncData) {
-        return SyncConfigurationManager.updateSyncConfiguration(syncId, syncData);
+        return syncConfigManager.updateSyncConfiguration(syncId, syncData);
     }
 
     /**
@@ -126,7 +157,7 @@ public with sharing class IntegrationSyncController {
             
             // Start the batch process to sync all records
             HistoricalSyncBatch batchProcess = new HistoricalSyncBatch(config.sourceEntity, syncId);
-            Database.executeBatch(batchProcess, 10); // Process 100 records at a time
+            Database.executeBatch(batchProcess, 10); // Process 10 records at a time
             
             return 'Success';
         } catch (Exception e) {

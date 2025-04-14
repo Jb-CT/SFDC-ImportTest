@@ -1,6 +1,6 @@
 @isTest
 private class ConfigTest {
-    
+    static Config config = new Config();
     @isTest
     static void testGetCredentials() {
         // Create test data
@@ -12,26 +12,28 @@ private class ConfigTest {
             CleverTap_API_URL__c = 'https://us1.api.clevertap.com/1/upload'
         );
         insert testConfig;
-        
+
         // Test
         Test.startTest();
-        Map<String, String> credentials = Config.getCredentials();
+         // Create instance
+        Map<String, String> credentials = config.getCredentials();
         Test.stopTest();
-        
+
         // Verify
         System.assertNotEquals(null, credentials, 'Credentials should not be null');
         System.assertEquals('test-account-id', credentials.get('ACCOUNT_ID'), 'Account ID should match');
         System.assertEquals('test-passcode', credentials.get('PASSCODE'), 'Passcode should match');
         System.assertEquals('https://us1.api.clevertap.com/1/upload', credentials.get('API_URL'), 'API URL should match');
     }
-    
+
     @isTest
     static void testGetCredentialsNoData() {
         // Test with no data
         Test.startTest();
-        Map<String, String> credentials = Config.getCredentials();
-        Test.stopTest();
         
+        Map<String, String> credentials = config.getCredentials();
+        Test.stopTest();
+
         // Verify
         System.assertEquals(null, credentials, 'Credentials should be null when no config exists');
     }

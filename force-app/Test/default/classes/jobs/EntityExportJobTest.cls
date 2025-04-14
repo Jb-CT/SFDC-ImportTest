@@ -4,7 +4,6 @@
  */
 @isTest
 private class EntityExportJobTest {
-    
     @testSetup
     static void setupTestData() {
         // Create test account
@@ -126,10 +125,11 @@ private class EntityExportJobTest {
         
         // Set the module in the integration handler
         Test.startTest();
+        IntegrationHandler ihandler = new IntegrationHandler();
         IntegrationHandler.setDIModule(testModule);
         
         // Process the lead through the integration handler
-        IntegrationHandler.processLeads(new List<Lead>{testLead});
+        ihandler.processLeads(new List<Lead>{testLead});
         Test.stopTest();
         
         // Here we can only verify that no exceptions were thrown since

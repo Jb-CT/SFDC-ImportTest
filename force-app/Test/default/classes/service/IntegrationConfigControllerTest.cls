@@ -1,6 +1,5 @@
 @isTest
 private class IntegrationConfigControllerTest {
-    
     @isTest
     static void testGetConfigurations() {
         // Create test data

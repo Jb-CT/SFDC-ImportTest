@@ -1,6 +1,5 @@
 @isTest
 private class HistoricalSyncBatchTest {
-    
     // Set up test data
     @testSetup
     static void setupTestData() {
@@ -310,82 +309,6 @@ private class HistoricalSyncBatchTest {
         List<CleverTap_Event__c> logs = [SELECT Id, Status__c FROM CleverTap_Event__c];
         System.assertNotEquals(0, logs.size(), 'Should create logs for error case');
     }
-    
-    // /**
-    //  * Test with an invalid sync configuration
-    //  */
-    // @isTest
-    // static void testWithInvalidSyncConfig() {
-    //     // Set mock response
-    //     Test.setMock(HttpCalloutMock.class, new MockHttpResponseSuccess());
-        
-    //     // Get test leads
-    //     List<Lead> leads = [SELECT Id, FirstName, LastName, Email, Company, Status, 
-    //                        AnnualRevenue,  LastModifiedDate 
-    //                        FROM Lead LIMIT 1];
-        
-    //     Test.startTest();
-        
-    //     // Create batch instance with invalid ID
-    //     HistoricalSyncBatch batchInstance = new HistoricalSyncBatch('Lead', 'INVALID_ID');
-        
-    //     // Execute with the lead
-    //     batchInstance.execute(null, leads);
-        
-    //     // Call finish
-    //     batchInstance.finish(null);
-        
-    //     Test.stopTest();
-        
-    //     // Verify log creation
-    //     List<CleverTap_Event__c> logs = [SELECT Id FROM CleverTap_Event__c];
-    //     System.assertNotEquals(0, logs.size(), 'Should create logs even with invalid sync config');
-    // }
-    
-    // /**
-    //  * Test with a lead missing critical fields
-    //  */
-    // @isTest
-    // static void testWithIncompleteData() {
-    //     // Get sync config ID
-    //     CleverTap_Sync_Configuration__c syncConfig = [
-    //         SELECT Id FROM CleverTap_Sync_Configuration__c 
-    //         WHERE Name = 'Test Lead Sync' LIMIT 1
-    //     ];
-        
-    //     // Set mock response
-    //     Test.setMock(HttpCalloutMock.class, new MockHttpResponseSuccess());
-        
-    //     // Create a lead with missing email (identity field)
-    //     Lead incompleteLead = new Lead(
-    //         FirstName = 'Incomplete',
-    //         LastName = 'Lead',
-    //         // Missing Email field
-    //         Company = 'Test Company'
-    //     );
-    //     insert incompleteLead;
-        
-    //     // Query the lead back
-    //     List<Lead> leads = [SELECT Id, FirstName, LastName, Company FROM Lead WHERE LastName = 'Lead' LIMIT 1];
-        
-    //     Test.startTest();
-        
-    //     // Create batch instance
-    //     HistoricalSyncBatch batchInstance = new HistoricalSyncBatch('Lead', syncConfig.Id);
-        
-    //     // Execute with the incomplete lead
-    //     batchInstance.execute(null, leads);
-        
-    //     // Call finish
-    //     batchInstance.finish(null);
-        
-    //     Test.stopTest();
-        
-    //     // Verify log creation
-    //     List<CleverTap_Event__c> logs = [SELECT Id FROM CleverTap_Event__c];
-    //     System.assertNotEquals(0, logs.size(), 'Should create logs even with incomplete data');
-    // }
-    
     /**
      * Test with multiple records in a batch
      */

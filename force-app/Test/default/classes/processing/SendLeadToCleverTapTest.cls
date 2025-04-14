@@ -1,6 +1,5 @@
 @isTest
 private class SendLeadToCleverTapTest {
-    
     // Test for insert scenario
     @isTest
     static void testLeadInsert() {

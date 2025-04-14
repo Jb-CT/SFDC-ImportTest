@@ -1,3 +1,3 @@
 trigger SendAccountToCleverTap on Account (after insert, after update) {
-    IntegrationHandler.processAccounts(Trigger.new);
+    IntegrationHandler.getInstance().processAccounts(Trigger.new);
 }

@@ -40,7 +40,7 @@ public class EntityExportJob implements Queueable, Database.AllowsCallouts {
      * @param record A single Salesforce record.
      */
     public EntityExportJob(SObject record) {
-        this(record, new ProductionModule());
+        this(record, new DIModuleMain());
     }
 
     /**
@@ -48,7 +48,7 @@ public class EntityExportJob implements Queueable, Database.AllowsCallouts {
      * @param records A list of Salesforce records of the same type.
      */
     public EntityExportJob(List<SObject> records) {
-        this(records, new ProductionModule());
+        this(records, new DIModuleMain());
     }
 
     /**
@@ -61,7 +61,7 @@ public class EntityExportJob implements Queueable, Database.AllowsCallouts {
         }
         
         // Get the service implementation from the DI module
-        ICleverTapService service = diModule.provideCleverTapService();
+        DataProcessor service = diModule.provideCleverTapService();
         
         // Process one record at a time to avoid mixing callouts and DML
         SObject record = records[0];

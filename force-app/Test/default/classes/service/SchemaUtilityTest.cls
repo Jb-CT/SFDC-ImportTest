@@ -1,11 +1,11 @@
 @isTest
 private class SchemaUtilityTest {
-    
+    static SchemaUtility schemaUtility = new SchemaUtility();
     @isTest
     static void testGetFieldsMap() {
         // Test getting fields map for a standard object
         Test.startTest();
-        Map<String, Schema.SObjectField> leadFields = SchemaUtility.getFieldsMap('Lead');
+        Map<String, Schema.SObjectField> leadFields = schemaUtility.getFieldsMap('Lead');
         Test.stopTest();
         
         // Verify fields map contains expected fields
@@ -18,7 +18,7 @@ private class SchemaUtilityTest {
     static void testGetFieldsMapInvalidObject() {
         // Test getting fields map for an invalid object
         Test.startTest();
-        Map<String, Schema.SObjectField> invalidFields = SchemaUtility.getFieldsMap('InvalidObject');
+        Map<String, Schema.SObjectField> invalidFields = schemaUtility.getFieldsMap('InvalidObject');
         Test.stopTest();
         
         // Verify empty map is returned
@@ -29,7 +29,7 @@ private class SchemaUtilityTest {
     static void testGetFieldDescribe() {
         // Test getting field describe result
         Test.startTest();
-        Schema.DescribeFieldResult emailField = SchemaUtility.getFieldDescribe('Lead', 'Email');
+        Schema.DescribeFieldResult emailField = schemaUtility.getFieldDescribe('Lead', 'Email');
         Test.stopTest();
         
         // Verify field describe
@@ -42,7 +42,7 @@ private class SchemaUtilityTest {
     static void testGetFieldDescribeInvalidField() {
         // Test getting field describe for an invalid field
         Test.startTest();
-        Schema.DescribeFieldResult invalidField = SchemaUtility.getFieldDescribe('Lead', 'InvalidField');
+        Schema.DescribeFieldResult invalidField = schemaUtility.getFieldDescribe('Lead', 'InvalidField');
         Test.stopTest();
         
         // Verify null is returned
@@ -53,7 +53,7 @@ private class SchemaUtilityTest {
     static void testGetObjectDescribe() {
         // Test getting object describe result
         Test.startTest();
-        Schema.DescribeSObjectResult leadDescribe = SchemaUtility.getObjectDescribe('Lead');
+        Schema.DescribeSObjectResult leadDescribe = schemaUtility.getObjectDescribe('Lead');
         Test.stopTest();
         
         // Verify object describe
@@ -66,7 +66,7 @@ private class SchemaUtilityTest {
     static void testGetObjectDescribeInvalidObject() {
         // Test getting object describe for an invalid object
         Test.startTest();
-        Schema.DescribeSObjectResult invalidDescribe = SchemaUtility.getObjectDescribe('InvalidObject');
+        Schema.DescribeSObjectResult invalidDescribe = schemaUtility.getObjectDescribe('InvalidObject');
         Test.stopTest();
         
         // Verify null is returned
@@ -77,7 +77,7 @@ private class SchemaUtilityTest {
     static void testIsFieldAccessible() {
         // Test field accessibility
         Test.startTest();
-        Boolean isAccessible = SchemaUtility.isFieldAccessible('Lead', 'Email');
+        Boolean isAccessible = schemaUtility.isFieldAccessible('Lead', 'Email');
         Test.stopTest();
         
         // Verify accessibility
@@ -88,7 +88,7 @@ private class SchemaUtilityTest {
     static void testIsFieldAccessibleInvalidField() {
         // Test accessibility for invalid field
         Test.startTest();
-        Boolean isAccessible = SchemaUtility.isFieldAccessible('Lead', 'InvalidField');
+        Boolean isAccessible = schemaUtility.isFieldAccessible('Lead', 'InvalidField');
         Test.stopTest();
         
         // Verify result
@@ -99,7 +99,7 @@ private class SchemaUtilityTest {
     static void testGetPicklistValues() {
         // Test getting picklist values
         Test.startTest();
-        List<Map<String, String>> leadStatusOptions = SchemaUtility.getPicklistValues('Lead', 'Status');
+        List<Map<String, String>> leadStatusOptions = schemaUtility.getPicklistValues('Lead', 'Status');
         Test.stopTest();
         
         // Verify picklist values
@@ -116,7 +116,7 @@ private class SchemaUtilityTest {
     static void testGetPicklistValuesNonPicklistField() {
         // Test getting picklist values for a non-picklist field
         Test.startTest();
-        List<Map<String, String>> emailOptions = SchemaUtility.getPicklistValues('Lead', 'Email');
+        List<Map<String, String>> emailOptions = schemaUtility.getPicklistValues('Lead', 'Email');
         Test.stopTest();
         
         // Verify empty list is returned
@@ -127,7 +127,7 @@ private class SchemaUtilityTest {
     static void testGetPicklistValuesInvalidField() {
         // Test getting picklist values for an invalid field
         Test.startTest();
-        List<Map<String, String>> invalidOptions = SchemaUtility.getPicklistValues('Lead', 'InvalidField');
+        List<Map<String, String>> invalidOptions = schemaUtility.getPicklistValues('Lead', 'InvalidField');
         Test.stopTest();
         
         // Verify empty list is returned
@@ -138,7 +138,7 @@ private class SchemaUtilityTest {
     static void testGetAccessibleFields() {
         // Test getting accessible fields
         Test.startTest();
-        List<Map<String, String>> leadFields = SchemaUtility.getAccessibleFields('Lead');
+        List<Map<String, String>> leadFields = schemaUtility.getAccessibleFields('Lead');
         Test.stopTest();
         
         // Verify accessible fields
@@ -155,7 +155,7 @@ private class SchemaUtilityTest {
     static void testGetAccessibleFieldsInvalidObject() {
         // Test getting accessible fields for an invalid object
         Test.startTest();
-        List<Map<String, String>> invalidFields = SchemaUtility.getAccessibleFields('InvalidObject');
+        List<Map<String, String>> invalidFields = schemaUtility.getAccessibleFields('InvalidObject');
         Test.stopTest();
         
         // Verify empty list is returned
@@ -167,9 +167,9 @@ private class SchemaUtilityTest {
         // Test that fields map is cached
         Test.startTest();
         // First call should add to cache
-        Map<String, Schema.SObjectField> firstCall = SchemaUtility.getFieldsMap('Lead');
+        Map<String, Schema.SObjectField> firstCall = schemaUtility.getFieldsMap('Lead');
         // Second call should use cache
-        Map<String, Schema.SObjectField> secondCall = SchemaUtility.getFieldsMap('Lead');
+        Map<String, Schema.SObjectField> secondCall = schemaUtility.getFieldsMap('Lead');
         Test.stopTest();
         
         // Verify both calls return same result
@@ -181,9 +181,9 @@ private class SchemaUtilityTest {
         // Test that object describe is cached
         Test.startTest();
         // First call should add to cache
-        Schema.DescribeSObjectResult firstCall = SchemaUtility.getObjectDescribe('Lead');
+        Schema.DescribeSObjectResult firstCall = schemaUtility.getObjectDescribe('Lead');
         // Second call should use cache
-        Schema.DescribeSObjectResult secondCall = SchemaUtility.getObjectDescribe('Lead');
+        Schema.DescribeSObjectResult secondCall = schemaUtility.getObjectDescribe('Lead');
         Test.stopTest();
         
         // Verify both calls return same result

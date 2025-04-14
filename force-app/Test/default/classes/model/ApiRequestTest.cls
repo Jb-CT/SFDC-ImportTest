@@ -4,7 +4,6 @@
  */
 @isTest
 private class ApiRequestTest {
-    
     /**
      * @description Tests constructor with valid credentials
      */

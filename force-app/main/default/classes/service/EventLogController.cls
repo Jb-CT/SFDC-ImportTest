@@ -3,7 +3,6 @@
  * @description Controller class for handling CleverTap event log operations.
  */
 public with sharing class EventLogController {
-    
     /**
      * @description Gets event logs with optional filtering
      * @param limit The maximum number of records to return

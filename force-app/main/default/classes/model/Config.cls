@@ -1,6 +1,9 @@
 public with sharing class Config {
-    
-    public static Map<String, String> getCredentials() {
+    /**
+     * @description Get CleverTap credentials from the custom setting
+     * @return Map of credential key-value pairs
+     */
+    public Map<String, String> getCredentials() {
         // Ensure the user has read access to CleverTap_Config__c
         if (!Schema.sObjectType.CleverTap_Config__c.isAccessible()) {
             return null;

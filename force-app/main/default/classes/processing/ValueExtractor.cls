@@ -3,15 +3,14 @@
  * @description Helper class for converting Salesforce data to CleverTap format.
  */
 public with sharing class ValueExtractor {
-    
-    private static final String DATE_PREFIX = '$D_';
+    private final String DATE_PREFIX = '$D_';
     /**
      * @description Converts a field value to the appropriate data type for CleverTap
      * @param value The value to convert
      * @param dataType The target data type
      * @return The converted value
      */
-    public static Object convertFieldValue(Object value, String dataType) {
+    public Object convertFieldValue(Object value, String dataType) {
         if (value == null) {
             return null;
         }
@@ -39,7 +38,7 @@ public with sharing class ValueExtractor {
      * @param value The value to convert
      * @return The numeric value
      */
-    private static Decimal convertToNumber(Object value) {
+    private Decimal convertToNumber(Object value) {
         try {
             return Decimal.valueOf(String.valueOf(value));
         } catch (Exception e) {
@@ -52,7 +51,7 @@ public with sharing class ValueExtractor {
      * @param value The value to convert
      * @return The boolean value
      */
-    private static Boolean convertToBoolean(Object value) {
+    private Boolean convertToBoolean(Object value) {
         return Boolean.valueOf(value);
     }
     
@@ -61,7 +60,7 @@ public with sharing class ValueExtractor {
      * @param value The value to convert
      * @return The formatted date value
      */
-    private static String convertToDate(Object value) {
+    private String convertToDate(Object value) {
         if (value instanceof DateTime) {
             DateTime dt = (DateTime)value;
             // Convert to epoch seconds for CleverTap
@@ -79,5 +78,5 @@ public with sharing class ValueExtractor {
             return DATE_PREFIX + v;
         }
         return String.valueOf(value);
-    }    
+    }
 }

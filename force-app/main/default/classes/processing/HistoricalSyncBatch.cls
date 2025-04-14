@@ -1,5 +1,4 @@
 public class HistoricalSyncBatch implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts {
-    
     private String objectName;
     private String syncConfigId;
     private Integer recordsProcessed = 0;
@@ -340,6 +339,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
      * @return Map<String, Object> The profile data
      */
     private Map<String, Object> createProfileData(SObject record, List<CleverTap_Mapping__c> fieldMappings) {
+        ValueExtractor valueExtractor = new ValueExtractor();
         Map<String, Object> profileData = new Map<String, Object>();
         
         for (CleverTap_Mapping__c mapping : fieldMappings) {
@@ -359,7 +359,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             // Get and convert field value
             Object fieldValue = record.get(mapping.Salesforce_Field__c);
             if (fieldValue != null) {
-                Object convertedValue = ValueExtractor.convertFieldValue(
+                Object convertedValue = valueExtractor.convertFieldValue(
                     fieldValue, mapping.Data_Type__c
                 );
                 profileData.put(mapping.CleverTap_Field__c, convertedValue);

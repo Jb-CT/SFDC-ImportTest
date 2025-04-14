@@ -4,7 +4,6 @@
  * Handles CRUD operations for CleverTap_Sync_Configuration__c records.
  */
 public with sharing class SyncConfigurationManager {
-    
     /**
      * @class SyncConfigWrapper
      * @description Wrapper class for CleverTap_Sync_Configuration__c objects
@@ -60,8 +59,7 @@ public with sharing class SyncConfigurationManager {
      * @return List of sync configuration wrappers
      * @throws AuraHandledException If there is an error accessing the data
      */
-    @AuraEnabled(cacheable=true)
-    public static List<SyncConfigWrapper> getSyncConfigurations(String connectionId) {
+    public List<SyncConfigWrapper> getSyncConfigurations(String connectionId) {
         try {
             if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
                 throw new AuraHandledException('You do not have access to sync configurations');
@@ -88,7 +86,7 @@ public with sharing class SyncConfigurationManager {
      * @param configs List of CleverTap_Sync_Configuration__c records
      * @return List of sync configuration wrappers
      */
-    private static List<SyncConfigWrapper> wrapConfigurations(List<CleverTap_Sync_Configuration__c> configs) {
+    private List<SyncConfigWrapper> wrapConfigurations(List<CleverTap_Sync_Configuration__c> configs) {
         List<SyncConfigWrapper> wrappers = new List<SyncConfigWrapper>();
         for (CleverTap_Sync_Configuration__c config : configs) {
             wrappers.add(new SyncConfigWrapper(config));
@@ -102,8 +100,7 @@ public with sharing class SyncConfigurationManager {
      * @return The sync configuration wrapper
      * @throws AuraHandledException If there is an error accessing the data
      */
-    @AuraEnabled(cacheable=true)
-    public static SyncConfigWrapper getSyncConfigurationById(String syncId) {
+    public SyncConfigWrapper getSyncConfigurationById(String syncId) {
         try {
             if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
                 throw new AuraHandledException('You do not have access to sync configurations');
@@ -130,8 +127,7 @@ public with sharing class SyncConfigurationManager {
      * @return The ID of the newly created configuration
      * @throws AuraHandledException If there is an error creating the configuration
      */
-    @AuraEnabled
-    public static String createSyncConfiguration(String syncData) {
+    public String createSyncConfiguration(String syncData) {
         try {
             if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isCreateable()) {
                 throw new AuraHandledException('You do not have permission to create configurations');
@@ -163,8 +159,7 @@ public with sharing class SyncConfigurationManager {
      * @return The updated sync configuration wrapper
      * @throws AuraHandledException If there is an error updating the configuration
      */
-    @AuraEnabled
-    public static SyncConfigWrapper updateSyncConfiguration(String syncId, String syncData) {
+    public SyncConfigWrapper updateSyncConfiguration(String syncId, String syncData) {
         try {
             if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
                 throw new AuraHandledException('You do not have permission to update configurations');
@@ -198,8 +193,7 @@ public with sharing class SyncConfigurationManager {
      * @param status The new status (Active/Inactive)
      * @throws AuraHandledException If there is an error updating the status
      */
-    @AuraEnabled
-    public static void updateSyncStatus(String syncId, String status) {
+    public void updateSyncStatus(String syncId, String status) {
         try {
             if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
                 throw new AuraHandledException('You do not have permission to update configurations');
@@ -220,8 +214,7 @@ public with sharing class SyncConfigurationManager {
      * @param syncId The ID of the sync configuration to delete
      * @throws AuraHandledException If there is an error deleting the configuration
      */
-    @AuraEnabled
-    public static void deleteSyncConfiguration(String syncId) {
+    public void deleteSyncConfiguration(String syncId) {
         try {
             if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {
                 throw new AuraHandledException('You do not have permission to delete configurations');
