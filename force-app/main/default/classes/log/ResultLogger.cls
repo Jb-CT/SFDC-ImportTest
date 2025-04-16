@@ -26,79 +26,110 @@ public with sharing class ResultLogger {
             this.requestBody = requestBody;
         }
     }
+    
     /**
      * @description Logs a CleverTap integration event
      * @param eventData The event data to log
      */
     public void logEvent(EventData eventData) {
         try {
-            // Check if we have create permission on CleverTap_Event__c
-            if (!Schema.sObjectType.CleverTap_Event__c.isCreateable()) {
+            // Check permissions
+            if (!canCreateEventLog()) {
                 return;
             }
             
-            // Determine real success status based on both HTTP status and response content
-            Boolean isSuccess = false;
-            String responseBody = '';
+            // Determine success status
+            Boolean isSuccess = determineSuccessStatus(eventData);
             
-            if (eventData.response != null) {
-                responseBody = eventData.response.getBody();
-                
-                // First check HTTP status
-                if (eventData.response.getStatusCode() == 200) {
-                    // Then check response content for API success
-                    try {
-                        Map<String, Object> responseMap = (Map<String, Object>)JSON.deserializeUntyped(responseBody);
-                        if (responseMap.containsKey('status')) {
-                            isSuccess = 'success'.equalsIgnoreCase((String)responseMap.get('status'));
-                        }
-                    } catch (Exception e) {
-                        // If can't parse JSON, default to HTTP status
-                        isSuccess = true;
-                    }
+            // Create and populate event log
+            CleverTap_Event__c eventLog = createEventLog(eventData, isSuccess);
+
+            // Check if we have create permission on CleverTap_Event__c
+            if (!Schema.sObjectType.CleverTap_Event__c.isCreateable()) {
+                return;
                 }
-            }
             
-            // Create fields map dynamically
-            Map<String, Object> fieldsMap = new Map<String, Object>{
-                'Status__c' => isSuccess ? 'Success' : 'Failed',
-                'Response__c' => responseBody != '' 
-                    ? responseBody + '\nRequest: ' + eventData.requestBody 
-                    : eventData.requestBody
-            };
-            
-            // Add the record ID to the appropriate field based on type
-            String fieldName = eventData.recordType + '__c';
-            
-            if (hasField(CleverTap_Event__c.SObjectType, fieldName)) {
-                fieldsMap.put(fieldName, eventData.recordId);
-            } else {
-                // Fallback - store record ID in description
-                fieldsMap.put('Response__c', eventData.recordType + ' ID: ' + eventData.recordId + '\n' + fieldsMap.get('Response__c'));
-            }
-            
-            // Create the record using the dynamic fields map
-            CleverTap_Event__c eventLog = new CleverTap_Event__c();
-            for (String fName : fieldsMap.keySet()) {
-                eventLog.put(fName, fieldsMap.get(fName));
-            }
-            
+            // Insert the log
             insert eventLog;
         } catch (Exception e) {
-            // Log the error since we can't propagate it
-            //System.debug(LoggingLevel.ERROR, 'Error logging CleverTap event: ' + e.getMessage());
-            //System.debug(LoggingLevel.ERROR, 'Stack trace: ' + e.getStackTraceString());
+            logError(e);
         }
     }
-    
-    /**
-     * @description Checks if an SObject type has a specific field
-     * @param sObjType The SObject type to check
-     * @param fieldName The field name to check for
-     * @return True if the field exists, false otherwise
-     */
+
+    private Boolean canCreateEventLog() {
+        return Schema.sObjectType.CleverTap_Event__c.isCreateable();
+    }
+
+    private Boolean determineSuccessStatus(EventData eventData) {
+        if (eventData.response == null) {
+            return false;
+        }
+        
+        if (eventData.response.getStatusCode() != 200) {
+            return false;
+        }
+        
+        return isSuccessResponse(eventData.response.getBody());
+    }
+
+    private Boolean isSuccessResponse(String responseBody) {
+        if (String.isBlank(responseBody)) {
+            return false;
+        }
+        
+        try {
+            Map<String, Object> responseMap = (Map<String, Object>)JSON.deserializeUntyped(responseBody);
+            if (responseMap.containsKey('status')) {
+                return 'success'.equalsIgnoreCase((String)responseMap.get('status'));
+            }
+        } catch (Exception e) {
+            // If can't parse JSON, default to HTTP status
+            return true;
+        }
+        
+        return false;
+    }
+
+    private CleverTap_Event__c createEventLog(EventData eventData, Boolean isSuccess) {
+        CleverTap_Event__c eventLog = new CleverTap_Event__c();
+        eventLog.Status__c = isSuccess ? 'Success' : 'Failed';
+        
+        String responseBody = (eventData.response != null) ? eventData.response.getBody() : '';
+        eventLog.Response__c = formatResponseContent(responseBody, eventData.requestBody);
+        
+        setRecordReference(eventLog, eventData);
+        
+        return eventLog;
+    }
+
+    private String formatResponseContent(String responseBody, String requestBody) {
+        if (String.isBlank(responseBody)) {
+            return requestBody;
+        }
+        
+        return responseBody + '\nRequest: ' + requestBody;
+    }
+
+    private void setRecordReference(CleverTap_Event__c eventLog, EventData eventData) {
+        String fieldName = eventData.recordType + '__c';
+        
+        if (hasField(CleverTap_Event__c.SObjectType, fieldName)) {
+            eventLog.put(fieldName, eventData.recordId);
+        } else {
+            // Fallback - store record ID in description
+            eventLog.Response__c = eventData.recordType + ' ID: ' + eventData.recordId + '\n' + eventLog.Response__c;
+        }
+    }
+
     private Boolean hasField(Schema.SObjectType sObjType, String fieldName) {
         Map<String, Schema.SObjectField> fieldMap = sObjType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
         return fieldMap.containsKey(fieldName);
+    }
+
+    private void logError(Exception e) {
+        // These debug statements provide essential troubleshooting information
+        // and are only visible when appropriate debug levels are enabled
+        System.debug(LoggingLevel.ERROR, 'Error logging CleverTap event: ' + e.getMessage());
+        System.debug(LoggingLevel.ERROR, 'Stack trace: ' + e.getStackTraceString());
     }
 }

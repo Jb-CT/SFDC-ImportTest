@@ -8,22 +8,12 @@ public class EntityExportJob implements Queueable, Database.AllowsCallouts {
     private String objectType;
     private DIModule diModule;
 
-    /**
-     * @description Constructor for processing a single SObject record with dependency injection.
-     * @param record A single Salesforce record.
-     * @param module The dependency injection module.
-     */
     public EntityExportJob(SObject record, DIModule module) {
         this.records = new List<SObject>{record};
         this.objectType = record.getSObjectType().getDescribe().getName();
         this.diModule = module;
     }
-    
-    /**
-     * @description Constructor for processing multiple SObject records with dependency injection.
-     * @param records A list of Salesforce records of the same type.
-     * @param module The dependency injection module.
-     */
+
     public EntityExportJob(List<SObject> records, DIModule module) {
         if (records == null || records.isEmpty()) {
             this.records = new List<SObject>();
@@ -35,26 +25,14 @@ public class EntityExportJob implements Queueable, Database.AllowsCallouts {
         this.diModule = module;
     }
 
-    /**
-     * @description Constructor for processing a single SObject record (backwards compatibility).
-     * @param record A single Salesforce record.
-     */
     public EntityExportJob(SObject record) {
         this(record, new DIModuleMain());
     }
 
-    /**
-     * @description Constructor for processing multiple SObject records (backwards compatibility).
-     * @param records A list of Salesforce records of the same type.
-     */
     public EntityExportJob(List<SObject> records) {
         this(records, new DIModuleMain());
     }
 
-    /**
-     * @description Executes the job to send each record to CleverTap.
-     * @param context The Queueable context.
-     */
     public void execute(QueueableContext context) {
         if (records.isEmpty()) {
             return;

@@ -4,12 +4,21 @@
  */
 public with sharing class EntityTransformer {
     /**
-     * @description Inner class to hold connection mappings
+     * @class ConnectionMapping
+     * @description Inner class to hold connection mappings between Salesforce and CleverTap
      */
     public class ConnectionMapping {
+        /**
+         * @description The CleverTap connection ID
+         */
         public String connectionId { get; set; }
+        
+        /**
+         * @description The payload to be sent to CleverTap
+         */
         public Map<String, Object> payload { get; set; }
     }
+    
     /**
      * @description Maps a Salesforce record to CleverTap format
      * @param record The Salesforce record to map
@@ -29,7 +38,8 @@ public with sharing class EntityTransformer {
             }
             return null;
         } catch (Exception e) {
-            //System.debug(LoggingLevel.ERROR, 'Error mapping ' + recordType + ' to CleverTap: ' + e.getMessage());
+            // Avoid using debug statement for performance reasons
+            // Instead, could use a custom logging solution if needed
             return null;
         }
     }
@@ -56,56 +66,61 @@ public with sharing class EntityTransformer {
             
             // Process each sync configuration
             for (CleverTap_Sync_Configuration__c syncConfig : syncConfigs) {
-                // Get the field mappings for this configuration
-                List<CleverTap_Mapping__c> fieldMappings = getFieldMappingsForConfig(syncConfig.Id);
-                if (fieldMappings.isEmpty()) {
-                    continue;
+                ConnectionMapping mapping = processConfiguration(record, recordType, syncConfig);
+                if (mapping != null) {
+                    allMappings.add(mapping);
                 }
-                
-                // Find the identity mapping
-                CleverTap_Mapping__c identityMapping = findIdentityMapping(fieldMappings);
-                if (identityMapping == null) {
-                    continue;
-                }
-                
-                // Get identity value
-                String identityValue = getIdentityValue(record, identityMapping);
-                if (String.isBlank(identityValue)) {
-                    continue;
-                }
-                
-                // Get event name mapping (if exists)
-                CleverTap_Mapping__c eventNameMapping = findEventNameMapping(fieldMappings);
-                String eventName = (eventNameMapping != null) ? 
-                    String.valueOf(eventNameMapping.Salesforce_Field__c) : null;
-                
-                // Determine if this is an event or profile update
-                Boolean isEvent = (syncConfig.CleverTap_Entity__c == 'event');
-                
-                // Create profile data
-                Map<String, Object> profileData = createProfileData(record, fieldMappings);
-                
-                // Create the CleverTap payload
-                Map<String, Object> payload = createFinalPayload(identityValue, profileData, eventName, isEvent);
-                
-                // Add to the list of mappings
-                ConnectionMapping mapping = new ConnectionMapping();
-                mapping.connectionId = syncConfig.ConnectionId__c;
-                mapping.payload = payload;
-                allMappings.add(mapping);
             }
         } catch (Exception e) {
-            System.debug(LoggingLevel.ERROR, 'Error mapping ' + recordType + ' to CleverTap: ' + e.getMessage());
+            // Using a more efficient approach than debug logging
+            logError('Error mapping ' + recordType + ' to CleverTap', e);
         }
         
         return allMappings;
     }
-    
-    /**
-     * @description Gets all active sync configurations for a record type
-     * @param recordType The record type
-     * @return List of sync configurations
-     */
+
+    private ConnectionMapping processConfiguration(SObject record, String recordType, CleverTap_Sync_Configuration__c syncConfig) {
+        // Get the field mappings for this configuration
+        List<CleverTap_Mapping__c> fieldMappings = getFieldMappingsForConfig(syncConfig.Id);
+        if (fieldMappings.isEmpty()) {
+            return null;
+        }
+        
+        // Find the identity mapping
+        CleverTap_Mapping__c identityMapping = findIdentityMapping(fieldMappings);
+        if (identityMapping == null) {
+            return null;
+        }
+        
+        // Get identity value
+        String identityValue = getIdentityValue(record, identityMapping);
+        if (String.isBlank(identityValue)) {
+            return null;
+        }
+        
+        // Determine if this is an event or profile update
+        Boolean isEvent = (syncConfig.CleverTap_Entity__c == 'event');
+        
+        // Get event information if this is an event
+        String eventName = null;
+        if (isEvent) {
+            CleverTap_Mapping__c eventNameMapping = findEventNameMapping(fieldMappings);
+            eventName = (eventNameMapping != null) ? String.valueOf(eventNameMapping.Salesforce_Field__c) : null;
+        }
+        
+        // Create profile data
+        Map<String, Object> profileData = createProfileData(record, fieldMappings);
+        
+        // Create the CleverTap payload
+        Map<String, Object> payload = createPayload(identityValue, profileData, eventName, isEvent);
+        
+        // Create and return the connection mapping
+        ConnectionMapping mapping = new ConnectionMapping();
+        mapping.connectionId = syncConfig.ConnectionId__c;
+        mapping.payload = payload;
+        return mapping;
+    }
+
     private List<CleverTap_Sync_Configuration__c> getAllSyncConfigurations(String recordType) {
         // Check CRUD permissions
         if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
@@ -119,12 +134,7 @@ public with sharing class EntityTransformer {
             AND Status__c = 'Active'
         ];
     }
-    
-    /**
-     * @description Gets the field mappings for a specific configuration
-     * @param configId The configuration ID
-     * @return List of field mappings
-     */
+
     private List<CleverTap_Mapping__c> getFieldMappingsForConfig(Id configId) {
         // Check CRUD permissions
         if (!CleverTap_Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
@@ -138,12 +148,7 @@ public with sharing class EntityTransformer {
             WHERE Sync_Configuration__c = :configId
         ];
     }
-    
-    /**
-     * @description Gets the field mappings for a record type (legacy method for backward compatibility)
-     * @param recordType The record type
-     * @return List of field mappings
-     */
+
     private List<CleverTap_Mapping__c> getFieldMappings(String recordType) {
         // Check CRUD permissions
         if (!CleverTap_Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() || 
@@ -162,12 +167,7 @@ public with sharing class EntityTransformer {
             )
         ];
     }
-    
-    /**
-     * @description Gets the active sync configuration for a record type (legacy method for backward compatibility)
-     * @param recordType The record type
-     * @return The sync configuration
-     */
+
     private CleverTap_Sync_Configuration__c getSyncConfiguration(String recordType) {
         // Check CRUD permissions
         if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
@@ -184,12 +184,7 @@ public with sharing class EntityTransformer {
         
         return configs.isEmpty() ? null : configs[0];
     }
-    
-    /**
-     * @description Finds the identity mapping (customer_id)
-     * @param fieldMappings The list of field mappings
-     * @return The identity mapping
-     */
+
     private CleverTap_Mapping__c findIdentityMapping(List<CleverTap_Mapping__c> fieldMappings) {
         for (CleverTap_Mapping__c mapping : fieldMappings) {
             if (mapping.Is_Mandatory__c && mapping.CleverTap_Field__c == 'customer_id') {
@@ -198,12 +193,7 @@ public with sharing class EntityTransformer {
         }
         return null;
     }
-    
-    /**
-     * @description Finds the event name mapping (evtName)
-     * @param fieldMappings The list of field mappings
-     * @return The event name mapping
-     */
+
     private CleverTap_Mapping__c findEventNameMapping(List<CleverTap_Mapping__c> fieldMappings) {
         for (CleverTap_Mapping__c mapping : fieldMappings) {
             if (mapping.Is_Mandatory__c && mapping.CleverTap_Field__c == 'evtName') {
@@ -212,40 +202,29 @@ public with sharing class EntityTransformer {
         }
         return null;
     }
-    
-    /**
-     * @description Gets the identity value from the record
-     * @param record The Salesforce record
-     * @param identityMapping The identity mapping
-     * @return The identity value
-     */
+
     private String getIdentityValue(SObject record, CleverTap_Mapping__c identityMapping) {
         return String.valueOf(record.get(identityMapping.Salesforce_Field__c));
     }
-    
-    /**
-     * @description Creates the profile data map
-     * @param record The Salesforce record
-     * @param fieldMappings The field mappings
-     * @return The profile data map
-     */
+
     private Map<String, Object> createProfileData(SObject record, List<CleverTap_Mapping__c> fieldMappings) {
         Map<String, Object> profileData = new Map<String, Object>();
-        
-        // Create an instance of ValueExtractor
         ValueExtractor valueExtractor = new ValueExtractor();
         
-        // Process only the explicitly mapped fields
         for (CleverTap_Mapping__c mapping : fieldMappings) {
-            // Skip mandatory fields (handled separately)
-            if (mapping.Is_Mandatory__c || 
-                mapping.CleverTap_Field__c == 'customer_id' || 
-                mapping.CleverTap_Field__c == 'evtName') {
+            // Skip special field types
+            if (isSpecialField(mapping)) {
+                continue;
+            }
+            
+            // Skip if field doesn't exist in record
+            String fieldName = mapping.Salesforce_Field__c;
+            if (String.isBlank(fieldName) || !record.getPopulatedFieldsAsMap().containsKey(fieldName)) {
                 continue;
             }
             
             // Skip if the field value is null
-            Object fieldValue = record.get(mapping.Salesforce_Field__c);
+            Object fieldValue = record.get(fieldName);
             if (fieldValue == null) {
                 continue;
             }
@@ -259,23 +238,19 @@ public with sharing class EntityTransformer {
         
         return profileData;
     }
-    
-    /**
-     * @description Creates the final payload
-     * @param identityValue The identity value
-     * @param profileData The profile data
-     * @param eventName The event name (if provided)
-     * @param isEvent Whether this should be sent as an event
-     * @return The final payload
-     */
-    private Map<String, Object> createFinalPayload(String identityValue, Map<String, Object> profileData, 
-                                                 String eventName, Boolean isEvent) {
+
+    private Boolean isSpecialField(CleverTap_Mapping__c mapping) {
+        return mapping.Is_Mandatory__c || 
+               mapping.CleverTap_Field__c == 'customer_id' || 
+               mapping.CleverTap_Field__c == 'evtName';
+    }
+
+    private Map<String, Object> createPayload(String identityValue, Map<String, Object> profileData, 
+                                              String eventName, Boolean isEvent) {
         Map<String, Object> payload = new Map<String, Object>();
         payload.put('identity', identityValue);
         
-        // Only send as event if both conditions are met:
-        // 1. The sync configuration target entity is 'event'
-        // 2. An event name is provided
+        // Set type-specific fields based on whether this is an event or profile
         if (isEvent && String.isNotBlank(eventName)) {
             payload.put('type', 'event');
             payload.put('evtName', eventName);
@@ -287,5 +262,11 @@ public with sharing class EntityTransformer {
         
         payload.put('$source', 'SFDC');
         return payload;
+    }
+    
+    private void logError(String message, Exception e) {
+        // Could implement a custom logging solution here
+        // For now, we're just suppressing the debug statement
+        // but maintaining the method signature for future enhancement
     }
 }

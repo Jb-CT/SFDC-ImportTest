@@ -9,40 +9,13 @@ public with sharing class SyncConfigurationManager {
      * @description Wrapper class for CleverTap_Sync_Configuration__c objects
      */
     public class SyncConfigWrapper {
-        /**
-         * @description The ID of the sync configuration
-         */
         @AuraEnabled public String id { get; set; }
-        
-        /**
-         * @description The name of the sync configuration
-         */
         @AuraEnabled public String name { get; set; }
-        
-        /**
-         * @description The type of sync (e.g., salesforce_to_clevertap)
-         */
         @AuraEnabled public String syncType { get; set; }
-        
-        /**
-         * @description The source entity (e.g., Contact, Lead)
-         */
         @AuraEnabled public String sourceEntity { get; set; }
-        
-        /**
-         * @description The target entity (e.g., profile, event)
-         */
         @AuraEnabled public String targetEntity { get; set; }
-        
-        /**
-         * @description The status of the sync configuration (Active/Inactive)
-         */
         @AuraEnabled public String status { get; set; }
-        
-        /**
-         * @description Constructor to create a wrapper from a sync configuration
-         * @param config The CleverTap_Sync_Configuration__c record
-         */
+
         public SyncConfigWrapper(CleverTap_Sync_Configuration__c config) {
             this.id = config.Id;
             this.name = config.Name;
@@ -52,13 +25,7 @@ public with sharing class SyncConfigurationManager {
             this.status = config.Status__c;
         }
     }
-    
-    /**
-     * @description Gets all sync configurations for a specific connection
-     * @param connectionId The ID of the connection
-     * @return List of sync configuration wrappers
-     * @throws AuraHandledException If there is an error accessing the data
-     */
+
     public List<SyncConfigWrapper> getSyncConfigurations(String connectionId) {
         try {
             if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
@@ -93,13 +60,7 @@ public with sharing class SyncConfigurationManager {
         }
         return wrappers;
     }
-    
-    /**
-     * @description Gets a sync configuration by ID
-     * @param syncId The ID of the sync configuration
-     * @return The sync configuration wrapper
-     * @throws AuraHandledException If there is an error accessing the data
-     */
+
     public SyncConfigWrapper getSyncConfigurationById(String syncId) {
         try {
             if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
@@ -120,13 +81,7 @@ public with sharing class SyncConfigurationManager {
             throw new AuraHandledException('Error fetching sync configuration: ' + e.getMessage());
         }
     }
-    
-    /**
-     * @description Creates a new sync configuration
-     * @param syncData JSON string containing sync configuration data
-     * @return The ID of the newly created configuration
-     * @throws AuraHandledException If there is an error creating the configuration
-     */
+
     public String createSyncConfiguration(String syncData) {
         try {
             if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isCreateable()) {
@@ -151,14 +106,7 @@ public with sharing class SyncConfigurationManager {
             throw new AuraHandledException('Error creating sync configuration: ' + e.getMessage());
         }
     }
-    
-    /**
-     * @description Updates a sync configuration
-     * @param syncId The ID of the sync configuration to update
-     * @param syncData JSON string containing updated sync configuration data
-     * @return The updated sync configuration wrapper
-     * @throws AuraHandledException If there is an error updating the configuration
-     */
+
     public SyncConfigWrapper updateSyncConfiguration(String syncId, String syncData) {
         try {
             if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
@@ -186,13 +134,7 @@ public with sharing class SyncConfigurationManager {
             throw new AuraHandledException('Error updating sync configuration: ' + e.getMessage());
         }
     }
-    
-    /**
-     * @description Updates the status of a sync configuration
-     * @param syncId The ID of the sync configuration
-     * @param status The new status (Active/Inactive)
-     * @throws AuraHandledException If there is an error updating the status
-     */
+
     public void updateSyncStatus(String syncId, String status) {
         try {
             if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
@@ -208,12 +150,7 @@ public with sharing class SyncConfigurationManager {
             throw new AuraHandledException('Error updating sync status: ' + e.getMessage());
         }
     }
-    
-    /**
-     * @description Deletes a sync configuration
-     * @param syncId The ID of the sync configuration to delete
-     * @throws AuraHandledException If there is an error deleting the configuration
-     */
+
     public void deleteSyncConfiguration(String syncId) {
         try {
             if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {

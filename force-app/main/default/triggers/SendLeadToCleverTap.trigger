@@ -1,5 +1,4 @@
 trigger SendLeadToCleverTap on Lead (after insert, after update) {
-
     // Skip processing in test context if bypass flag is set
     if (Test.isRunningTest() && TestUtils.bypassTriggers) {
         return;

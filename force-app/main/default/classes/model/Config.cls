@@ -1,3 +1,8 @@
+/**
+ * @class Config
+ * @description This class is responsible for retrieving CleverTap credentials from the CleverTap_Config__c custom setting.
+ * It ensures proper field-level access and returns a map containing configuration key-value pairs used for integration with CleverTap.
+ */
 public with sharing class Config {
     /**
      * @description Get CleverTap credentials from the custom setting
@@ -26,7 +31,7 @@ public with sharing class Config {
 
         Map<String, String> credentials = new Map<String, String>{
             'NAME'       => config.Name,
-            'DEV_NAME'   => config.Name, // Custom objects don't have DeveloperName
+            'DEV_NAME'   => config.Name, 
             'API_URL'    => config.CleverTap_API_URL__c,
             'ACCOUNT_ID' => config.CleverTap_Account_ID__c,
             'PASSCODE'   => config.CleverTap_Passcode__c,

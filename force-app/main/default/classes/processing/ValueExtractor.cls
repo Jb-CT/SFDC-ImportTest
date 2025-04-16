@@ -3,7 +3,7 @@
  * @description Helper class for converting Salesforce data to CleverTap format.
  */
 public with sharing class ValueExtractor {
-    private final String DATE_PREFIX = '$D_';
+    private final String datePrefix = '$D_';
     /**
      * @description Converts a field value to the appropriate data type for CleverTap
      * @param value The value to convert
@@ -32,12 +32,7 @@ public with sharing class ValueExtractor {
             }
         }
     }
-    
-    /**
-     * @description Converts a value to a number
-     * @param value The value to convert
-     * @return The numeric value
-     */
+
     private Decimal convertToNumber(Object value) {
         try {
             return Decimal.valueOf(String.valueOf(value));
@@ -45,27 +40,17 @@ public with sharing class ValueExtractor {
             return 0;
         }
     }
-    
-    /**
-     * @description Converts a value to a boolean
-     * @param value The value to convert
-     * @return The boolean value
-     */
+
     private Boolean convertToBoolean(Object value) {
         return Boolean.valueOf(value);
     }
-    
-    /**
-     * @description Converts a value to a CleverTap date format
-     * @param value The value to convert
-     * @return The formatted date value
-     */
+
     private String convertToDate(Object value) {
         if (value instanceof DateTime) {
             DateTime dt = (DateTime)value;
             // Convert to epoch seconds for CleverTap
             Long v = dt.getTime() / 1000;
-            return DATE_PREFIX + v;
+            return datePrefix + v;
         } else if (value instanceof Date) {
             Date dateValue = (Date)value;
             // Convert Date to DateTime at midnight, then to epoch seconds
@@ -75,7 +60,7 @@ public with sharing class ValueExtractor {
                 dateValue.day()
             );
             Long v = dt.getTime() / 1000;
-            return DATE_PREFIX + v;
+            return datePrefix + v;
         }
         return String.valueOf(value);
     }

@@ -3,17 +3,29 @@
  * @description Production implementation of DIModule
  */
 public class DIModuleMain implements DIModule {
-    // Singleton instance
-    private static DataProcessor serviceInstance;
-    
-    /**
-     * @description Provides the CleverTap service implementation
-     * @return DataProcessor A singleton instance of the CleverTap service
-     */
+    private static DataProcessor dataProcessor;
+
     public DataProcessor provideCleverTapService() {
-        if (serviceInstance == null) {
-            serviceInstance = new DataProcessorImpl();
+        if (dataProcessor == null) {
+
+            EntityTransformer entityTransformer = provideEntityTransformer();
+            Config config = provideConfig();
+            ResultLogger resultLogger = provideResultLogger();
+
+            dataProcessor = new DataProcessorImpl(entityTransformer, config, resultLogger);
         }
-        return serviceInstance;
+        return dataProcessor;
+    }
+
+    private EntityTransformer provideEntityTransformer(){
+        return new EntityTransformer();
+    }
+
+    private Config provideConfig(){
+        return new Config();
+    }
+
+    private ResultLogger provideResultLogger(){
+        return new ResultLogger();
     }
 }

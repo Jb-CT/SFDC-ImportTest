@@ -9,20 +9,12 @@ public with sharing class SchemaUtility {
     
     // Cache for object describe results
     private Map<String, Schema.DescribeSObjectResult> objectDescribeCache;
-    
-    /**
-     * @description Constructor initializes the cache maps
-     */
+
     public SchemaUtility() {
         this.objectFieldsCache = new Map<String, Map<String, Schema.SObjectField>>();
         this.objectDescribeCache = new Map<String, Schema.DescribeSObjectResult>();
     }
-    
-    /**
-     * @description Get the fields map for an object with caching
-     * @param objectName API name of the object
-     * @return Map of field name to SObjectField
-     */
+
     public Map<String, Schema.SObjectField> getFieldsMap(String objectName) {
         // Check cache first
         if (objectFieldsCache.containsKey(objectName)) {
@@ -41,13 +33,7 @@ public with sharing class SchemaUtility {
         
         return fieldsMap;
     }
-    
-    /**
-     * @description Get a specific field describe result with caching
-     * @param objectName API name of the object
-     * @param fieldName API name of the field
-     * @return DescribeFieldResult for the field, or null if not found
-     */
+
     public Schema.DescribeFieldResult getFieldDescribe(String objectName, String fieldName) {
         Map<String, Schema.SObjectField> fieldsMap = getFieldsMap(objectName);
         Schema.SObjectField field = fieldsMap.get(fieldName);
@@ -58,12 +44,7 @@ public with sharing class SchemaUtility {
         
         return field.getDescribe();
     }
-    
-    /**
-     * @description Get an object describe result with caching
-     * @param objectName API name of the object
-     * @return DescribeSObjectResult for the object, or null if not found
-     */
+
     public Schema.DescribeSObjectResult getObjectDescribe(String objectName) {
         // Check cache first
         if (objectDescribeCache.containsKey(objectName)) {
@@ -82,24 +63,12 @@ public with sharing class SchemaUtility {
         
         return describeResult;
     }
-    
-    /**
-     * @description Check if a field is accessible to the current user
-     * @param objectName API name of the object
-     * @param fieldName API name of the field
-     * @return True if the field is accessible, false otherwise
-     */
+
     public Boolean isFieldAccessible(String objectName, String fieldName) {
         Schema.DescribeFieldResult fieldDescribe = getFieldDescribe(objectName, fieldName);
         return (fieldDescribe != null && fieldDescribe.isAccessible());
     }
-    
-    /**
-     * @description Get picklist values for a field
-     * @param objectName API name of the object
-     * @param fieldName API name of the field
-     * @return List of maps with label and value keys
-     */
+
     public List<Map<String, String>> getPicklistValues(String objectName, String fieldName) {
         Schema.DescribeFieldResult fieldDescribe = getFieldDescribe(objectName, fieldName);
         if (fieldDescribe == null || !fieldDescribe.isAccessible()) {
@@ -116,12 +85,7 @@ public with sharing class SchemaUtility {
         
         return options;
     }
-    
-    /**
-     * @description Get all accessible fields for an object
-     * @param objectName API name of the object
-     * @return List of maps with label and value keys
-     */
+
     public List<Map<String, String>> getAccessibleFields(String objectName) {
         List<Map<String, String>> fields = new List<Map<String, String>>();
         Map<String, Schema.SObjectField> fieldsMap = getFieldsMap(objectName);

@@ -10,22 +10,14 @@ public with sharing class DataProcessorImpl implements DataProcessor {
     // Instance variables for the helper classes
     private EntityTransformer entityTransformer;
     private Config configHelper;
-    private ResultLogger ResultLogger;
-    
-    /**
-     * @description Constructor initializes the required helper class instances
-     */
-    public DataProcessorImpl() {
-        this.entityTransformer = new EntityTransformer();
-        this.configHelper = new Config();
-        this.ResultLogger = new ResultLogger();
+    private ResultLogger resultLogger;
+
+    public DataProcessorImpl(EntityTransformer entityTransformer,Config configHelper,ResultLogger resultLogger) {
+        this.entityTransformer = entityTransformer;
+        this.configHelper = configHelper;
+        this.resultLogger = resultLogger;
     }
-    
-    /**
-     * @description Sends a Salesforce record to CleverTap.
-     * @param record The Salesforce record to be sent.
-     * @param recordType The type of record being sent ('Lead', 'Contact', 'Account', 'Opportunity').
-     */
+
     public void sendToCleverTap(SObject record, String recordType) {
         if (record == null) {
             return;
@@ -108,13 +100,7 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         
         return configs[0].CleverTap_Entity__c;
     }
-    
-    /**
-     * @description Adjusts the API endpoint in credentials based on target entity type
-     * @param credentials The original credentials
-     * @param targetEntityType The target entity type
-     * @return Updated credentials with correct API endpoint
-     */
+
     private Map<String, String> adjustApiEndpoint(Map<String, String> credentials, String targetEntityType) {
         Map<String, String> adjustedCredentials = new Map<String, String>(credentials);
         
@@ -138,54 +124,27 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         
         return adjustedCredentials;
     }
-    
-    /**
-     * @description Wrapper method for sending Lead records to CleverTap.
-     * @param lead The Lead record to be sent to CleverTap.
-     */
+
     public void sendLeadToCleverTap(Lead lead) {
         sendToCleverTap(lead, 'Lead');
     }
-    
-    /**
-     * @description Wrapper method for sending Contact records to CleverTap.
-     * @param contact The Contact record to be sent to CleverTap.
-     */
+
     public void sendContactToCleverTap(Contact contact) {
         sendToCleverTap(contact, 'Contact');
     }
-    
-    /**
-     * @description Wrapper method for sending Account records to CleverTap.
-     * @param account The Account record to be sent to CleverTap.
-     */
+
     public void sendAccountToCleverTap(Account account) {
         sendToCleverTap(account, 'Account');
     }
-    
-    /**
-     * @description Wrapper method for sending Opportunity records to CleverTap.
-     * @param opportunity The Opportunity record to be sent to CleverTap.
-     */
+
     public void sendOpportunityToCleverTap(Opportunity opportunity) {
         sendToCleverTap(opportunity, 'Opportunity');
     }
-    
-    /**
-     * @description Checks if the configuration object is accessible
-     * @return True if accessible, false otherwise
-     * This method checks whether the CleverTap Sync Configuration object (CleverTap_Sync_Configuration__c) 
-     * is accessible to the current Salesforce user.
-     */
+
     private Boolean isConfigurationAccessible() {
         return CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible();
     }
-    
-    /**
-     * @description Checks if a sync configuration exists for the record type
-     * @param recordType The record type to check
-     * @return True if configuration exists, false otherwise
-     */
+
     private Boolean hasSyncConfiguration(String recordType) {
         // Validate CRUD permission before SOQL operation
         if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
@@ -200,34 +159,18 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         ];
         return !syncConfigs.isEmpty();
     }
-    
-    /**
-     * @description Checks if the credentials are valid
-     * @param credentials The credentials to check
-     * @return True if valid, false otherwise
-     */
+
     private Boolean areCredentialsValid(Map<String, String> credentials) {
         return (credentials != null && !credentials.isEmpty());
     }
-    
-    /**
-     * @description Gets the request body as JSON
-     * @param mappedRecord The mapped record
-     * @return The JSON request body
-     */
+
     private String getRequestBody(Map<String, Object> mappedRecord) {
         Map<String, Object> payload = new Map<String, Object>{
             'd' => new List<Map<String, Object>>{mappedRecord}
         };
         return JSON.serialize(payload);
     }
-    
-    /**
-     * @description Sends the HTTP request to CleverTap
-     * @param credentials The API credentials
-     * @param mappedRecord The record to send
-     * @return The HTTP response
-     */
+
     private HttpResponse sendRequest(Map<String, String> credentials, Map<String, Object> mappedRecord) {
         String jsonBody = getRequestBody(mappedRecord);
         
@@ -242,12 +185,7 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         Http http = new Http();
         return http.send(req);
     }
-    
-    /**
-     * @description Prepares the HTTP request
-     * @param request The API request
-     * @return The prepared HTTP request
-     */
+
     private HttpRequest prepareHttpRequest(ApiRequest request) {
         HttpRequest req = new HttpRequest();
         req.setEndpoint(request.apiUrl);
@@ -263,11 +201,6 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         return req;
     }
 
-    /**
-     * @description Gets credentials for a specific connection
-     * @param connectionId The connection ID
-     * @return The API credentials
-     */
     private Map<String, String> getCredentialsForConnection(String connectionId) {
         // Query the specific connection by ID or developer name
         if (String.isBlank(connectionId)) {

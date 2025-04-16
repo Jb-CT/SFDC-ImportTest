@@ -92,12 +92,7 @@ public with sharing class CredentialValidator {
             return new ValidationResult(false, 'Validation failed: ' + errorMessage + ' (Code: ' + errorCode + ')');
         }
     }
-    
-    /**
-     * @description Gets the base URL for a CleverTap region
-     * @param region The CleverTap region code
-     * @return String The base URL for the region
-     */
+
     private String getRegionBaseUrl(String region) {
         Map<String, String> regionUrls = new Map<String, String>{
             'US' => 'https://us1.api.clevertap.com',
@@ -112,12 +107,15 @@ public with sharing class CredentialValidator {
     }
     
     /**
-     * @description Wrapper class for validation result
+     * @class ValidationResult
+     * @description Wrapper class to represent the result of the CleverTap credentials validation process.
      */
     public class ValidationResult {
-        @AuraEnabled public Boolean isValid { get; set; }
-        @AuraEnabled public String message { get; set; }
-        
+        @AuraEnabled 
+        public Boolean isValid { get; set; }
+        @AuraEnabled 
+        public String message { get; set; }
+
         public ValidationResult(Boolean isValid, String message) {
             this.isValid = isValid;
             this.message = message;

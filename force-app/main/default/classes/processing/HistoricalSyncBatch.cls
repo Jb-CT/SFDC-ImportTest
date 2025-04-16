@@ -1,3 +1,8 @@
+/**
+ * @class HistoricalSyncBatch
+ * @description Batch class for handling historical data sync between Salesforce and CleverTap.
+ */
+@SuppressWarnings('PMD.AvoidDebugStatements')
 public class HistoricalSyncBatch implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts {
     private String objectName;
     private String syncConfigId;
@@ -42,11 +47,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         // Return the query locator
         return Database.getQueryLocator(query);
     }
-    
-    /**
-     * @description Gets the fields that need to be queried from the mappings
-     * @return Set<String> Set of field API names to query
-     */
+
     private Set<String> getFieldsFromMappings() {
         Set<String> fields = new Set<String>{'Id'}; // Always include Id
         
@@ -78,12 +79,6 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         return fields;
     }
 
-    /**
-     * @description Checks if a field name appears to be a valid Salesforce field
-     * @param fieldName The field name to check
-     * @param objectType The Salesforce object type
-     * @return Boolean True if it appears to be a valid field
-     */
     private Boolean isValidField(String fieldName, String objectType) {
         // Check custom field or relationship field
         if (fieldName.contains('__c') || fieldName.contains('.')) {
@@ -94,12 +89,6 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         return isStandardField(fieldName, objectType);
     }
 
-    /**
-     * @description Checks if a field is a known standard field for an object type
-     * @param fieldName The field name to check
-     * @param objectType The Salesforce object type
-     * @return Boolean True if it's a standard field
-     */
     private Boolean isStandardField(String fieldName, String objectType) {
         // Common standard fields for most objects
         Set<String> commonFields = new Set<String>{'Id', 'Name', 'CreatedDate', 'LastModifiedDate', 'OwnerId'};
@@ -113,11 +102,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         return objectFields.containsKey(objectType) && 
                objectFields.get(objectType).contains(fieldName);
     }
-    
-    /**
-     * @description Returns a map of object-specific standard fields
-     * @return Map<String, Set<String>> Map of object types to their standard fields
-     */
+
     private Map<String, Set<String>> getObjectSpecificFields() {
         return new Map<String, Set<String>>{
             'Lead' => new Set<String>{'Email', 'FirstName', 'LastName', 'Company', 'Status', 'Phone'},
@@ -126,12 +111,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             'Opportunity' => new Set<String>{'Amount', 'CloseDate', 'StageName', 'AccountId'}
         };
     }
-    
-    /**
-     * @description Builds a query string with the specified fields
-     * @param fields Set of field API names to include in the query
-     * @return String The complete SOQL query
-     */
+
     private String buildQueryWithFields(Set<String> fields) {
         String fieldList = String.join(new List<String>(fields), ', ');
         return 'SELECT ' + fieldList + ' FROM ' + objectName;
@@ -152,7 +132,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         // Get credentials outside the loop
         Map<String, String> credentials = getCredentials(syncConfig.ConnectionId__c);
         if (credentials == null || credentials.isEmpty()) {
-            System.debug('No credentials found for connection: ' + syncConfig.ConnectionId__c);
+            System.debug(LoggingLevel.ERROR,  'No credentials found for connection: ' + syncConfig.ConnectionId__c);
             return;
         }
         
@@ -160,13 +140,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             processRecord(record, syncConfig, credentials);
         }
     }
-    
-    /**
-     * @description Process a single record
-     * @param record The record to process
-     * @param syncConfig The sync configuration
-     * @param credentials The API credentials
-     */
+
     private void processRecord(SObject record, CleverTap_Sync_Configuration__c syncConfig, Map<String, String> credentials) {
         try {
             recordsProcessed++;
@@ -174,7 +148,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             // Map the record
             Map<String, Object> payload = mapRecord(record, syncConfig);
             if (payload == null) {
-                System.debug('Failed to map record: ' + record.Id);
+                System.debug(LoggingLevel.ERROR, 'Failed to map record: ' + record.Id);
                 return;
             }
             
@@ -188,13 +162,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             logError(record, e);
         }
     }
-    
-    /**
-     * @description Log a successful result
-     * @param record The record that was processed
-     * @param response The HTTP response
-     * @param requestBody The request body
-     */
+
     private void logResult(SObject record, HttpResponse response, String requestBody) {
         if (response != null && response.getStatusCode() == 200) {
             recordsSuccess++;
@@ -218,12 +186,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         eventData.requestBody = requestBody;
         eventLogs.add(eventData);
     }
-    
-    /**
-     * @description Log an error
-     * @param record The record that failed
-     * @param e The exception
-     */
+
     private void logError(SObject record, Exception e) {
         recordsFailed++;
         System.debug(LoggingLevel.ERROR, 'Error processing record ' + record.Id + ': ' + e.getMessage());
@@ -238,11 +201,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         
         eventLogs.add(eventData);
     }
-    
-    /**
-     * @description Get the active sync configuration
-     * @return CleverTap_Sync_Configuration__c The sync configuration
-     */
+
     private CleverTap_Sync_Configuration__c getActiveSyncConfig() {
         // Return cached value if available
         if (cachedSyncConfig != null) {
@@ -261,11 +220,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         cachedSyncConfig = syncConfigs.isEmpty() ? null : syncConfigs[0];
         return cachedSyncConfig;
     }
-    
-    /**
-     * @description Get field mappings for the sync configuration
-     * @return List<CleverTap_Mapping__c> The field mappings
-     */
+
     private List<CleverTap_Mapping__c> getFieldMappings() {
         // Return cached mappings if available
         if (cachedFieldMappings != null) {
@@ -290,13 +245,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         
         return cachedFieldMappings;
     }
-    
-    /**
-     * @description Maps a record to CleverTap format
-     * @param record The record to map
-     * @param syncConfig The sync configuration
-     * @return The mapped payload
-     */
+
     private Map<String, Object> mapRecord(SObject record, CleverTap_Sync_Configuration__c syncConfig) {
         try {
             // Make sure we have field mappings
@@ -308,14 +257,14 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             // Get customer_id mapping
             CleverTap_Mapping__c identityMapping = specialMappings.get('customer_id');
             if (identityMapping == null) {
-                System.debug('No customer_id mapping found');
+                System.debug(LoggingLevel.ERROR, 'No customer_id mapping found');
                 return null;
             }
             
             // Get identity value
             Object idValue = record.get(identityMapping.Salesforce_Field__c);
             if (idValue == null) {
-                System.debug('Identity value is null for record: ' + record.Id);
+                System.debug(LoggingLevel.ERROR, 'Identity value is null for record: ' + record.Id);
                 return null;
             }
             
@@ -331,13 +280,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             return null;
         }
     }
-    
-    /**
-     * @description Creates profile data from record fields
-     * @param record The Salesforce record
-     * @param fieldMappings The field mappings
-     * @return Map<String, Object> The profile data
-     */
+
     private Map<String, Object> createProfileData(SObject record, List<CleverTap_Mapping__c> fieldMappings) {
         ValueExtractor valueExtractor = new ValueExtractor();
         Map<String, Object> profileData = new Map<String, Object>();
@@ -368,14 +311,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         
         return profileData;
     }
-    
-    /**
-     * @description Creates the final payload for CleverTap
-     * @param identityValue The identity value
-     * @param profileData The profile data
-     * @param entityType The entity type (profile/event)
-     * @return Map<String, Object> The final payload
-     */
+
     private Map<String, Object> createFinalPayload(String identityValue, Map<String, Object> profileData, String entityType) {
         Map<String, Object> payload = new Map<String, Object>();
         payload.put('identity', identityValue);
@@ -397,11 +333,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         payload.put('$source', 'SFDC');
         return payload;
     }
-    
-    /**
-     * @description Gets the event name from mapping or default
-     * @return String The event name
-     */
+
     private String getEventName() {
         CleverTap_Mapping__c eventNameMapping = specialMappings.get('evtName');
         
@@ -411,12 +343,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             return 'sf_' + objectName.toLowerCase();
         }
     }
-    
-    /**
-     * @description Gets credentials for a connection ID
-     * @param connectionId The connection ID
-     * @return Map of credentials
-     */
+
     private Map<String, String> getCredentials(String connectionId) {
         try {
             if (String.isBlank(connectionId)) {
@@ -451,12 +378,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             return null;
         }
     }
-    
-    /**
-     * @description Creates the request body
-     * @param payload The payload to send
-     * @return The JSON request body
-     */
+
     private String getRequestBody(Map<String, Object> payload) {
         Map<String, Object> requestPayload = new Map<String, Object>{
             'd' => new List<Map<String, Object>>{payload}
@@ -464,14 +386,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         
         return JSON.serialize(requestPayload);
     }
-    
-    /**
-     * @description Sends the request to CleverTap
-     * @param credentials The credentials
-     * @param payload The payload
-     * @param entityType The entity type
-     * @return The HTTP response
-     */
+
     private HttpResponse sendToCleverTap(Map<String, String> credentials, Map<String, Object> payload, String entityType) {
         try {
             // Get the API URL
@@ -493,13 +408,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             return null;
         }
     }
-    
-    /**
-     * @description Builds the API URL based on entity type
-     * @param baseUrl The base URL
-     * @param entityType The entity type
-     * @return String The complete API URL
-     */
+
     private String buildApiUrl(String baseUrl, String entityType) {
         if (String.isBlank(baseUrl)) {
             return null;
@@ -515,14 +424,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         String apiPath = (entityType.toLowerCase() == 'event') ? eventApiPath : profileApiPath;
         return baseUrl + apiPath;
     }
-    
-    /**
-     * @description Creates an HTTP request
-     * @param apiUrl The API URL
-     * @param credentials The credentials
-     * @param jsonBody The request body
-     * @return HttpRequest The HTTP request
-     */
+
     private HttpRequest createHttpRequest(String apiUrl, Map<String, String> credentials, String jsonBody) {
         HttpRequest req = new HttpRequest();
         req.setEndpoint(apiUrl);
@@ -549,10 +451,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         // Create detailed logs
         createDetailedLogs();
     }
-    
-    /**
-     * @description Creates a summary log entry
-     */
+
     private void createSummaryLog() {
         try {
             CleverTap_Event__c syncLog = new CleverTap_Event__c(
@@ -561,16 +460,12 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             );
             
             insert syncLog;
-            System.debug('Inserted summary log: ' + syncLog.Id);
+            System.debug(LoggingLevel.DEBUG, 'Inserted summary log: ' + syncLog.Id);
         } catch (Exception e) {
             System.debug(LoggingLevel.ERROR, 'Error creating summary log: ' + e.getMessage());
         }
     }
-    
-    /**
-     * @description Builds the summary log message
-     * @return String The summary message
-     */
+
     private String buildSummaryLogMessage() {
         return 'Historical sync completed.\n' +
                'Records processed: ' + recordsProcessed + '\n' +
@@ -578,10 +473,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
                'Records failed: ' + recordsFailed + '\n' +
                'Sync Configuration ID: ' + syncConfigId;
     }
-    
-    /**
-     * @description Creates detailed log entries
-     */
+
     private void createDetailedLogs() {
         if (eventLogs.isEmpty()) {
             return;
@@ -601,18 +493,13 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             
             if (!detailedLogs.isEmpty()) {
                 insert detailedLogs;
-                System.debug('Inserted ' + detailedLogs.size() + ' detailed logs');
+                System.debug(LoggingLevel.DEBUG, 'Inserted ' + detailedLogs.size() + ' detailed logs');
             }
         } catch (Exception e) {
             System.debug(LoggingLevel.ERROR, 'Error creating detailed logs: ' + e.getMessage());
         }
     }
-    
-    /**
-     * @description Determines if the result was successful
-     * @param eventData The event data
-     * @return Boolean True if successful
-     */
+
     private Boolean determineSuccess(SerializableEventData eventData) {
         if (eventData.statusCode != 200) {
             return false;
@@ -630,13 +517,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         
         return true;
     }
-    
-    /**
-     * @description Creates a detailed log entry
-     * @param eventData The event data
-     * @param isSuccess Whether the operation was successful
-     * @return CleverTap_Event__c The log entry
-     */
+
     private CleverTap_Event__c createDetailedLogEntry(SerializableEventData eventData, Boolean isSuccess) {
         CleverTap_Event__c eventLog = new CleverTap_Event__c(
             Status__c = isSuccess ? 'Success' : 'Failed',
@@ -648,23 +529,13 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         
         return eventLog;
     }
-    
-    /**
-     * @description Builds a detailed log message
-     * @param eventData The event data
-     * @return String The detailed message
-     */
+
     private String buildDetailedLogMessage(SerializableEventData eventData) {
         return String.isNotBlank(eventData.responseBody) ? 
             eventData.responseBody + '\nRequest: ' + eventData.requestBody : 
             eventData.requestBody;
     }
-    
-    /**
-     * @description Sets the record reference on the event log
-     * @param eventLog The event log
-     * @param eventData The event data
-     */
+
     private void setEventRecordReference(CleverTap_Event__c eventLog, SerializableEventData eventData) {
         String fieldName = eventData.recordType + '__c';
         Map<String, Schema.SObjectField> fieldsMap = Schema.SObjectType.CleverTap_Event__c.fields.getMap();
@@ -677,7 +548,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
     }
     
     /**
-     * Helper class for storing event data - simplified to reduce parameter list
+     * @description Helper class for storing event data - simplified to reduce parameter list
      */
     public class SerializableEventData {
         public Id recordId;
