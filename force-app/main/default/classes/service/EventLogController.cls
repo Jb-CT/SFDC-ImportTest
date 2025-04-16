@@ -26,41 +26,42 @@ public with sharing class EventLogController {
             throw new AuraHandledException('You do not have access to one or more required fields');
         }
         
-        // Build the query safely
-        // Base query with fields
-        List<String> queryParts = new List<String>{
-            'SELECT Id, Name, Status__c, Response__c, CreatedDate',
-            'FROM CleverTap_Event__c'
-        };
+        // Define query format strings using camelCase for local variables
+        String baseQuery = 
+            'SELECT Id, Name, Status__c, Response__c, CreatedDate FROM CleverTap_Event__c';
+        String whereStatus = 
+            ' WHERE Status__c = :status';
+        String whereDate = 
+            ' WHERE CreatedDate >= :filterDate';
+        String andDate = 
+            ' AND CreatedDate >= :filterDate';
+        String orderLimit = 
+            ' ORDER BY CreatedDate DESC LIMIT :recordLimit';
         
-        // WHERE clause construction
-        List<String> whereConditions = new List<String>();
+        // Build the query
+        String query = baseQuery;
         
-        // Filter by status if provided (using bind variable for safety)
-        if (String.isNotBlank(status)) {
-            whereConditions.add('Status__c = :status');
-        }
-        
-        // Filter by date if days is provided (using bind variable for safety)
+        // Calculate filter date if needed
+        DateTime filterDate;
         if (days != null && days > 0) {
-            DateTime filterDate = DateTime.now().addDays(-days);
-            whereConditions.add('CreatedDate >= :filterDate');
+            filterDate = DateTime.now().addDays(-days);
         }
         
-        // Add WHERE clause if conditions exist
-        if (!whereConditions.isEmpty()) {
-            queryParts.add('WHERE ' + String.join(whereConditions, ' AND '));
+        // Add conditions
+        if (String.isNotBlank(status)) {
+            query += whereStatus;
+            if (days != null && days > 0) {
+                query += andDate;
+            }
+        } else if (days != null && days > 0) {
+            query += whereDate;
         }
         
-        // Add ORDER BY and LIMIT clauses
-        queryParts.add('ORDER BY CreatedDate DESC');
-        queryParts.add('LIMIT :recordLimit');
-        
-        // Join all query parts
-        String finalQuery = String.join(queryParts, ' ');
+        // Add order by and limit
+        query += orderLimit;
         
         // Execute the query with safely bound parameters
-        return Database.query(finalQuery);
+        return Database.query(query);
     }
     
     /**

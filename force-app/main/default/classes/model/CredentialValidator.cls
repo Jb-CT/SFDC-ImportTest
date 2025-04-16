@@ -16,33 +16,26 @@ public with sharing class CredentialValidator {
         }
         
         try {
-            // Determine the API URL based on region
             String apiBaseUrl = getRegionBaseUrl(region);
             if (String.isBlank(apiBaseUrl)) {
                 return new ValidationResult(false, 'Invalid region selected');
             }
-            
-            // Create the connection test URL
+
             String connectUrl = apiBaseUrl + '/v1/connect?partner=Salesforce';
-            
-            // Make API request to CleverTap
+
             HttpRequest req = new HttpRequest();
             req.setEndpoint(connectUrl);
             req.setMethod('GET');
-            req.setTimeout(20000); // 20 seconds timeout
-            
-            // Set the authentication headers
+            req.setTimeout(20000); 
+
             req.setHeader('X-CleverTap-Account-Id', accountId);
             req.setHeader('X-CleverTap-Passcode', passcode);
             req.setHeader('Content-Type', 'application/json');
-            
-            // Send request
+
             Http http = new Http();
             HttpResponse res = http.send(req);
-            
-            // Process response
-            return processValidationResponse(res);
-            
+
+            return processValidationResponse(res);   
         } catch (Exception e) {
             return new ValidationResult(false, 'Validation error: ' + e.getMessage());
         }
@@ -56,8 +49,7 @@ public with sharing class CredentialValidator {
     private ValidationResult processValidationResponse(HttpResponse res) {
         Integer statusCode = res.getStatusCode();
         String responseBody = res.getBody();
-        
-        // Parse the response body
+
         Map<String, Object> responseMap;
         try {
             responseMap = (Map<String, Object>)JSON.deserializeUntyped(responseBody);

@@ -97,16 +97,21 @@ private class EntityExportJobTest {
         MockCleverTapService mockService = new MockCleverTapService();
         TestModule testModule = new TestModule(mockService);
         
-        // Execute the queueable with test module and multiple records
-        Test.startTest();
-        EntityExportJob queueable = new EntityExportJob(testContacts, testModule);
-        queueable.execute(null);
+        // Disable chaining for this test to prevent stack overflow
+        EntityExportJob.disableChaining = true;
         
-        // Since we can't easily test queueable chaining in unit tests, 
-        // manually process the second record
-        EntityExportJob secondQueueable = new EntityExportJob(new List<Contact>{testContacts[1]}, testModule);
+        Test.startTest();
+        // Process first contact
+        EntityExportJob firstQueueable = new EntityExportJob(testContacts[0], testModule);
+        firstQueueable.execute(null);
+        
+        // Process second contact separately
+        EntityExportJob secondQueueable = new EntityExportJob(testContacts[1], testModule);
         secondQueueable.execute(null);
         Test.stopTest();
+        
+        // Reset for other tests
+        EntityExportJob.disableChaining = false;
         
         // Verify the mock was called correctly
         System.assertEquals(0, mockService.leadCallCount, 'Lead service should not be called');
@@ -125,8 +130,7 @@ private class EntityExportJobTest {
         
         // Set the module in the integration handler
         Test.startTest();
-        IntegrationHandler ihandler = new IntegrationHandler();
-        IntegrationHandler.setDIModule(testModule);
+        IntegrationHandler ihandler = new IntegrationHandler(new DIModuleMain());
         
         // Process the lead through the integration handler
         ihandler.processLeads(new List<Lead>{testLead});

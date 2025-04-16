@@ -5,10 +5,10 @@
  */
 public with sharing class SchemaUtility {
     // Cache for field describe results to avoid repeated API calls
-    private Map<String, Map<String, Schema.SObjectField>> objectFieldsCache;
+    private final Map<String, Map<String, Schema.SObjectField>> objectFieldsCache;
     
     // Cache for object describe results
-    private Map<String, Schema.DescribeSObjectResult> objectDescribeCache;
+    private final Map<String, Schema.DescribeSObjectResult> objectDescribeCache;
 
     public SchemaUtility() {
         this.objectFieldsCache = new Map<String, Map<String, Schema.SObjectField>>();
@@ -16,18 +16,15 @@ public with sharing class SchemaUtility {
     }
 
     public Map<String, Schema.SObjectField> getFieldsMap(String objectName) {
-        // Check cache first
         if (objectFieldsCache.containsKey(objectName)) {
             return objectFieldsCache.get(objectName);
         }
-        
-        // Get the object type in a safe manner
+
         Schema.SObjectType objectType = Schema.getGlobalDescribe().get(objectName);
         if (objectType == null) {
             return new Map<String, Schema.SObjectField>();
         }
-        
-        // Get fields map and cache it
+
         Map<String, Schema.SObjectField> fieldsMap = objectType.getDescribe().fields.getMap();
         objectFieldsCache.put(objectName, fieldsMap);
         
@@ -46,18 +43,15 @@ public with sharing class SchemaUtility {
     }
 
     public Schema.DescribeSObjectResult getObjectDescribe(String objectName) {
-        // Check cache first
         if (objectDescribeCache.containsKey(objectName)) {
             return objectDescribeCache.get(objectName);
         }
-        
-        // Get the object type
+
         Schema.SObjectType objectType = Schema.getGlobalDescribe().get(objectName);
         if (objectType == null) {
             return null;
         }
-        
-        // Get describe result and cache it
+
         Schema.DescribeSObjectResult describeResult = objectType.getDescribe();
         objectDescribeCache.put(objectName, describeResult);
         

@@ -7,7 +7,7 @@ public class ResultLoggerJob implements Queueable {
     private static final String STATUS_FIELD = 'Status__c';
     private static final String RESPONSE_FIELD = 'Response__c';
     
-    private List<EventDataWrapper> eventDataList;
+    private final List<EventDataWrapper> eventDataList;
     
     /**
      * @class EventDataWrapper

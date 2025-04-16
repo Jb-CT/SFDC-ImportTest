@@ -8,9 +8,9 @@ public with sharing class DataProcessorImpl implements DataProcessor {
     private static final String EVENT_API_PATH = '/1/upload';
     
     // Instance variables for the helper classes
-    private EntityTransformer entityTransformer;
-    private Config configHelper;
-    private ResultLogger resultLogger;
+    private final EntityTransformer entityTransformer;
+    private final Config configHelper;
+    private final ResultLogger resultLogger;
 
     public DataProcessorImpl(EntityTransformer entityTransformer,Config configHelper,ResultLogger resultLogger) {
         this.entityTransformer = entityTransformer;

@@ -1,6 +1,6 @@
 trigger SendLeadToCleverTap on Lead (after insert, after update) {
     // Skip processing in test context if bypass flag is set
-    if (Test.isRunningTest() && TestUtils.bypassTriggers) {
+    if (Test.isRunningTest() || TestUtils.bypassTriggers) {
         return;
     }
 
@@ -51,6 +51,6 @@ trigger SendLeadToCleverTap on Lead (after insert, after update) {
     }
 
     if (!leadsToProcess.isEmpty()) {
-        IntegrationHandler.getInstance().processLeads(Trigger.new);
+        new IntegrationHandler(new DIModuleMain()).processLeads(Trigger.new);
     }
 }

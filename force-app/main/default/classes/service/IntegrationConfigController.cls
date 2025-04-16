@@ -1,5 +1,5 @@
 public with sharing class IntegrationConfigController {
-    private static Map<String, String> regionToUrl = new Map<String, String>{
+    private static final Map<String, String> regionToUrl = new Map<String, String>{
         'US' => 'https://us1.api.clevertap.com/1/upload',
         'IN' => 'https://in1.api.clevertap.com/1/upload',
         'EU' => 'https://eu1.api.clevertap.com/1/upload',

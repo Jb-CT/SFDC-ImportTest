@@ -25,7 +25,7 @@
  */
 @isTest
 private class IntegrationHandlerTest {
-    static IntegrationHandler integrationHandler = new IntegrationHandler();
+    static IntegrationHandler integrationHandler = new IntegrationHandler(new DIModuleMain());
     // Use class variables instead of inner class
     private static Boolean queueableExecuted = false;
     

@@ -7,13 +7,13 @@ public class DIModuleMain implements DIModule {
 
     public DataProcessor provideCleverTapService() {
         if (dataProcessor == null) {
-
             EntityTransformer entityTransformer = provideEntityTransformer();
             Config config = provideConfig();
             ResultLogger resultLogger = provideResultLogger();
 
             dataProcessor = new DataProcessorImpl(entityTransformer, config, resultLogger);
         }
+
         return dataProcessor;
     }
 

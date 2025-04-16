@@ -4,9 +4,11 @@
  */
 @SuppressWarnings('PMD.QueueableWithoutFinalizer')
 public class EntityExportJob implements Queueable, Database.AllowsCallouts {
-    private List<SObject> records;
-    private String objectType;
-    private DIModule diModule;
+    private final List<SObject> records;
+    private final String objectType;
+    private final DIModule diModule;
+
+    @TestVisible private static Boolean disableChaining = false;
 
     public EntityExportJob(SObject record, DIModule module) {
         this.records = new List<SObject>{record};
@@ -62,8 +64,8 @@ public class EntityExportJob implements Queueable, Database.AllowsCallouts {
             }
         }
         
-        // Enqueue the next batch if there are more records
-        if (!remainingRecords.isEmpty()) {
+        // Only enqueue the next batch if chaining is not disabled
+        if (!remainingRecords.isEmpty() && !disableChaining) {
             System.enqueueJob(new EntityExportJob(remainingRecords, diModule));
         }
     }

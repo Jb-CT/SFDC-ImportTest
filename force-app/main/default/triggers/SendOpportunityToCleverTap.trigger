@@ -1,3 +1,3 @@
 trigger SendOpportunityToCleverTap on Opportunity (after insert, after update) {
-    IntegrationHandler.getInstance().processOpportunities(Trigger.new);
+    new IntegrationHandler(new DIModuleMain()).processOpportunities(Trigger.new);
 }

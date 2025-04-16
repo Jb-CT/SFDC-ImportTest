@@ -4,8 +4,7 @@
  */
 @IsTest
 public class TestModule implements DIModule {
-    // The mock service to return
-    private MockCleverTapService mockService;
+    private final MockCleverTapService mockService;
     
     /**
      * @description Constructor that accepts a mock service
@@ -14,10 +13,7 @@ public class TestModule implements DIModule {
     public TestModule(MockCleverTapService mockService) {
         this.mockService = mockService;
     }
-    
-    /**
-     * @description Default constructor that creates a new mock service
-     */
+
     public TestModule() {
         this.mockService = new MockCleverTapService();
     }
