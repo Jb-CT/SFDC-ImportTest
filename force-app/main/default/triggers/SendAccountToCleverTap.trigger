@@ -1,3 +1,5 @@
 trigger SendAccountToCleverTap on Account (after insert, after update) {
-    new IntegrationHandler(new DIModuleMain()).processAccounts(Trigger.new);
+    DIModule diModule = new DIModuleMain();
+    IntegrationHandler handler = diModule.provideIntegrationHandler();
+    handler.processAccounts(Trigger.new);
 }

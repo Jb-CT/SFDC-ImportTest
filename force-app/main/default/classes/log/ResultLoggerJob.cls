@@ -4,8 +4,8 @@
  * Uses a serializable wrapper to handle HttpResponse data that cannot be serialized directly.
  */
 public class ResultLoggerJob implements Queueable {
-    private static final String STATUS_FIELD = 'Status__c';
-    private static final String RESPONSE_FIELD = 'Response__c';
+    private static final String STATUS_FIELD = 'CleverTap__Status__c';
+    private static final String RESPONSE_FIELD = 'CleverTap__Response__c';
     
     private final List<EventDataWrapper> eventDataList;
     
@@ -62,37 +62,33 @@ public class ResultLoggerJob implements Queueable {
      * @param context The queueable context
      */
     public void execute(QueueableContext context) {
-        try {
-            List<CleverTap_Event__c> logsToInsert = createLogRecords();
-            
-            if (!logsToInsert.isEmpty()) {
-                insertLogs(logsToInsert);
-            }
-        } catch (Exception e) {
-            logError(e);
+        List<CleverTap__Event__c> logsToInsert = createLogRecords();
+        
+        if (!logsToInsert.isEmpty()) {
+            insertLogs(logsToInsert);
         }
     }
 
-    private List<CleverTap_Event__c> createLogRecords() {
-        List<CleverTap_Event__c> logsToInsert = new List<CleverTap_Event__c>();
+    private List<CleverTap__Event__c> createLogRecords() {
+        List<CleverTap__Event__c> logsToInsert = new List<CleverTap__Event__c>();
         
         for (EventDataWrapper eventData : eventDataList) {
             // Create and add the log record
-            CleverTap_Event__c eventLog = createSingleLogRecord(eventData);
+            CleverTap__Event__c eventLog = createSingleLogRecord(eventData);
             logsToInsert.add(eventLog);
         }
         
         return logsToInsert;
     }
 
-    private CleverTap_Event__c createSingleLogRecord(EventDataWrapper eventData) {
+    private CleverTap__Event__c createSingleLogRecord(EventDataWrapper eventData) {
         // Determine success status
         Boolean isSuccess = determineSuccessStatus(eventData);
         
         // Create event log record
-        CleverTap_Event__c eventLog = new CleverTap_Event__c(
-            Status__c = isSuccess ? 'Success' : 'Failed',
-            Response__c = formatResponseContent(eventData)
+        CleverTap__Event__c eventLog = new CleverTap__Event__c(
+            CleverTap__Status__c = isSuccess ? 'Success' : 'Failed',
+            CleverTap__Response__c = formatResponseContent(eventData)
         );
         
         // Set the record reference
@@ -125,35 +121,22 @@ public class ResultLoggerJob implements Queueable {
         return eventData.requestBody;
     }
 
-    private void setRecordReference(CleverTap_Event__c eventLog, EventDataWrapper eventData) {
+    private void setRecordReference(CleverTap__Event__c eventLog, EventDataWrapper eventData) {
         String fieldName = eventData.recordType + '__c';
         
         // Check if field exists before setting it
-        if (Schema.SObjectType.CleverTap_Event__c.fields.getMap().containsKey(fieldName.toLowerCase())) {
+        if (Schema.SObjectType.CleverTap__Event__c.fields.getMap().containsKey(fieldName.toLowerCase())) {
             eventLog.put(fieldName, eventData.recordId);
         } else {
             // Fallback - store record ID in description
-            eventLog.Response__c = eventData.recordType + ' ID: ' + eventData.recordId + '\n' + eventLog.Response__c;
+            eventLog.CleverTap__Response__c = eventData.recordType + ' ID: ' + eventData.recordId + '\n' + eventLog.CleverTap__Response__c;
         }
     }
 
-    private void insertLogs(List<CleverTap_Event__c> logsToInsert) {
+    private void insertLogs(List<CleverTap__Event__c> logsToInsert) {
         // Verify field-level security and insert
-        if (Schema.SObjectType.CleverTap_Event__c.isCreateable()) {
+        if (Schema.SObjectType.CleverTap__Event__c.isCreateable()) {
             insert logsToInsert;
-            // Log success with appropriate logging level
-            logSuccess(logsToInsert.size());
         }
-    }
-
-    private void logSuccess(Integer count) {
-        // Only log at INFO level for monitoring purposes
-        System.debug(LoggingLevel.INFO, 'Successfully inserted ' + count + ' CleverTap event logs');
-    }
-
-    private void logError(Exception e) {
-        // These are critical errors that must be preserved for troubleshooting integration issues
-        System.debug(LoggingLevel.ERROR, 'Error in ResultLoggerJob: ' + e.getMessage());
-        System.debug(LoggingLevel.ERROR, 'Stack trace: ' + e.getStackTraceString());
     }
 }

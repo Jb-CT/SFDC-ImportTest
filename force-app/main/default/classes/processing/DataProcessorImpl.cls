@@ -18,18 +18,23 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         this.resultLogger = resultLogger;
     }
 
+    private static Boolean isProcessing = false;
+
     public void sendToCleverTap(SObject record, String recordType) {
         if (record == null) {
             return;
         }
+
+        if (isProcessing) {
+            return;
+        }
         
         try {
-            // Check access and configurations
+            isProcessing = true;
+
             if (!isConfigurationAccessible()) {
                 return;
             }
-            
-            // Get all connection mappings for this record
             List<EntityTransformer.ConnectionMapping> connectionMappings = 
                 entityTransformer.mapToMultipleConnections(record, recordType);
             
@@ -37,10 +42,10 @@ public with sharing class DataProcessorImpl implements DataProcessor {
                 return;
             }
             
-            // Collect log data for batch logging
+
             List<ResultLogger.EventData> eventDataList = new List<ResultLogger.EventData>();
             
-            // Process each connection mapping
+
             for (EntityTransformer.ConnectionMapping mapping : connectionMappings) {
                 // Get credentials for this connection
                 Map<String, String> credentials = getCredentialsForConnection(mapping.connectionId);
@@ -48,31 +53,42 @@ public with sharing class DataProcessorImpl implements DataProcessor {
                     continue;
                 }
                 
-                // Get the target entity type and set API endpoint
                 Boolean isEvent = (mapping.payload.get('type') == 'event');
                 credentials = adjustApiEndpoint(credentials, isEvent ? 'event' : 'profile');
                 
-                // Send to CleverTap
                 HttpResponse response = sendRequest(credentials, mapping.payload);
                 
-                // Collect event data for later logging
                 String requestBody = getRequestBody(mapping.payload);
                 eventDataList.add(new ResultLogger.EventData(
                     record.Id, recordType, response, requestBody
                 ));
             }
             
-            // Enqueue logging as separate job
             if (!eventDataList.isEmpty()) {
-                System.enqueueJob(new ResultLoggerJob(eventDataList));
+                if (!Test.isRunningTest()) {
+                    System.enqueueJob(new ResultLoggerJob(eventDataList));
+                } else {
+                    ResultLogger directLogger = new ResultLogger();
+                    for (ResultLogger.EventData data : eventDataList) {
+                        directLogger.logEvent(data);
+                    }
+                }
             }
-            
         } catch (Exception e) {
-            // Log error in separate job
             List<ResultLogger.EventData> errorData = new List<ResultLogger.EventData>{
                 new ResultLogger.EventData(record.Id, recordType, null, 'Error: ' + e.getMessage())
             };
-            System.enqueueJob(new ResultLoggerJob(errorData));
+            
+            if (!Test.isRunningTest()) {
+                System.enqueueJob(new ResultLoggerJob(errorData));
+            } else {
+                ResultLogger directLogger = new ResultLogger();
+                for (ResultLogger.EventData data : errorData) {
+                    directLogger.logEvent(data);
+                }
+            }
+        } finally {
+            isProcessing = false;
         }
     }
     
@@ -82,15 +98,15 @@ public with sharing class DataProcessorImpl implements DataProcessor {
      * @return The target entity type (profile or event)
      */
     private String getTargetEntityType(String recordType) {
-        if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+        if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return 'profile'; // Default to profile if no access
         }
         
-        List<CleverTap_Sync_Configuration__c> configs = [
-            SELECT CleverTap_Entity__c 
-            FROM CleverTap_Sync_Configuration__c 
-            WHERE Salesforce_Entity__c = :recordType 
-            AND Status__c = 'Active'
+        List<CleverTap__Sync_Configuration__c> configs = [
+            SELECT CleverTap__Entity__c 
+            FROM CleverTap__Sync_Configuration__c 
+            WHERE CleverTap__Salesforce_Entity__c = :recordType 
+            AND CleverTap__Status__c = 'Active'
             LIMIT 1
         ];
         
@@ -98,7 +114,7 @@ public with sharing class DataProcessorImpl implements DataProcessor {
             return 'profile'; // Default to profile if no configuration found
         }
         
-        return configs[0].CleverTap_Entity__c;
+        return configs[0].CleverTap__Entity__c;
     }
 
     private Map<String, String> adjustApiEndpoint(Map<String, String> credentials, String targetEntityType) {
@@ -142,19 +158,19 @@ public with sharing class DataProcessorImpl implements DataProcessor {
     }
 
     private Boolean isConfigurationAccessible() {
-        return CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible();
+        return CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible();
     }
 
     private Boolean hasSyncConfiguration(String recordType) {
         // Validate CRUD permission before SOQL operation
-        if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+        if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return false;
         }
         
-        List<CleverTap_Sync_Configuration__c> syncConfigs = [
-            SELECT Id FROM CleverTap_Sync_Configuration__c 
-            WHERE Salesforce_Entity__c = :recordType 
-            AND Status__c = 'Active' 
+        List<CleverTap__Sync_Configuration__c> syncConfigs = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c 
+            WHERE CleverTap__Salesforce_Entity__c = :recordType 
+            AND CleverTap__Status__c = 'Active' 
             LIMIT 1
         ];
         return !syncConfigs.isEmpty();
@@ -208,15 +224,15 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         }
         
         // Check CRUD permissions
-        if (!CleverTap_Config__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+        if (!CleverTap__Config__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return null;
         }
         
         // Query the connection by ID
-        List<CleverTap_Config__c> configs = [
-            SELECT Name, CleverTap_API_URL__c, CleverTap_Account_ID__c, 
-                CleverTap_Passcode__c, Region__c
-            FROM CleverTap_Config__c
+        List<CleverTap__Config__c> configs = [
+            SELECT Name, CleverTap__API_URL__c, CleverTap__Account_ID__c, 
+                CleverTap__Passcode__c, CleverTap__Region__c
+            FROM CleverTap__Config__c
             WHERE Id = :connectionId OR Name = :connectionId
             LIMIT 1
         ];
@@ -225,16 +241,16 @@ public with sharing class DataProcessorImpl implements DataProcessor {
             return null;
         }
         
-        CleverTap_Config__c config = configs[0];
+        CleverTap__Config__c config = configs[0];
         
         // Build credentials map
         Map<String, String> credentials = new Map<String, String>{
             'NAME' => config.Name,
             'DEV_NAME' => config.Name,
-            'API_URL' => config.CleverTap_API_URL__c,
-            'ACCOUNT_ID' => config.CleverTap_Account_ID__c,
-            'PASSCODE' => config.CleverTap_Passcode__c,
-            'REGION' => config.Region__c
+            'API_URL' => config.CleverTap__API_URL__c,
+            'ACCOUNT_ID' => config.CleverTap__Account_ID__c,
+            'PASSCODE' => config.CleverTap__Passcode__c,
+            'REGION' => config.CleverTap__Region__c
         };
         
         return credentials;

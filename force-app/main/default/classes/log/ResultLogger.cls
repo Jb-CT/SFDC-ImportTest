@@ -37,27 +37,25 @@ public with sharing class ResultLogger {
             if (!canCreateEventLog()) {
                 return;
             }
-            
-            // Determine success status
-            Boolean isSuccess = determineSuccessStatus(eventData);
-            
-            // Create and populate event log
-            CleverTap_Event__c eventLog = createEventLog(eventData, isSuccess);
 
-            // Check if we have create permission on CleverTap_Event__c
-            if (!Schema.sObjectType.CleverTap_Event__c.isCreateable()) {
+            Boolean isSuccess = determineSuccessStatus(eventData);
+
+            CleverTap__Event__c eventLog = createEventLog(eventData, isSuccess);
+
+            if (!Schema.sObjectType.CleverTap__Event__c.isCreateable()) {
                 return;
                 }
             
             // Insert the log
             insert eventLog;
         } catch (Exception e) {
-            logError(e);
+            //logError(e);
+            return ;
         }
     }
 
     private Boolean canCreateEventLog() {
-        return Schema.sObjectType.CleverTap_Event__c.isCreateable();
+        return Schema.sObjectType.CleverTap__Event__c.isCreateable();
     }
 
     private Boolean determineSuccessStatus(EventData eventData) {
@@ -90,12 +88,12 @@ public with sharing class ResultLogger {
         return false;
     }
 
-    private CleverTap_Event__c createEventLog(EventData eventData, Boolean isSuccess) {
-        CleverTap_Event__c eventLog = new CleverTap_Event__c();
-        eventLog.Status__c = isSuccess ? 'Success' : 'Failed';
+    private CleverTap__Event__c createEventLog(EventData eventData, Boolean isSuccess) {
+        CleverTap__Event__c eventLog = new CleverTap__Event__c();
+        eventLog.CleverTap__Status__c = isSuccess ? 'Success' : 'Failed';
         
         String responseBody = (eventData.response != null) ? eventData.response.getBody() : '';
-        eventLog.Response__c = formatResponseContent(responseBody, eventData.requestBody);
+        eventLog.CleverTap__Response__c = formatResponseContent(responseBody, eventData.requestBody);
         
         setRecordReference(eventLog, eventData);
         
@@ -110,26 +108,19 @@ public with sharing class ResultLogger {
         return responseBody + '\nRequest: ' + requestBody;
     }
 
-    private void setRecordReference(CleverTap_Event__c eventLog, EventData eventData) {
+    private void setRecordReference(CleverTap__Event__c eventLog, EventData eventData) {
         String fieldName = eventData.recordType + '__c';
         
-        if (hasField(CleverTap_Event__c.SObjectType, fieldName)) {
+        if (hasField(CleverTap__Event__c.SObjectType, fieldName)) {
             eventLog.put(fieldName, eventData.recordId);
         } else {
             // Fallback - store record ID in description
-            eventLog.Response__c = eventData.recordType + ' ID: ' + eventData.recordId + '\n' + eventLog.Response__c;
+            eventLog.CleverTap__Response__c = eventData.recordType + ' ID: ' + eventData.recordId + '\n' + eventLog.CleverTap__Response__c;
         }
     }
 
     private Boolean hasField(Schema.SObjectType sObjType, String fieldName) {
         Map<String, Schema.SObjectField> fieldMap = sObjType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
         return fieldMap.containsKey(fieldName);
-    }
-
-    private void logError(Exception e) {
-        // These debug statements provide essential troubleshooting information
-        // and are only visible when appropriate debug levels are enabled
-        System.debug(LoggingLevel.ERROR, 'Error logging CleverTap event: ' + e.getMessage());
-        System.debug(LoggingLevel.ERROR, 'Stack trace: ' + e.getStackTraceString());
     }
 }

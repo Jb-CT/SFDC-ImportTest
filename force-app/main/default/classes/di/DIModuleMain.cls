@@ -4,28 +4,47 @@
  */
 public class DIModuleMain implements DIModule {
     private static DataProcessor dataProcessor;
+    private static EntityTransformer entityTransformer;
+    private static Config config;
+    private static ResultLogger resultLogger;
+
+    public IntegrationHandler provideIntegrationHandler() {
+        return new IntegrationHandler(this);
+    }
 
     public DataProcessor provideCleverTapService() {
         if (dataProcessor == null) {
-            EntityTransformer entityTransformer = provideEntityTransformer();
-            Config config = provideConfig();
-            ResultLogger resultLogger = provideResultLogger();
-
-            dataProcessor = new DataProcessorImpl(entityTransformer, config, resultLogger);
+            dataProcessor = new DataProcessorImpl(
+                provideEntityTransformer(), 
+                provideConfig(), 
+                provideResultLogger()
+            );
         }
-
+        
         return dataProcessor;
     }
 
-    private EntityTransformer provideEntityTransformer(){
-        return new EntityTransformer();
+    public EntityTransformer provideEntityTransformer() {
+        if (entityTransformer == null) {
+            entityTransformer = new EntityTransformer();
+        }
+
+        return entityTransformer;
     }
 
-    private Config provideConfig(){
-        return new Config();
+    public Config provideConfig() {
+        if (config == null) {
+            config = new Config();
+        }
+
+        return config;
     }
 
-    private ResultLogger provideResultLogger(){
-        return new ResultLogger();
+    public ResultLogger provideResultLogger() {
+        if (resultLogger == null) {
+            resultLogger = new ResultLogger();
+        }
+
+        return resultLogger;
     }
 }

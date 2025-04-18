@@ -21,7 +21,7 @@ export default class EventLogViewer extends NavigationMixin(LightningElement) {
         },
         {
             label: 'Status',
-            fieldName: 'Status__c',
+            fieldName: 'CleverTap__Status__c',
             type: 'text',
             sortable: true,
             cellAttributes: {
@@ -58,22 +58,22 @@ export default class EventLogViewer extends NavigationMixin(LightningElement) {
     
     // Computed property for formatted response
     get formattedResponse() {
-        if (this.selectedEvent && this.selectedEvent.Response__c) {
+        if (this.selectedEvent && this.selectedEvent.CleverTap__Response__c) {
             try {
                 // Try to parse and format as JSON
-                const responseObj = JSON.parse(this.selectedEvent.Response__c);
+                const responseObj = JSON.parse(this.selectedEvent.CleverTap__Response__c);
                 return JSON.stringify(responseObj, null, 2);
             } catch (e) {
                 // If not valid JSON, return as is
-                return this.selectedEvent.Response__c;
+                return this.selectedEvent.CleverTap__Response__c;
             }
         }
         return '';
     }
     
     get selectedEventStatusClass() {
-        if (this.selectedEvent && this.selectedEvent.Status__c) {
-            return this.selectedEvent.Status__c === 'Success' ? 'slds-theme_success' : 'slds-theme_error';
+        if (this.selectedEvent && this.selectedEvent.CleverTap__Status__c) {
+            return this.selectedEvent.CleverTap__Status__c === 'Success' ? 'slds-theme_success' : 'slds-theme_error';
         }
         return '';
     }
@@ -132,7 +132,7 @@ export default class EventLogViewer extends NavigationMixin(LightningElement) {
     processLogData(data) {
         this.eventLogs = data.map(log => {
             // Determine status class
-            const statusClass = log.Status__c === 'Success' ? 'slds-text-color_success' : 'slds-text-color_error';
+            const statusClass = log.CleverTap__Status__c === 'Success' ? 'slds-text-color_success' : 'slds-text-color_error';
             
             return {
                 ...log,

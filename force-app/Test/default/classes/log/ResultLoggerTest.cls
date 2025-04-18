@@ -58,9 +58,9 @@ private class ResultLoggerTest {
         Test.stopTest();
         
         // Verify log was created
-        List<CleverTap_Event__c> logs = [SELECT Id, Status__c FROM CleverTap_Event__c];
+        List<CleverTap__Event__c> logs = [SELECT Id, CleverTap__Status__c FROM CleverTap__Event__c];
         System.assertEquals(1, logs.size(), 'One event log should be created');
-        System.assertEquals('Success', logs[0].Status__c, 'Status should be Success');
+        System.assertEquals('Success', logs[0].CleverTap__Status__c, 'Status should be Success');
     }
     
     @isTest
@@ -84,9 +84,9 @@ private class ResultLoggerTest {
         Test.stopTest();
         
         // Verify log was created
-        List<CleverTap_Event__c> logs = [SELECT Id, Status__c FROM CleverTap_Event__c];
+        List<CleverTap__Event__c> logs = [SELECT Id, CleverTap__Status__c FROM CleverTap__Event__c];
         System.assertEquals(1, logs.size(), 'One event log should be created');
-        System.assertEquals('Failed', logs[0].Status__c, 'Status should be Failed');
+        System.assertEquals('Failed', logs[0].CleverTap__Status__c, 'Status should be Failed');
     }
     
     @isTest
@@ -110,9 +110,9 @@ private class ResultLoggerTest {
         Test.stopTest();
         
         // Verify log was created with the right relationship
-        List<CleverTap_Event__c> logs = [SELECT Id, Contact__c FROM CleverTap_Event__c];
+        List<CleverTap__Event__c> logs = [SELECT Id, CleverTap__Contact__c FROM CleverTap__Event__c];
         System.assertEquals(1, logs.size(), 'One event log should be created');
-        System.assertEquals(testContact.Id, logs[0].Contact__c, 'Contact ID should be set');
+        System.assertEquals(testContact.Id, logs[0].CleverTap__Contact__c, 'Contact ID should be set');
     }
     
     @isTest
@@ -136,9 +136,9 @@ private class ResultLoggerTest {
         Test.stopTest();
         
         // Verify log was created with information in response field
-        List<CleverTap_Event__c> logs = [SELECT Id, Response__c FROM CleverTap_Event__c];
+        List<CleverTap__Event__c> logs = [SELECT Id, CleverTap__Response__c FROM CleverTap__Event__c];
         System.assertEquals(1, logs.size(), 'One event log should be created');
-        System.assert(logs[0].Response__c.contains('Request:'), 'Response should contain request data');
+        System.assert(logs[0].CleverTap__Response__c.contains('Request:'), 'Response should contain request data');
     }
     
     @isTest
@@ -162,8 +162,8 @@ private class ResultLoggerTest {
         Test.stopTest();
         
         // Verify log was created with information in response field
-        List<CleverTap_Event__c> logs = [SELECT Id, Response__c FROM CleverTap_Event__c];
+        List<CleverTap__Event__c> logs = [SELECT Id, CleverTap__Response__c FROM CleverTap__Event__c];
         System.assertEquals(1, logs.size(), 'One event log should be created');
-        System.assert(logs[0].Response__c.contains('CustomObject ID:'), 'Response should contain object ID');
+        System.assert(logs[0].CleverTap__Response__c.contains('CustomObject ID:'), 'Response should contain object ID');
     }
 }

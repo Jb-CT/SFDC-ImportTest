@@ -13,37 +13,37 @@ private class IntegrationSyncControllerTest {
         String testConnectionId = 'TEST_CONN_123';
         
         // Create test sync configuration
-        CleverTap_Sync_Configuration__c config = new CleverTap_Sync_Configuration__c(
+        CleverTap__Sync_Configuration__c config = new CleverTap__Sync_Configuration__c(
             Name = 'Test Sync Config',
-            Sync_Type__c = 'salesforce_to_clevertap',
-            Salesforce_Entity__c = 'Lead',
-            CleverTap_Entity__c = 'profile',
-            ConnectionId__c = testConnectionId,
-            Status__c = 'Active'
+            CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
+            CleverTap__Salesforce_Entity__c = 'Lead',
+            CleverTap__Entity__c = 'profile',
+            CleverTap__ConnectionId__c = testConnectionId,
+            CleverTap__Status__c = 'Active'
         );
         insert config;
         
         // Create test field mappings
-        List<CleverTap_Mapping__c> mappings = new List<CleverTap_Mapping__c>();
+        List<CleverTap__Mapping__c> mappings = new List<CleverTap__Mapping__c>();
         
         // Mandatory mapping
-        mappings.add(new CleverTap_Mapping__c(
+        mappings.add(new CleverTap__Mapping__c(
             Name = 'Customer ID Mapping',
-            Sync_Configuration__c = config.Id,
-            CleverTap_Field__c = 'customer_id',
-            Salesforce_Field__c = 'Email',
-            Data_Type__c = 'Text',
-            Is_Mandatory__c = true
+            CleverTap__Sync_mapping__c = config.Id,
+            CleverTap__Field__c = 'customer_id',
+            CleverTap__Salesforce_Field__c = 'Email',
+            CleverTap__Data_Type__c = 'Text',
+            CleverTap__Is_Mandatory__c = true
         ));
         
         // Regular mapping
-        mappings.add(new CleverTap_Mapping__c(
+        mappings.add(new CleverTap__Mapping__c(
             Name = 'First Name Mapping',
-            Sync_Configuration__c = config.Id,
-            CleverTap_Field__c = 'first_name',
-            Salesforce_Field__c = 'FirstName',
-            Data_Type__c = 'Text',
-            Is_Mandatory__c = false
+            CleverTap__Sync_mapping__c = config.Id,
+            CleverTap__Field__c = 'first_name',
+            CleverTap__Salesforce_Field__c = 'FirstName',
+            CleverTap__Data_Type__c = 'Text',
+            CleverTap__Is_Mandatory__c = false
         ));
         
         insert mappings;
@@ -84,15 +84,15 @@ private class IntegrationSyncControllerTest {
         Map<String, String> option1 = new Map<String, String>{'label' => 'Text', 'value' => 'Text'};
         mockPicklist.add(option1);
         
-        // Create a test instance of CleverTap_Mapping__c to ensure field exists
-        CleverTap_Mapping__c testMapping = new CleverTap_Mapping__c(
-            Data_Type__c = 'Text'
+        // Create a test instance of CleverTap__Mapping__c to ensure field exists
+        CleverTap__Mapping__c testMapping = new CleverTap__Mapping__c(
+            CleverTap__Data_Type__c = 'Text'
         );
         
         // Execute the method
         Test.startTest();
         List<Map<String, String>> picklistValues = 
-            IntegrationSyncController.getPicklistValues('CleverTap_Mapping__c', 'Data_Type__c');
+            IntegrationSyncController.getPicklistValues('CleverTap__Mapping__c', 'CleverTap__Data_Type__c');
         Test.stopTest();
         
         // The assertion below has a condition to make it more resilient
@@ -119,8 +119,8 @@ private class IntegrationSyncControllerTest {
     @isTest
     static void testSaveFieldMappings() {
         // Get existing configuration
-        CleverTap_Sync_Configuration__c config = [
-            SELECT Id, Name FROM CleverTap_Sync_Configuration__c LIMIT 1
+        CleverTap__Sync_Configuration__c config = [
+            SELECT Id, Name FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
         // Prepare test mapping data
@@ -131,18 +131,18 @@ private class IntegrationSyncControllerTest {
         
         // Add mandatory customer_id mapping
         Map<String, Object> mandatoryMapping = new Map<String, Object>{
-            'CleverTap_Field__c' => 'customer_id',
-            'Salesforce_Field__c' => 'Email',
-            'Data_Type__c' => 'Text',
-            'Is_Mandatory__c' => true
+            'CleverTap__Field__c' => 'customer_id',
+            'CleverTap__Salesforce_Field__c' => 'Email',
+            'CleverTap__Data_Type__c' => 'Text',
+            'CleverTap__Is_Mandatory__c' => true
         };
         
         // Add a new additional mapping
         Map<String, Object> additionalMapping = new Map<String, Object>{
-            'CleverTap_Field__c' => 'last_name',
-            'Salesforce_Field__c' => 'LastName',
-            'Data_Type__c' => 'Text',
-            'Is_Mandatory__c' => false
+            'CleverTap__Field__c' => 'last_name',
+            'CleverTap__Salesforce_Field__c' => 'LastName',
+            'CleverTap__Data_Type__c' => 'Text',
+            'CleverTap__Is_Mandatory__c' => false
         };
         
         mappings.add(mandatoryMapping);
@@ -157,26 +157,26 @@ private class IntegrationSyncControllerTest {
         Test.stopTest();
         
         // Verify results
-        List<CleverTap_Mapping__c> updatedMappings = [
-            SELECT CleverTap_Field__c, Salesforce_Field__c, Is_Mandatory__c
-            FROM CleverTap_Mapping__c
-            WHERE Sync_Configuration__c = :config.Id
-            ORDER BY Is_Mandatory__c DESC
+        List<CleverTap__Mapping__c> updatedMappings = [
+            SELECT CleverTap__Field__c, CleverTap__Salesforce_Field__c, CleverTap__Is_Mandatory__c
+            FROM CleverTap__Mapping__c
+            WHERE CleverTap__Sync_mapping__c = :config.Id
+            ORDER BY CleverTap__Is_Mandatory__c DESC
         ];
         
         // Should have 2 mappings (1 mandatory, 1 regular)
         System.assertEquals(2, updatedMappings.size(), 'Should have 2 mappings after update');
         
         // First should be the mandatory mapping
-        System.assertEquals('customer_id', updatedMappings[0].CleverTap_Field__c, 
+        System.assertEquals('customer_id', updatedMappings[0].CleverTap__Field__c, 
             'First mapping should be customer_id');
-        System.assertEquals(true, updatedMappings[0].Is_Mandatory__c, 
+        System.assertEquals(true, updatedMappings[0].CleverTap__Is_Mandatory__c, 
             'customer_id mapping should be mandatory');
         
         // Second should be the new last_name mapping
-        System.assertEquals('last_name', updatedMappings[1].CleverTap_Field__c, 
+        System.assertEquals('last_name', updatedMappings[1].CleverTap__Field__c, 
             'Second mapping should be last_name');
-        System.assertEquals('LastName', updatedMappings[1].Salesforce_Field__c, 
+        System.assertEquals('LastName', updatedMappings[1].CleverTap__Salesforce_Field__c, 
             'Second mapping should map to LastName field');
     }
     
@@ -240,13 +240,13 @@ private class IntegrationSyncControllerTest {
     @isTest
     static void testGetExistingMappings() {
         // Get existing configuration
-        CleverTap_Sync_Configuration__c config = [
-            SELECT Id FROM CleverTap_Sync_Configuration__c LIMIT 1
+        CleverTap__Sync_Configuration__c config = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
         // Execute the method
         Test.startTest();
-        List<CleverTap_Mapping__c> mappings = 
+        List<CleverTap__Mapping__c> mappings = 
             IntegrationSyncController.getExistingMappings(config.Id);
         Test.stopTest();
         
@@ -257,14 +257,14 @@ private class IntegrationSyncControllerTest {
         Boolean hasCustomerId = false;
         Boolean hasFirstName = false;
         
-        for (CleverTap_Mapping__c mapping : mappings) {
-            if (mapping.CleverTap_Field__c == 'customer_id') {
+        for (CleverTap__Mapping__c mapping : mappings) {
+            if (mapping.CleverTap__Field__c == 'customer_id') {
                 hasCustomerId = true;
-                System.assertEquals(true, mapping.Is_Mandatory__c, 'customer_id should be mandatory');
+                System.assertEquals(true, mapping.CleverTap__Is_Mandatory__c, 'customer_id should be mandatory');
             }
-            if (mapping.CleverTap_Field__c == 'first_name') {
+            if (mapping.CleverTap__Field__c == 'first_name') {
                 hasFirstName = true;
-                System.assertEquals(false, mapping.Is_Mandatory__c, 'first_name should not be mandatory');
+                System.assertEquals(false, mapping.CleverTap__Is_Mandatory__c, 'first_name should not be mandatory');
             }
         }
         
@@ -278,12 +278,12 @@ private class IntegrationSyncControllerTest {
     @isTest
     static void testUpdateSyncStatus() {
         // Get existing configuration
-        CleverTap_Sync_Configuration__c config = [
-            SELECT Id, Status__c FROM CleverTap_Sync_Configuration__c LIMIT 1
+        CleverTap__Sync_Configuration__c config = [
+            SELECT Id, CleverTap__Status__c FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
         // Verify initial status
-        System.assertEquals('Active', config.Status__c, 'Initial status should be Active');
+        System.assertEquals('Active', config.CleverTap__Status__c, 'Initial status should be Active');
         
         // Execute the method to deactivate
         Test.startTest();
@@ -291,8 +291,8 @@ private class IntegrationSyncControllerTest {
         Test.stopTest();
         
         // Verify status change
-        config = [SELECT Status__c FROM CleverTap_Sync_Configuration__c WHERE Id = :config.Id];
-        System.assertEquals('Inactive', config.Status__c, 'Status should be updated to Inactive');
+        config = [SELECT CleverTap__Status__c FROM CleverTap__Sync_Configuration__c WHERE Id = :config.Id];
+        System.assertEquals('Inactive', config.CleverTap__Status__c, 'Status should be updated to Inactive');
     }
     
     /**
@@ -319,17 +319,17 @@ private class IntegrationSyncControllerTest {
         System.assertNotEquals(null, newConfigId, 'Should return new configuration Id');
         
         // Query the new configuration
-        CleverTap_Sync_Configuration__c newConfig = [
-            SELECT Name, Salesforce_Entity__c, CleverTap_Entity__c, Status__c, ConnectionId__c
-            FROM CleverTap_Sync_Configuration__c
+        CleverTap__Sync_Configuration__c newConfig = [
+            SELECT Name, CleverTap__Salesforce_Entity__c, CleverTap__Entity__c, CleverTap__Status__c, CleverTap__ConnectionId__c
+            FROM CleverTap__Sync_Configuration__c
             WHERE Id = :newConfigId
         ];
         
         System.assertEquals('New Test Config', newConfig.Name, 'Name should match');
-        System.assertEquals('Contact', newConfig.Salesforce_Entity__c, 'Source entity should match');
-        System.assertEquals('profile', newConfig.CleverTap_Entity__c, 'Target entity should match');
-        System.assertEquals('Active', newConfig.Status__c, 'Status should be Active');
-        System.assertEquals(connectionId, newConfig.ConnectionId__c, 'Connection ID should match');
+        System.assertEquals('Contact', newConfig.CleverTap__Salesforce_Entity__c, 'Source entity should match');
+        System.assertEquals('profile', newConfig.CleverTap__Entity__c, 'Target entity should match');
+        System.assertEquals('Active', newConfig.CleverTap__Status__c, 'Status should be Active');
+        System.assertEquals(connectionId, newConfig.CleverTap__ConnectionId__c, 'Connection ID should match');
     }
     
     /**
@@ -338,8 +338,8 @@ private class IntegrationSyncControllerTest {
     @isTest
     static void testGetSyncConfigurationById() {
         // Get existing configuration
-        CleverTap_Sync_Configuration__c config = [
-            SELECT Id FROM CleverTap_Sync_Configuration__c LIMIT 1
+        CleverTap__Sync_Configuration__c config = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
         // Execute the method
@@ -363,8 +363,8 @@ private class IntegrationSyncControllerTest {
     @isTest
     static void testUpdateSyncConfiguration() {
         // Get existing configuration
-        CleverTap_Sync_Configuration__c config = [
-            SELECT Id FROM CleverTap_Sync_Configuration__c LIMIT 1
+        CleverTap__Sync_Configuration__c config = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
         // Prepare update data
@@ -386,14 +386,14 @@ private class IntegrationSyncControllerTest {
         System.assertEquals('Account', updatedWrapper.sourceEntity, 'Source entity should be updated');
         
         // Verify database update
-        CleverTap_Sync_Configuration__c updatedConfig = [
-            SELECT Name, Salesforce_Entity__c
-            FROM CleverTap_Sync_Configuration__c
+        CleverTap__Sync_Configuration__c updatedConfig = [
+            SELECT Name, CleverTap__Salesforce_Entity__c
+            FROM CleverTap__Sync_Configuration__c
             WHERE Id = :config.Id
         ];
         
         System.assertEquals('Updated Test Config', updatedConfig.Name, 'Name should be updated in database');
-        System.assertEquals('Account', updatedConfig.Salesforce_Entity__c, 
+        System.assertEquals('Account', updatedConfig.CleverTap__Salesforce_Entity__c, 
             'Source entity should be updated in database');
     }
     
@@ -403,13 +403,13 @@ private class IntegrationSyncControllerTest {
     @isTest
     static void testDeleteSyncConfiguration() {
         // Get existing configuration
-        CleverTap_Sync_Configuration__c config = [
-            SELECT Id FROM CleverTap_Sync_Configuration__c LIMIT 1
+        CleverTap__Sync_Configuration__c config = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
         // Count mappings before delete
         Integer initialMappingCount = [
-            SELECT COUNT() FROM CleverTap_Mapping__c WHERE Sync_Configuration__c = :config.Id
+            SELECT COUNT() FROM CleverTap__Mapping__c WHERE CleverTap__Sync_mapping__c = :config.Id
         ];
         System.assertEquals(2, initialMappingCount, 'Should have 2 mappings initially');
         
@@ -419,14 +419,14 @@ private class IntegrationSyncControllerTest {
         Test.stopTest();
         
         // Verify configuration deleted
-        List<CleverTap_Sync_Configuration__c> remainingConfigs = [
-            SELECT Id FROM CleverTap_Sync_Configuration__c WHERE Id = :config.Id
+        List<CleverTap__Sync_Configuration__c> remainingConfigs = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c WHERE Id = :config.Id
         ];
         System.assertEquals(0, remainingConfigs.size(), 'Configuration should be deleted');
         
         // Verify cascade delete of mappings
-        List<CleverTap_Mapping__c> remainingMappings = [
-            SELECT Id FROM CleverTap_Mapping__c WHERE Sync_Configuration__c = :config.Id
+        List<CleverTap__Mapping__c> remainingMappings = [
+            SELECT Id FROM CleverTap__Mapping__c WHERE CleverTap__Sync_mapping__c = :config.Id
         ];
         System.assertEquals(0, remainingMappings.size(), 'Related mappings should be deleted');
     }
@@ -511,8 +511,8 @@ private class IntegrationSyncControllerTest {
     @isTest
     static void testRunHistoricalSync() {
         // Set up a test configuration
-        CleverTap_Sync_Configuration__c config = [
-            SELECT Id FROM CleverTap_Sync_Configuration__c LIMIT 1
+        CleverTap__Sync_Configuration__c config = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
         // Create a test Lead to ensure there's data for the batch to process
@@ -534,16 +534,16 @@ private class IntegrationSyncControllerTest {
         System.assertEquals('Success', result, 'Should return success status');
         
         // Verify that an event log was created
-        List<CleverTap_Event__c> events = [
-            SELECT Id, Status__c, Response__c 
-            FROM CleverTap_Event__c 
+        List<CleverTap__Event__c> events = [
+            SELECT Id, CleverTap__Status__c, CleverTap__Response__c 
+            FROM CleverTap__Event__c 
             
         ];
         
         // This will pass even if no events were created, which might happen in test context
         // where batch runs are simulated but not fully executed
         if (!events.isEmpty()) {
-            System.assertEquals('Success', events[0].Status__c, 'Event status should be Success');
+            System.assertEquals('Success', events[0].CleverTap__Status__c, 'Event status should be Success');
         } else {
             System.assert(true, 'No events created, which is acceptable in test context');
         }

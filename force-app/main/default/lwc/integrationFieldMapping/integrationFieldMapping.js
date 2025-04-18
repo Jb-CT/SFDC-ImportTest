@@ -70,25 +70,25 @@ export default class IntegrationFieldMapping extends LightningElement {
             const existingMappings = await getExistingMappings({ syncId: this.syncId });
             if (existingMappings) {
                 // Process customer_id mapping
-                const customerIdMapping = existingMappings.find(m => m.CleverTap_Field__c === 'customer_id' && m.Is_Mandatory__c);
+                const customerIdMapping = existingMappings.find(m => m.CleverTap__Field__c === 'customer_id' && m.CleverTap__Is_Mandatory__c);
                 if (customerIdMapping) {
-                    this.mandatoryFieldMapping.customer_id = customerIdMapping.Salesforce_Field__c;
+                    this.mandatoryFieldMapping.customer_id = customerIdMapping.CleverTap__Salesforce_Field__c;
                 }
                 
                 // Process event_name mapping
-                const eventNameMapping = existingMappings.find(m => m.CleverTap_Field__c === 'evtName' && m.Is_Mandatory__c);
+                const eventNameMapping = existingMappings.find(m => m.CleverTap__Field__c === 'evtName' && m.CleverTap__Is_Mandatory__c);
                 if (eventNameMapping) {
-                    this.mandatoryFieldMapping.event_name = eventNameMapping.Salesforce_Field__c;
+                    this.mandatoryFieldMapping.event_name = eventNameMapping.CleverTap__Salesforce_Field__c;
                 }
 
                 // Process additional mappings
                 this.additionalMappings = existingMappings
-                    .filter(m => !m.Is_Mandatory__c)
+                    .filter(m => !m.CleverTap__Is_Mandatory__c)
                     .map(m => ({
                         id: Date.now() + Math.random(),
-                        targetField: m.CleverTap_Field__c,
-                        sourceField: m.Salesforce_Field__c,
-                        dataType: m.Data_Type__c || 'Text'
+                        targetField: m.CleverTap__Field__c,
+                        sourceField: m.CleverTap__Salesforce_Field__c,
+                        dataType: m.CleverTap__Data_Type__c || 'Text'
                     }));
             }
             
@@ -183,20 +183,20 @@ export default class IntegrationFieldMapping extends LightningElement {
             const mappings = [
                 // Customer ID mapping
                 {
-                    CleverTap_Field__c: 'customer_id',
-                    Salesforce_Field__c: this.mandatoryFieldMapping.customer_id,
-                    Data_Type__c: 'Text',
-                    Is_Mandatory__c: true
+                    CleverTap__Field__c: 'customer_id',
+                    CleverTap__Salesforce_Field__c: this.mandatoryFieldMapping.customer_id,
+                    CleverTap__Data_Type__c: 'Text',
+                    CleverTap__Is_Mandatory__c: true
                 }
             ];
             
             // Only include event name mapping for event entity type
             if (this.isEventEntity) {
                 mappings.push({
-                    CleverTap_Field__c: 'evtName',
-                    Salesforce_Field__c: this.mandatoryFieldMapping.event_name,
-                    Data_Type__c: 'Text',
-                    Is_Mandatory__c: true
+                    CleverTap__Field__c: 'evtName',
+                    CleverTap__Salesforce_Field__c: this.mandatoryFieldMapping.event_name,
+                    CleverTap__Data_Type__c: 'Text',
+                    CleverTap__Is_Mandatory__c: true
                 });
             }
             
@@ -209,10 +209,10 @@ export default class IntegrationFieldMapping extends LightningElement {
                     ...this.additionalMappings
                         .filter(m => m.targetField && m.sourceField)
                         .map(m => ({
-                            CleverTap_Field__c: m.targetField,
-                            Salesforce_Field__c: m.sourceField,
-                            Data_Type__c: m.dataType || 'Text',
-                            Is_Mandatory__c: false
+                            CleverTap__Field__c: m.targetField,
+                            CleverTap__Salesforce_Field__c: m.sourceField,
+                            CleverTap__Data_Type__c: m.dataType || 'Text',
+                            CleverTap__Is_Mandatory__c: false
                         }))
                 ]
             };

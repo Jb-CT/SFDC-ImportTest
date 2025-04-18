@@ -29,105 +29,105 @@ private class EntityTransformerTest {
         insert testLead;
         
         // Create active sync configuration for Lead
-        CleverTap_Sync_Configuration__c leadConfig = new CleverTap_Sync_Configuration__c(
+        CleverTap__Sync_Configuration__c leadConfig = new CleverTap__Sync_Configuration__c(
             Name = 'Test Lead Config',
-            Salesforce_Entity__c = 'Lead',
-            CleverTap_Entity__c = 'profile',
-            Status__c = 'Active',
-            Sync_Type__c = 'salesforce_to_clevertap',
-            ConnectionId__c = 'TEST_CONN_ID_1'
+            CleverTap__Salesforce_Entity__c = 'Lead',
+            CleverTap__Entity__c = 'profile',
+            CleverTap__Status__c = 'Active',
+            CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
+            CleverTap__ConnectionId__c = 'TEST_CONN_ID_1'
         );
         insert leadConfig;
         
         // Create field mappings for Lead
-        List<CleverTap_Mapping__c> leadMappings = new List<CleverTap_Mapping__c>{
-            new CleverTap_Mapping__c(
-                Sync_Configuration__c = leadConfig.Id,
-                CleverTap_Field__c = 'customer_id',
-                Salesforce_Field__c = 'Email',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = true
+        List<CleverTap__Mapping__c> leadMappings = new List<CleverTap__Mapping__c>{
+            new CleverTap__Mapping__c(
+                CleverTap__Sync_mapping__c = leadConfig.Id,
+                CleverTap__Field__c = 'customer_id',
+                CleverTap__Salesforce_Field__c = 'Email',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = true
             ),
-            new CleverTap_Mapping__c(
-                Sync_Configuration__c = leadConfig.Id,
-                CleverTap_Field__c = 'first_name',
-                Salesforce_Field__c = 'FirstName',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = false
+            new CleverTap__Mapping__c(
+                CleverTap__Sync_mapping__c = leadConfig.Id,
+                CleverTap__Field__c = 'first_name',
+                CleverTap__Salesforce_Field__c = 'FirstName',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = false
             ),
-            new CleverTap_Mapping__c(
-                Sync_Configuration__c = leadConfig.Id,
-                CleverTap_Field__c = 'last_name',
-                Salesforce_Field__c = 'LastName',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = false
+            new CleverTap__Mapping__c(
+                CleverTap__Sync_mapping__c = leadConfig.Id,
+                CleverTap__Field__c = 'last_name',
+                CleverTap__Salesforce_Field__c = 'LastName',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = false
             )
         };
         insert leadMappings;
         
         // Create active sync configuration for Lead as Event
-        CleverTap_Sync_Configuration__c leadEventConfig = new CleverTap_Sync_Configuration__c(
+        CleverTap__Sync_Configuration__c leadEventConfig = new CleverTap__Sync_Configuration__c(
             Name = 'Test Lead Event Config',
-            Salesforce_Entity__c = 'Lead',
-            CleverTap_Entity__c = 'event',
-            Status__c = 'Active',
-            Sync_Type__c = 'salesforce_to_clevertap',
-            ConnectionId__c = 'TEST_CONN_ID_2'
+            CleverTap__Salesforce_Entity__c = 'Lead',
+            CleverTap__Entity__c = 'event',
+            CleverTap__Status__c = 'Active',
+            CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
+            CleverTap__ConnectionId__c = 'TEST_CONN_ID_2'
         );
         insert leadEventConfig;
         
         // Create field mappings for Lead Event
-        List<CleverTap_Mapping__c> leadEventMappings = new List<CleverTap_Mapping__c>{
-            new CleverTap_Mapping__c(
-                Sync_Configuration__c = leadEventConfig.Id,
-                CleverTap_Field__c = 'customer_id',
-                Salesforce_Field__c = 'Email',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = true
+        List<CleverTap__Mapping__c> leadEventMappings = new List<CleverTap__Mapping__c>{
+            new CleverTap__Mapping__c(
+                CleverTap__Sync_mapping__c = leadEventConfig.Id,
+                CleverTap__Field__c = 'customer_id',
+                CleverTap__Salesforce_Field__c = 'Email',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = true
             ),
-            new CleverTap_Mapping__c(
-                Sync_Configuration__c = leadEventConfig.Id,
-                CleverTap_Field__c = 'evtName',
-                Salesforce_Field__c = 'sf_lead_created',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = true
+            new CleverTap__Mapping__c(
+                CleverTap__Sync_mapping__c = leadEventConfig.Id,
+                CleverTap__Field__c = 'evtName',
+                CleverTap__Salesforce_Field__c = 'sf_lead_created',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = true
             ),
-            new CleverTap_Mapping__c(
-                Sync_Configuration__c = leadEventConfig.Id,
-                CleverTap_Field__c = 'company',
-                Salesforce_Field__c = 'Company',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = false
+            new CleverTap__Mapping__c(
+                CleverTap__Sync_mapping__c = leadEventConfig.Id,
+                CleverTap__Field__c = 'company',
+                CleverTap__Salesforce_Field__c = 'Company',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = false
             )
         };
         insert leadEventMappings;
         
         // Create active sync configuration for Contact
-        CleverTap_Sync_Configuration__c contactConfig = new CleverTap_Sync_Configuration__c(
+        CleverTap__Sync_Configuration__c contactConfig = new CleverTap__Sync_Configuration__c(
             Name = 'Test Contact Config',
-            Salesforce_Entity__c = 'Contact',
-            CleverTap_Entity__c = 'profile',
-            Status__c = 'Active',
-            Sync_Type__c = 'salesforce_to_clevertap',
-            ConnectionId__c = 'TEST_CONN_ID_3'
+            CleverTap__Salesforce_Entity__c = 'Contact',
+            CleverTap__Entity__c = 'profile',
+            CleverTap__Status__c = 'Active',
+            CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
+            CleverTap__ConnectionId__c = 'TEST_CONN_ID_3'
         );
         insert contactConfig;
         
         // Create field mappings for Contact
-        List<CleverTap_Mapping__c> contactMappings = new List<CleverTap_Mapping__c>{
-            new CleverTap_Mapping__c(
-                Sync_Configuration__c = contactConfig.Id,
-                CleverTap_Field__c = 'customer_id',
-                Salesforce_Field__c = 'Email',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = true
+        List<CleverTap__Mapping__c> contactMappings = new List<CleverTap__Mapping__c>{
+            new CleverTap__Mapping__c(
+                CleverTap__Sync_mapping__c = contactConfig.Id,
+                CleverTap__Field__c = 'customer_id',
+                CleverTap__Salesforce_Field__c = 'Email',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = true
             ),
-            new CleverTap_Mapping__c(
-                Sync_Configuration__c = contactConfig.Id,
-                CleverTap_Field__c = 'name',
-                Salesforce_Field__c = 'LastName',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = false
+            new CleverTap__Mapping__c(
+                CleverTap__Sync_mapping__c = contactConfig.Id,
+                CleverTap__Field__c = 'name',
+                CleverTap__Salesforce_Field__c = 'LastName',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = false
             )
         };
         insert contactMappings;
@@ -242,12 +242,12 @@ private class EntityTransformerTest {
     @isTest
     static void testMapToCleverTapWithNoMappings() {
         // Create config for Account but don't create mappings
-        CleverTap_Sync_Configuration__c accountConfig = new CleverTap_Sync_Configuration__c(
+        CleverTap__Sync_Configuration__c accountConfig = new CleverTap__Sync_Configuration__c(
             Name = 'Test Account Config',
-            Salesforce_Entity__c = 'Account',
-            CleverTap_Entity__c = 'profile',
-            Status__c = 'Active',
-            Sync_Type__c = 'salesforce_to_clevertap'
+            CleverTap__Salesforce_Entity__c = 'Account',
+            CleverTap__Entity__c = 'profile',
+            CleverTap__Status__c = 'Active',
+            CleverTap__Sync_Type__c = 'salesforce_to_clevertap'
         );
         insert accountConfig;
         

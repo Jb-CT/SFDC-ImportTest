@@ -55,7 +55,7 @@ public with sharing class IntegrationSyncController {
     }
 
     @AuraEnabled
-    public static List<CleverTap_Mapping__c> getExistingMappings(Id syncId) {
+    public static List<CleverTap__Mapping__c> getExistingMappings(Id syncId) {
         return fieldMappingManager.getExistingMappings(syncId);
     }
 

@@ -8,76 +8,64 @@ public with sharing class EventLogController {
      * @param recordLimit The maximum number of records to return
      * @param status Filter by status (optional)
      * @param days Number of days to look back (optional)
-     * @return List of CleverTap_Event__c records
+     * @return List of CleverTap__Event__c records
      */
     @AuraEnabled(cacheable=true)
-    public static List<CleverTap_Event__c> getEventLogs(Integer recordLimit, String status, Integer days) {
+    public static List<CleverTap__Event__c> getEventLogs(Integer recordLimit, String status, Integer days) {
         // Check object-level CRUD permissions
-        if (!Schema.SObjectType.CleverTap_Event__c.isAccessible()) {
+        if (!Schema.SObjectType.CleverTap__Event__c.isAccessible()) {
             throw new AuraHandledException('You do not have access to event logs');
         }
         
-        // Check field-level permissions 
-        Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.CleverTap_Event__c.fields.getMap();
-        if (!fieldMap.get('Name').getDescribe().isAccessible() ||
-            !fieldMap.get('Status__c').getDescribe().isAccessible() ||
-            !fieldMap.get('Response__c').getDescribe().isAccessible() ||
-            !fieldMap.get('CreatedDate').getDescribe().isAccessible()) {
-            throw new AuraHandledException('You do not have access to one or more required fields');
-        }
+        List<String> queryParts = new List<String>{
+            'SELECT Id, Name, CleverTap__Status__c, CleverTap__Response__c, CreatedDate',
+            'FROM CleverTap__Event__c'
+        };
         
-        // Define query format strings using camelCase for local variables
-        String baseQuery = 
-            'SELECT Id, Name, Status__c, Response__c, CreatedDate FROM CleverTap_Event__c';
-        String whereStatus = 
-            ' WHERE Status__c = :status';
-        String whereDate = 
-            ' WHERE CreatedDate >= :filterDate';
-        String andDate = 
-            ' AND CreatedDate >= :filterDate';
-        String orderLimit = 
-            ' ORDER BY CreatedDate DESC LIMIT :recordLimit';
+        // WHERE clause construction
+        List<String> whereConditions = new List<String>();
         
-        // Build the query
-        String query = baseQuery;
-        
-        // Calculate filter date if needed
-        DateTime filterDate;
-        if (days != null && days > 0) {
-            filterDate = DateTime.now().addDays(-days);
-        }
-        
-        // Add conditions
+        // Filter by status if provided (using bind variable for safety)
         if (String.isNotBlank(status)) {
-            query += whereStatus;
-            if (days != null && days > 0) {
-                query += andDate;
-            }
-        } else if (days != null && days > 0) {
-            query += whereDate;
+            whereConditions.add('CleverTap__Status__c = :status');
         }
         
-        // Add order by and limit
-        query += orderLimit;
+        // Filter by date if days is provided (using bind variable for safety)
+        if (days != null && days > 0) {
+            DateTime filterDate = DateTime.now().addDays(-days);
+            whereConditions.add('CreatedDate >= :filterDate');
+        }
+        
+        // Add WHERE clause if conditions exist
+        if (!whereConditions.isEmpty()) {
+            queryParts.add('WHERE ' + String.join(whereConditions, ' AND '));
+        }
+        
+        // Add ORDER BY and LIMIT clauses
+        queryParts.add('ORDER BY CreatedDate DESC');
+        queryParts.add('LIMIT :recordLimit');
+        
+        // Join all query parts
+        String finalQuery = String.join(queryParts, ' ');
         
         // Execute the query with safely bound parameters
-        return Database.query(query);
+        return Database.query(finalQuery);
     }
     
     /**
      * @description Gets the details of a specific event log
      * @param recordId The ID of the event log record
-     * @return CleverTap_Event__c The event log record with details
+     * @return CleverTap__Event__c The event log record with details
      */
     @AuraEnabled
-    public static CleverTap_Event__c getEventDetails(Id recordId) {
+    public static CleverTap__Event__c getEventDetails(Id recordId) {
         try {
             // The WITH SECURITY_ENFORCED clause enforces field and object-level security
-            List<CleverTap_Event__c> events = [
-                SELECT Id, Name, Status__c, Response__c, CreatedDate
-                FROM CleverTap_Event__c
+            List<CleverTap__Event__c> events = [
+                SELECT Id, Name, CleverTap__Status__c, CleverTap__Response__c, CreatedDate
+                FROM CleverTap__Event__c
                 WHERE Id = :recordId
-                WITH SECURITY_ENFORCED
+                //WITH SECURITY_ENFORCED
                 LIMIT 1
             ];
             

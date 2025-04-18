@@ -1,12 +1,12 @@
 /**
  * @class SyncConfigurationManager
  * @description Manager class for handling sync configuration operations.
- * Handles CRUD operations for CleverTap_Sync_Configuration__c records.
+ * Handles CRUD operations for CleverTap__Sync_Configuration__c records.
  */
 public with sharing class SyncConfigurationManager {
     /**
      * @class SyncConfigWrapper
-     * @description Wrapper class for CleverTap_Sync_Configuration__c objects
+     * @description Wrapper class for CleverTap__Sync_Configuration__c objects
      */
     public class SyncConfigWrapper {
         @AuraEnabled public String id { get; set; }
@@ -16,28 +16,28 @@ public with sharing class SyncConfigurationManager {
         @AuraEnabled public String targetEntity { get; set; }
         @AuraEnabled public String status { get; set; }
 
-        public SyncConfigWrapper(CleverTap_Sync_Configuration__c config) {
+        public SyncConfigWrapper(CleverTap__Sync_Configuration__c config) {
             this.id = config.Id;
             this.name = config.Name;
-            this.syncType = config.Sync_Type__c;
-            this.sourceEntity = config.Salesforce_Entity__c;
-            this.targetEntity = config.CleverTap_Entity__c;
-            this.status = config.Status__c;
+            this.syncType = config.CleverTap__Sync_Type__c;
+            this.sourceEntity = config.CleverTap__Salesforce_Entity__c;
+            this.targetEntity = config.CleverTap__Entity__c;
+            this.status = config.CleverTap__Status__c;
         }
     }
 
     public List<SyncConfigWrapper> getSyncConfigurations(String connectionId) {
         try {
-            if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+            if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
                 throw new AuraHandledException('You do not have access to sync configurations');
             }
             
-            List<CleverTap_Sync_Configuration__c> configs = [
-                SELECT Id, Name, Sync_Type__c, 
-                       Salesforce_Entity__c, CleverTap_Entity__c, 
-                       Status__c, ConnectionId__c
-                FROM CleverTap_Sync_Configuration__c
-                WHERE ConnectionId__c = :connectionId
+            List<CleverTap__Sync_Configuration__c> configs = [
+                SELECT Id, Name, CleverTap__Sync_Type__c, 
+                       CleverTap__Salesforce_Entity__c, CleverTap__Entity__c, 
+                       CleverTap__Status__c, CleverTap__ConnectionId__c
+                FROM CleverTap__Sync_Configuration__c
+                WHERE CleverTap__ConnectionId__c = :connectionId
                 ORDER BY CreatedDate DESC
             ];
             
@@ -50,12 +50,12 @@ public with sharing class SyncConfigurationManager {
     
     /**
      * @description Helper method to convert configurations to wrappers
-     * @param configs List of CleverTap_Sync_Configuration__c records
+     * @param configs List of CleverTap__Sync_Configuration__c records
      * @return List of sync configuration wrappers
      */
-    private List<SyncConfigWrapper> wrapConfigurations(List<CleverTap_Sync_Configuration__c> configs) {
+    private List<SyncConfigWrapper> wrapConfigurations(List<CleverTap__Sync_Configuration__c> configs) {
         List<SyncConfigWrapper> wrappers = new List<SyncConfigWrapper>();
-        for (CleverTap_Sync_Configuration__c config : configs) {
+        for (CleverTap__Sync_Configuration__c config : configs) {
             wrappers.add(new SyncConfigWrapper(config));
         }
         return wrappers;
@@ -63,15 +63,15 @@ public with sharing class SyncConfigurationManager {
 
     public SyncConfigWrapper getSyncConfigurationById(String syncId) {
         try {
-            if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+            if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
                 throw new AuraHandledException('You do not have access to sync configurations');
             }
             
-            CleverTap_Sync_Configuration__c config = [
-                SELECT Id, Name, Sync_Type__c, 
-                       Salesforce_Entity__c, CleverTap_Entity__c, 
-                       Status__c
-                FROM CleverTap_Sync_Configuration__c
+            CleverTap__Sync_Configuration__c config = [
+                SELECT Id, Name, CleverTap__Sync_Type__c, 
+                       CleverTap__Salesforce_Entity__c, CleverTap__Entity__c, 
+                       CleverTap__Status__c
+                FROM CleverTap__Sync_Configuration__c
                 WHERE Id = :syncId
                 LIMIT 1
             ];
@@ -84,19 +84,19 @@ public with sharing class SyncConfigurationManager {
 
     public String createSyncConfiguration(String syncData) {
         try {
-            if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isCreateable()) {
+            if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isCreateable()) {
                 throw new AuraHandledException('You do not have permission to create configurations');
             }
             
             Map<String, Object> syncMap = (Map<String, Object>) JSON.deserializeUntyped(syncData);
             
-            CleverTap_Sync_Configuration__c syncConfig = new CleverTap_Sync_Configuration__c(
+            CleverTap__Sync_Configuration__c syncConfig = new CleverTap__Sync_Configuration__c(
                 Name = (String) syncMap.get('name'),
-                Sync_Type__c = (String) syncMap.get('syncType'),
-                Salesforce_Entity__c = (String) syncMap.get('sourceEntity'),
-                CleverTap_Entity__c = (String) syncMap.get('targetEntity'),
-                ConnectionId__c = (String) syncMap.get('connectionId'),
-                Status__c = 'Active'
+                CleverTap__Sync_Type__c = (String) syncMap.get('syncType'),
+                CleverTap__Salesforce_Entity__c = (String) syncMap.get('sourceEntity'),
+                CleverTap__Entity__c = (String) syncMap.get('targetEntity'),
+                CleverTap__ConnectionId__c = (String) syncMap.get('connectionId'),
+                CleverTap__Status__c = 'Active'
             );
             
             insert syncConfig;
@@ -109,22 +109,22 @@ public with sharing class SyncConfigurationManager {
 
     public SyncConfigWrapper updateSyncConfiguration(String syncId, String syncData) {
         try {
-            if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
+            if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
                 throw new AuraHandledException('You do not have permission to update configurations');
             }
             
             Map<String, Object> syncMap = (Map<String, Object>) JSON.deserializeUntyped(syncData);
             
-            CleverTap_Sync_Configuration__c syncConfig = [
-                SELECT Id FROM CleverTap_Sync_Configuration__c 
+            CleverTap__Sync_Configuration__c syncConfig = [
+                SELECT Id FROM CleverTap__Sync_Configuration__c 
                 WHERE Id = :syncId 
                 LIMIT 1
             ];
             
             syncConfig.Name = (String) syncMap.get('name');
-            syncConfig.Sync_Type__c = (String) syncMap.get('syncType');
-            syncConfig.Salesforce_Entity__c = (String) syncMap.get('sourceEntity');
-            syncConfig.CleverTap_Entity__c = (String) syncMap.get('targetEntity');
+            syncConfig.CleverTap__Sync_Type__c = (String) syncMap.get('syncType');
+            syncConfig.CleverTap__Salesforce_Entity__c = (String) syncMap.get('sourceEntity');
+            syncConfig.CleverTap__Entity__c = (String) syncMap.get('targetEntity');
             
             update syncConfig;
             
@@ -137,14 +137,14 @@ public with sharing class SyncConfigurationManager {
 
     public void updateSyncStatus(String syncId, String status) {
         try {
-            if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
+            if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
                 throw new AuraHandledException('You do not have permission to update configurations');
             }
             
-            CleverTap_Sync_Configuration__c config = [
-                SELECT Id, Status__c FROM CleverTap_Sync_Configuration__c WHERE Id = :syncId LIMIT 1
+            CleverTap__Sync_Configuration__c config = [
+                SELECT Id, CleverTap__Status__c FROM CleverTap__Sync_Configuration__c WHERE Id = :syncId LIMIT 1
             ];
-            config.Status__c = status;
+            config.CleverTap__Status__c = status;
             update config;
         } catch (Exception e) {
             throw new AuraHandledException('Error updating sync status: ' + e.getMessage());
@@ -153,12 +153,12 @@ public with sharing class SyncConfigurationManager {
 
     public void deleteSyncConfiguration(String syncId) {
         try {
-            if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {
+            if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {
                 throw new AuraHandledException('You do not have permission to delete configurations');
             }
             
-            CleverTap_Sync_Configuration__c config = [
-                SELECT Id FROM CleverTap_Sync_Configuration__c WHERE Id = :syncId LIMIT 1
+            CleverTap__Sync_Configuration__c config = [
+                SELECT Id FROM CleverTap__Sync_Configuration__c WHERE Id = :syncId LIMIT 1
             ];
             delete config;
         } catch (Exception e) {

@@ -14,8 +14,19 @@ public class TestModule implements DIModule {
         this.mockService = mockService;
     }
 
+    /**
+     * @description Default constructor
+     */
     public TestModule() {
         this.mockService = new MockCleverTapService();
+    }
+    
+    /**
+     * @description Provides an instance of IntegrationHandler
+     * @return IntegrationHandler An instance of the integration handler
+     */
+    public IntegrationHandler provideIntegrationHandler() {
+        return new IntegrationHandler(this);
     }
     
     /**
@@ -24,6 +35,30 @@ public class TestModule implements DIModule {
      */
     public DataProcessor provideCleverTapService() {
         return mockService;
+    }
+    
+    /**
+     * @description Provides an instance of EntityTransformer for testing
+     * @return EntityTransformer A mock or test implementation of EntityTransformer
+     */
+    public EntityTransformer provideEntityTransformer() {
+        return new EntityTransformer();
+    }
+    
+    /**
+     * @description Provides an instance of Config for testing
+     * @return Config A mock or test implementation of Config
+     */
+    public Config provideConfig() {
+        return new Config();
+    }
+    
+    /**
+     * @description Provides an instance of ResultLogger for testing
+     * @return ResultLogger A mock or test implementation of ResultLogger
+     */
+    public ResultLogger provideResultLogger() {
+        return new ResultLogger();
     }
     
     /**

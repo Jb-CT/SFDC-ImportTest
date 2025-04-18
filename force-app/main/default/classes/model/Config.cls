@@ -1,6 +1,6 @@
 /**
  * @class Config
- * @description This class is responsible for retrieving CleverTap credentials from the CleverTap_Config__c custom setting.
+ * @description This class is responsible for retrieving CleverTap credentials from the CleverTap__Config__c custom setting.
  * It ensures proper field-level access and returns a map containing configuration key-value pairs used for integration with CleverTap.
  */
 public with sharing class Config {
@@ -9,16 +9,16 @@ public with sharing class Config {
      * @return Map of credential key-value pairs
      */
     public Map<String, String> getCredentials() {
-        // Ensure the user has read access to CleverTap_Config__c
-        if (!Schema.sObjectType.CleverTap_Config__c.isAccessible()) {
+        // Ensure the user has read access to CleverTap__Config__c
+        if (!Schema.sObjectType.CleverTap__Config__c.isAccessible()) {
             return null;
         }
 
-        List<CleverTap_Config__c> configList = [
-            SELECT Name, CleverTap_API_URL__c, 
-                   CleverTap_Account_ID__c, CleverTap_Passcode__c,
-                   Region__c
-            FROM CleverTap_Config__c 
+        List<CleverTap__Config__c> configList = [
+            SELECT Name, CleverTap__API_URL__c, 
+                   CleverTap__Account_ID__c, CleverTap__Passcode__c,
+                   CleverTap__Region__c
+            FROM CleverTap__Config__c 
             WHERE Name != '[Deleted]'
             LIMIT 1
         ];
@@ -27,15 +27,15 @@ public with sharing class Config {
             return null;
         }
 
-        CleverTap_Config__c config = configList[0];
+        CleverTap__Config__c config = configList[0];
 
         Map<String, String> credentials = new Map<String, String>{
             'NAME'       => config.Name,
             'DEV_NAME'   => config.Name, 
-            'API_URL'    => config.CleverTap_API_URL__c,
-            'ACCOUNT_ID' => config.CleverTap_Account_ID__c,
-            'PASSCODE'   => config.CleverTap_Passcode__c,
-            'REGION'     => config.Region__c
+            'API_URL'    => config.CleverTap__API_URL__c,
+            'ACCOUNT_ID' => config.CleverTap__Account_ID__c,
+            'PASSCODE'   => config.CleverTap__Passcode__c,
+            'REGION'     => config.CleverTap__Region__c
         };
         
         return credentials;

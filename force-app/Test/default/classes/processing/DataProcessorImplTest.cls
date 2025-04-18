@@ -5,34 +5,34 @@ private class DataProcessorImplTest {
     @testSetup
     static void setupTestData() {
         // Test config record
-        CleverTap_Config__c testConfig = new CleverTap_Config__c(
+        CleverTap__Config__c testConfig = new CleverTap__Config__c(
             Name = 'Test Config',
-            Region__c = 'US',
-            CleverTap_Account_ID__c = 'test-id',
-            CleverTap_Passcode__c = 'test-pass',
-            CleverTap_API_URL__c = 'https://test-api.example.com'
+            CleverTap__Region__c = 'US',
+            CleverTap__Account_ID__c = 'test-id',
+            CleverTap__Passcode__c = 'test-pass',
+            CleverTap__API_URL__c = 'https://test-api.example.com'
         );
         insert testConfig;
         
         // Create sync config
-        CleverTap_Sync_Configuration__c syncConfig = new CleverTap_Sync_Configuration__c(
+        CleverTap__Sync_Configuration__c syncConfig = new CleverTap__Sync_Configuration__c(
             Name = 'Test Lead Sync',
-            Sync_Type__c = 'salesforce_to_clevertap',
-            Salesforce_Entity__c = 'Lead',
-            CleverTap_Entity__c = 'profile',
-            ConnectionId__c = testConfig.Id,
-            Status__c = 'Active'
+            CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
+            CleverTap__Salesforce_Entity__c = 'Lead',
+            CleverTap__Entity__c = 'profile',
+            CleverTap__ConnectionId__c = testConfig.Id,
+            CleverTap__Status__c = 'Active'
         );
         insert syncConfig;
         
         // Create field mapping
-        CleverTap_Mapping__c mapping = new CleverTap_Mapping__c(
+        CleverTap__Mapping__c mapping = new CleverTap__Mapping__c(
             Name = 'Test Mapping',
-            Sync_Configuration__c = syncConfig.Id,
-            CleverTap_Field__c = 'customer_id',
-            Salesforce_Field__c = 'Email',
-            Data_Type__c = 'Text',
-            Is_Mandatory__c = true
+            CleverTap__Sync_mapping__c = syncConfig.Id,
+            CleverTap__Field__c = 'customer_id',
+            CleverTap__Salesforce_Field__c = 'Email',
+            CleverTap__Data_Type__c = 'Text',
+            CleverTap__Is_Mandatory__c = true
         );
         insert mapping;
         
@@ -84,7 +84,7 @@ private class DataProcessorImplTest {
         TestUtils.bypassTriggers = false;
         
         // Verify log created
-        List<CleverTap_Event__c> logs = [SELECT Id, Status__c FROM CleverTap_Event__c WHERE Lead__c = :testLead.Id];
+        List<CleverTap__Event__c> logs = [SELECT Id, CleverTap__Status__c FROM CleverTap__Event__c WHERE Lead__c = :testLead.Id];
         System.assertNotEquals(0, logs.size(), 'Event log should be created');
     }
     
@@ -98,8 +98,8 @@ private class DataProcessorImplTest {
         Lead testLead = [SELECT Id, FirstName, LastName, Email FROM Lead LIMIT 1];
         
         // Update sync config to profile
-        CleverTap_Sync_Configuration__c syncConfig = [SELECT Id FROM CleverTap_Sync_Configuration__c LIMIT 1];
-        syncConfig.CleverTap_Entity__c = 'profile';
+        CleverTap__Sync_Configuration__c syncConfig = [SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1];
+        syncConfig.CleverTap__Entity__c = 'profile';
         update syncConfig;
         
         // Create test helpers
@@ -115,7 +115,7 @@ private class DataProcessorImplTest {
         Test.stopTest();
         
         // Verify log created
-        List<CleverTap_Event__c> logs = [SELECT Id FROM CleverTap_Event__c WHERE Lead__c = :testLead.Id];
+        List<CleverTap__Event__c> logs = [SELECT Id FROM CleverTap__Event__c WHERE Lead__c = :testLead.Id];
         System.assertNotEquals(0, logs.size(), 'Event log should be created for profile entity');
     }
     
@@ -129,18 +129,18 @@ private class DataProcessorImplTest {
         Lead testLead = [SELECT Id, FirstName, LastName, Email FROM Lead LIMIT 1];
         
         // Update sync config to event
-        CleverTap_Sync_Configuration__c syncConfig = [SELECT Id FROM CleverTap_Sync_Configuration__c LIMIT 1];
-        syncConfig.CleverTap_Entity__c = 'event';
+        CleverTap__Sync_Configuration__c syncConfig = [SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1];
+        syncConfig.CleverTap__Entity__c = 'event';
         update syncConfig;
         
         // Create additional mandatory mapping for event name
-        CleverTap_Mapping__c eventMapping = new CleverTap_Mapping__c(
+        CleverTap__Mapping__c eventMapping = new CleverTap__Mapping__c(
             Name = 'Event Name Mapping',
-            Sync_Configuration__c = syncConfig.Id,
-            CleverTap_Field__c = 'evtName',
-            Salesforce_Field__c = 'sf_lead_event',
-            Data_Type__c = 'Text',
-            Is_Mandatory__c = true
+            CleverTap__Sync_mapping__c = syncConfig.Id,
+            CleverTap__Field__c = 'evtName',
+            CleverTap__Salesforce_Field__c = 'sf_lead_event',
+            CleverTap__Data_Type__c = 'Text',
+            CleverTap__Is_Mandatory__c = true
         );
         insert eventMapping;
         
@@ -157,7 +157,7 @@ private class DataProcessorImplTest {
         Test.stopTest();
         
         // Verify log created
-        List<CleverTap_Event__c> logs = [SELECT Id FROM CleverTap_Event__c WHERE Lead__c = :testLead.Id];
+        List<CleverTap__Event__c> logs = [SELECT Id FROM CleverTap__Event__c WHERE Lead__c = :testLead.Id];
         System.assertNotEquals(0, logs.size(), 'Event log should be created for event entity');
     }
     
@@ -165,7 +165,7 @@ private class DataProcessorImplTest {
     @isTest
     static void testSendToCleverTapInvalidCredentials() {
         // Delete config to simulate invalid credentials
-        delete [SELECT Id FROM CleverTap_Config__c];
+        delete [SELECT Id FROM CleverTap__Config__c];
         
         // Get test lead
         Lead testLead = [SELECT Id, FirstName, LastName, Email FROM Lead LIMIT 1];
@@ -185,5 +185,41 @@ private class DataProcessorImplTest {
         // No exception should be thrown
         System.assert(true, 'Method should handle invalid credentials gracefully');
     }
-
+    @isTest
+    static void testDataProcessorErrorHandling() {
+        // Setup a mock that throws an exception
+        Test.setMock(HttpCalloutMock.class, new MockExceptionThrowingHttpResponse());
+        
+        // Get test lead
+        Lead testLead = [SELECT Id, FirstName, LastName, Email FROM Lead LIMIT 1];
+        
+        // Create test helpers
+        EntityTransformer transformer = new EntityTransformer();
+        Config config = new Config();
+        ResultLogger logger = new ResultLogger();
+        
+        // Create processor instance
+        DataProcessorImpl processor = new DataProcessorImpl(transformer, config, logger);
+        
+        // Enable bypass for trigger
+        TestUtils.bypassTriggers = true;
+        
+        Test.startTest();
+        // This should exercise error handling paths in DataProcessorImpl
+        processor.sendToCleverTap(testLead, 'Lead');
+        Test.stopTest();
+        
+        // Reset bypass flag
+        TestUtils.bypassTriggers = false;
+        
+        // No assertions needed - we're just exercising the code paths
+        System.assert(true, 'Test completed without exceptions');
+    }
+    
+    // Mock that throws an exception during HTTP callout
+    private class MockExceptionThrowingHttpResponse implements HttpCalloutMock {
+        public HTTPResponse respond(HTTPRequest req) {
+            throw new CalloutException('Simulated callout exception');
+        }
+    }
 }

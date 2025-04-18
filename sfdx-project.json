@@ -6,7 +6,7 @@
     }
   ],
   "name": "sfdc-import",
-  "namespace": "",
+  "namespace": "CleverTap",
   "sfdcLoginUrl": "https://login.salesforce.com",
   "sourceApiVersion": "58.0"
 }

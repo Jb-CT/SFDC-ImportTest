@@ -8,7 +8,7 @@
             "lastRetrievedFromServer": null,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Mapping__c.Sync_Configuration__c": {
+        "CustomField__CleverTap_Mapping__c.CleverTap__Sync_mapping__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 23,
             "lastRetrievedFromServer": 23,
@@ -20,31 +20,31 @@
             "lastRetrievedFromServer": 161,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Config__c.CleverTap_API_URL__c": {
+        "CustomField__CleverTap_Config__c.CleverTap__API_URL__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 25,
             "lastRetrievedFromServer": 25,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Config__c.CleverTap_Account_ID__c": {
+        "CustomField__CleverTap_Config__c.CleverTap__Account_ID__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 26,
             "lastRetrievedFromServer": 26,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Config__c.CleverTap_Passcode__c": {
+        "CustomField__CleverTap_Config__c.CleverTap__Passcode__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 27,
             "lastRetrievedFromServer": 27,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Config__c.Region__c": {
+        "CustomField__CleverTap_Config__c.CleverTap__Region__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 28,
             "lastRetrievedFromServer": 28,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Event__c.Contact__c": {
+        "CustomField__CleverTap_Event__c.CleverTap__Contact__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 29,
             "lastRetrievedFromServer": 29,
@@ -62,67 +62,67 @@
             "lastRetrievedFromServer": 128,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Event__c.Response__c": {
+        "CustomField__CleverTap_Event__c.CleverTap__Response__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 33,
             "lastRetrievedFromServer": 33,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Event__c.Status__c": {
+        "CustomField__CleverTap_Event__c.CleverTap__Status__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 34,
             "lastRetrievedFromServer": 34,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Mapping__c.CleverTap_Field__c": {
+        "CustomField__CleverTap_Mapping__c.CleverTap__Field__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 35,
             "lastRetrievedFromServer": 35,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Mapping__c.Data_Type__c": {
+        "CustomField__CleverTap_Mapping__c.CleverTap__Data_Type__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 36,
             "lastRetrievedFromServer": 36,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Mapping__c.Is_Mandatory__c": {
+        "CustomField__CleverTap_Mapping__c.CleverTap__Is_Mandatory__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 37,
             "lastRetrievedFromServer": 37,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Mapping__c.Salesforce_Field__c": {
+        "CustomField__CleverTap_Mapping__c.CleverTap__Salesforce_Field__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 38,
             "lastRetrievedFromServer": 38,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Sync_Configuration__c.CleverTap_Entity__c": {
+        "CustomField__CleverTap_Sync_Configuration__c.CleverTap__Entity__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 39,
             "lastRetrievedFromServer": 39,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Sync_Configuration__c.ConnectionId__c": {
+        "CustomField__CleverTap_Sync_Configuration__c.CleverTap__ConnectionId__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 40,
             "lastRetrievedFromServer": 40,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Sync_Configuration__c.Salesforce_Entity__c": {
+        "CustomField__CleverTap_Sync_Configuration__c.CleverTap__Salesforce_Entity__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 41,
             "lastRetrievedFromServer": 41,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Sync_Configuration__c.Status__c": {
+        "CustomField__CleverTap_Sync_Configuration__c.CleverTap__Status__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 42,
             "lastRetrievedFromServer": 42,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Sync_Configuration__c.Sync_Type__c": {
+        "CustomField__CleverTap_Sync_Configuration__c.CleverTap__Sync_Type__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 43,
             "lastRetrievedFromServer": 43,

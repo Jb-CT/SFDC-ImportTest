@@ -20,7 +20,7 @@ public with sharing class IntegrationConfigController {
     }
     
     @AuraEnabled(cacheable=true)
-    public static List<CleverTap_Config__c> getConfigurations() {
+    public static List<CleverTap__Config__c> getConfigurations() {
         try {
             return getConfigurationsWithSecurity();
         } catch (Exception e) {
@@ -29,14 +29,14 @@ public with sharing class IntegrationConfigController {
     }
 
     // Helper method to implement security checks
-    private static List<CleverTap_Config__c> getConfigurationsWithSecurity() {
+    private static List<CleverTap__Config__c> getConfigurationsWithSecurity() {
         // Security check required by PMD immediately before SOQL
-        if (Schema.sObjectType.CleverTap_Config__c.isAccessible()) {
+        if (Schema.sObjectType.CleverTap__Config__c.isAccessible()) {
             // SOQL immediately after security check
             return [
-                SELECT Id, Name, CleverTap_Account_ID__c, 
-                       CleverTap_Passcode__c, Region__c, CleverTap_API_URL__c
-                FROM CleverTap_Config__c
+                SELECT Id, Name, CleverTap__Account_ID__c, 
+                       CleverTap__Passcode__c, CleverTap__Region__c, CleverTap__API_URL__c
+                FROM CleverTap__Config__c
                 WHERE Name != '[Deleted]%'
                 ORDER BY Name
             ];
@@ -80,21 +80,21 @@ public with sharing class IntegrationConfigController {
     // Helper method for creating a new configuration
     private static String createNewConfiguration(Map<String, Object> config) {
         // Create new config object
-        CleverTap_Config__c newConfig = new CleverTap_Config__c(
+        CleverTap__Config__c newConfig = new CleverTap__Config__c(
             Name = (String)config.get('name'),
-            Region__c = (String)config.get('region'),
-            CleverTap_Account_ID__c = (String)config.get('accountId'),
-            CleverTap_Passcode__c = (String)config.get('passcode'),
-            CleverTap_API_URL__c = regionToUrl.get(((String)config.get('region')).toUpperCase())
+            CleverTap__Region__c = (String)config.get('region'),
+            CleverTap__Account_ID__c = (String)config.get('accountId'),
+            CleverTap__Passcode__c = (String)config.get('passcode'),
+            CleverTap__API_URL__c = regionToUrl.get(((String)config.get('region')).toUpperCase())
         );
         
         // Security check required by PMD immediately before DML
-        if (Schema.sObjectType.CleverTap_Config__c.isCreateable() &&
-            Schema.sObjectType.CleverTap_Config__c.fields.Name.isCreateable() &&
-            Schema.sObjectType.CleverTap_Config__c.fields.Region__c.isCreateable() &&
-            Schema.sObjectType.CleverTap_Config__c.fields.CleverTap_Account_ID__c.isCreateable() &&
-            Schema.sObjectType.CleverTap_Config__c.fields.CleverTap_Passcode__c.isCreateable() &&
-            Schema.sObjectType.CleverTap_Config__c.fields.CleverTap_API_URL__c.isCreateable()) {
+        if (Schema.sObjectType.CleverTap__Config__c.isCreateable() &&
+            Schema.sObjectType.CleverTap__Config__c.fields.Name.isCreateable() &&
+            Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Region__c.isCreateable() &&
+            Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Account_ID__c.isCreateable() &&
+            Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Passcode__c.isCreateable() &&
+            Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__API_URL__c.isCreateable()) {
             // DML immediately after security check
             insert newConfig;
             return 'Success';
@@ -106,13 +106,13 @@ public with sharing class IntegrationConfigController {
     // Helper method for updating an existing configuration
     private static String updateExistingConfiguration(Map<String, Object> config) {
         String configId = (String)config.get('id');
-        CleverTap_Config__c existingConfig;
+        CleverTap__Config__c existingConfig;
         
         // Security check required by PMD immediately before SOQL
-        if (Schema.sObjectType.CleverTap_Config__c.isAccessible()) {
+        if (Schema.sObjectType.CleverTap__Config__c.isAccessible()) {
             // SOQL immediately after security check
-            List<CleverTap_Config__c> configs = [
-                SELECT Id FROM CleverTap_Config__c WHERE Id = :configId LIMIT 1
+            List<CleverTap__Config__c> configs = [
+                SELECT Id FROM CleverTap__Config__c WHERE Id = :configId LIMIT 1
             ];
             
             if (configs.isEmpty()) {
@@ -126,18 +126,18 @@ public with sharing class IntegrationConfigController {
         
         // Update fields
         existingConfig.Name = (String)config.get('name');
-        existingConfig.Region__c = (String)config.get('region');
-        existingConfig.CleverTap_Account_ID__c = (String)config.get('accountId');
-        existingConfig.CleverTap_Passcode__c = (String)config.get('passcode');
-        existingConfig.CleverTap_API_URL__c = regionToUrl.get(((String)config.get('region')).toUpperCase());
+        existingConfig.CleverTap__Region__c = (String)config.get('region');
+        existingConfig.CleverTap__Account_ID__c = (String)config.get('accountId');
+        existingConfig.CleverTap__Passcode__c = (String)config.get('passcode');
+        existingConfig.CleverTap__API_URL__c = regionToUrl.get(((String)config.get('region')).toUpperCase());
         
         // Security check required by PMD immediately before DML
-        if (Schema.sObjectType.CleverTap_Config__c.isUpdateable() &&
-            Schema.sObjectType.CleverTap_Config__c.fields.Name.isUpdateable() &&
-            Schema.sObjectType.CleverTap_Config__c.fields.Region__c.isUpdateable() &&
-            Schema.sObjectType.CleverTap_Config__c.fields.CleverTap_Account_ID__c.isUpdateable() &&
-            Schema.sObjectType.CleverTap_Config__c.fields.CleverTap_Passcode__c.isUpdateable() &&
-            Schema.sObjectType.CleverTap_Config__c.fields.CleverTap_API_URL__c.isUpdateable()) {
+        if (Schema.sObjectType.CleverTap__Config__c.isUpdateable() &&
+            Schema.sObjectType.CleverTap__Config__c.fields.Name.isUpdateable() &&
+            Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Region__c.isUpdateable() &&
+            Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Account_ID__c.isUpdateable() &&
+            Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Passcode__c.isUpdateable() &&
+            Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__API_URL__c.isUpdateable()) {
             // DML immediately after security check
             update existingConfig;
             return 'Success';
@@ -161,13 +161,13 @@ public with sharing class IntegrationConfigController {
     
     // Helper method to implement security checks for deletion
     private static String deleteConfigWithSecurity(String configId) {
-        List<CleverTap_Config__c> configToDelete;
+        List<CleverTap__Config__c> configToDelete;
         
         // Security check required by PMD immediately before SOQL
-        if (Schema.sObjectType.CleverTap_Config__c.isAccessible()) {
+        if (Schema.sObjectType.CleverTap__Config__c.isAccessible()) {
             // SOQL immediately after security check
             configToDelete = [
-                SELECT Id FROM CleverTap_Config__c WHERE Id = :configId LIMIT 1
+                SELECT Id FROM CleverTap__Config__c WHERE Id = :configId LIMIT 1
             ];
             
             if (configToDelete.isEmpty()) {
@@ -178,7 +178,7 @@ public with sharing class IntegrationConfigController {
         }
         
         // Security check required by PMD immediately before DML
-        if (Schema.sObjectType.CleverTap_Config__c.isDeletable()) {
+        if (Schema.sObjectType.CleverTap__Config__c.isDeletable()) {
             // DML immediately after security check
             delete configToDelete;
             return 'Success';

@@ -9,8 +9,8 @@ import deleteSyncConfiguration from '@salesforce/apex/IntegrationSyncController.
 export default class IntegrationSyncConfig extends LightningElement {
     @api recordId;
     @api mode = 'new';
-    @api objectName = 'CleverTap_Mapping__c';
-    @api fieldName = 'Data_Type__c';
+    @api objectName = 'CleverTap__Mapping__c';
+    @api fieldName = 'CleverTap__Data_Type__c';
     @api connectionId;
     @api connectionName;
     

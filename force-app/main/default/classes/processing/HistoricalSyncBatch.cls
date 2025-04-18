@@ -2,7 +2,6 @@
  * @class HistoricalSyncBatch
  * @description Batch class for handling historical data sync between Salesforce and CleverTap.
  */
-@SuppressWarnings('PMD.AvoidDebugStatements')
 public class HistoricalSyncBatch implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts {
     private final String objectName;
     private final String syncConfigId;
@@ -15,9 +14,9 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
     private final String profileApiPath = '/1/upload';
     private final String eventApiPath = '/1/upload';
 
-    private CleverTap_Sync_Configuration__c cachedSyncConfig;
-    private List<CleverTap_Mapping__c> cachedFieldMappings;
-    private Map<String, CleverTap_Mapping__c> specialMappings;
+    private CleverTap__Sync_Configuration__c cachedSyncConfig;
+    private List<CleverTap__Mapping__c> cachedFieldMappings;
+    private Map<String, CleverTap__Mapping__c> specialMappings;
     
     /**
      * @description Constructor for the batch class
@@ -27,7 +26,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
     public HistoricalSyncBatch(String objectName, String syncConfigId) {
         this.objectName = objectName;
         this.syncConfigId = syncConfigId;
-        this.specialMappings = new Map<String, CleverTap_Mapping__c>();
+        this.specialMappings = new Map<String, CleverTap__Mapping__c>();
     }
     
     /**
@@ -44,23 +43,24 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         return Database.getQueryLocator(query);
     }
 
+    @SuppressWarnings('PMD.AvoidDebugStatements')
     private Set<String> getFieldsFromMappings() {
         Set<String> fields = new Set<String>{'Id'}; 
         
         try {
-            List<CleverTap_Mapping__c> mappings = getFieldMappings();
+            List<CleverTap__Mapping__c> mappings = getFieldMappings();
             
-            for (CleverTap_Mapping__c mapping : mappings) {
-                if (mapping.CleverTap_Field__c == 'evtName') {
+            for (CleverTap__Mapping__c mapping : mappings) {
+                if (mapping.CleverTap__Field__c == 'evtName') {
                     continue;
                 }
 
-                if (String.isBlank(mapping.Salesforce_Field__c)) {
+                if (String.isBlank(mapping.CleverTap__Salesforce_Field__c)) {
                     continue;
                 }
 
-                if (isValidField(mapping.Salesforce_Field__c, objectName)) {
-                    fields.add(mapping.Salesforce_Field__c);
+                if (isValidField(mapping.CleverTap__Salesforce_Field__c, objectName)) {
+                    fields.add(mapping.CleverTap__Salesforce_Field__c);
                 }
             }
         } catch (Exception e) {
@@ -110,14 +110,13 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
      * @param scope The list of records to process
      */
     public void execute(Database.BatchableContext bc, List<SObject> scope) {
-        CleverTap_Sync_Configuration__c syncConfig = getActiveSyncConfig();
+        CleverTap__Sync_Configuration__c syncConfig = getActiveSyncConfig();
         if (syncConfig == null) {
             return;
         }
 
-        Map<String, String> credentials = getCredentials(syncConfig.ConnectionId__c);
+        Map<String, String> credentials = getCredentials(syncConfig.CleverTap__ConnectionId__c);
         if (credentials == null || credentials.isEmpty()) {
-            System.debug(LoggingLevel.ERROR,  'No credentials found for connection: ' + syncConfig.ConnectionId__c);
             return;
         }
         
@@ -126,18 +125,17 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         }
     }
 
-    private void processRecord(SObject record, CleverTap_Sync_Configuration__c syncConfig, Map<String, String> credentials) {
+    private void processRecord(SObject record, CleverTap__Sync_Configuration__c syncConfig, Map<String, String> credentials) {
         try {
             recordsProcessed++;
 
             Map<String, Object> payload = mapRecord(record, syncConfig);
             if (payload == null) {
-                System.debug(LoggingLevel.ERROR, 'Failed to map record: ' + record.Id);
                 return;
             }
 
             String requestBody = getRequestBody(payload);
-            HttpResponse response = sendToCleverTap(credentials, payload, syncConfig.CleverTap_Entity__c);
+            HttpResponse response = sendToCleverTap(credentials, payload, syncConfig.CleverTap__Entity__c);
 
             logResult(record, response, requestBody);
         } catch (Exception e) {
@@ -170,7 +168,6 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
 
     private void logError(SObject record, Exception e) {
         recordsFailed++;
-        System.debug(LoggingLevel.ERROR, 'Error processing record ' + record.Id + ': ' + e.getMessage());
 
         SerializableEventData eventData = new SerializableEventData();
         eventData.recordId = record.Id;
@@ -182,16 +179,16 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         eventLogs.add(eventData);
     }
 
-    private CleverTap_Sync_Configuration__c getActiveSyncConfig() {
+    private CleverTap__Sync_Configuration__c getActiveSyncConfig() {
         if (cachedSyncConfig != null) {
             return cachedSyncConfig;
         }
         
-        List<CleverTap_Sync_Configuration__c> syncConfigs = [
-            SELECT Id, CleverTap_Entity__c, ConnectionId__c
-            FROM CleverTap_Sync_Configuration__c
-            WHERE Salesforce_Entity__c = :objectName
-            AND Status__c = 'Active'
+        List<CleverTap__Sync_Configuration__c> syncConfigs = [
+            SELECT Id, CleverTap__Entity__c, CleverTap__ConnectionId__c
+            FROM CleverTap__Sync_Configuration__c
+            WHERE CleverTap__Salesforce_Entity__c = :objectName
+            AND CleverTap__Status__c = 'Active'
             AND Id = :syncConfigId
             LIMIT 1
         ];
@@ -200,22 +197,22 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         return cachedSyncConfig;
     }
 
-    private List<CleverTap_Mapping__c> getFieldMappings() {
+    private List<CleverTap__Mapping__c> getFieldMappings() {
         if (cachedFieldMappings != null) {
             return cachedFieldMappings;
         }
         
         cachedFieldMappings = [
-            SELECT Id, CleverTap_Field__c, Salesforce_Field__c, 
-                Data_Type__c, Is_Mandatory__c
-            FROM CleverTap_Mapping__c
-            WHERE Sync_Configuration__c = :syncConfigId
+            SELECT Id, CleverTap__Field__c, CleverTap__Salesforce_Field__c, 
+                CleverTap__Data_Type__c, CleverTap__Is_Mandatory__c
+            FROM CleverTap__Mapping__c
+            WHERE CleverTap__Sync_mapping__c = :syncConfigId
         ];
 
-        for (CleverTap_Mapping__c mapping : cachedFieldMappings) {
-            if (mapping.Is_Mandatory__c && mapping.CleverTap_Field__c == 'customer_id') {
+        for (CleverTap__Mapping__c mapping : cachedFieldMappings) {
+            if (mapping.CleverTap__Is_Mandatory__c && mapping.CleverTap__Field__c == 'customer_id') {
                 specialMappings.put('customer_id', mapping);
-            } else if (mapping.CleverTap_Field__c == 'evtName') {
+            } else if (mapping.CleverTap__Field__c == 'evtName') {
                 specialMappings.put('evtName', mapping);
             }
         }
@@ -223,22 +220,20 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         return cachedFieldMappings;
     }
 
-    private Map<String, Object> mapRecord(SObject record, CleverTap_Sync_Configuration__c syncConfig) {
+    private Map<String, Object> mapRecord(SObject record, CleverTap__Sync_Configuration__c syncConfig) {
         try {
-            List<CleverTap_Mapping__c> fieldMappings = getFieldMappings();
+            List<CleverTap__Mapping__c> fieldMappings = getFieldMappings();
             if (fieldMappings.isEmpty()) {
                 return null;
             }
 
-            CleverTap_Mapping__c identityMapping = specialMappings.get('customer_id');
+            CleverTap__Mapping__c identityMapping = specialMappings.get('customer_id');
             if (identityMapping == null) {
-                System.debug(LoggingLevel.ERROR, 'No customer_id mapping found');
                 return null;
             }
 
-            Object idValue = record.get(identityMapping.Salesforce_Field__c);
+            Object idValue = record.get(identityMapping.CleverTap__Salesforce_Field__c);
             if (idValue == null) {
-                System.debug(LoggingLevel.ERROR, 'Identity value is null for record: ' + record.Id);
                 return null;
             }
             
@@ -246,35 +241,34 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
 
             Map<String, Object> profileData = createProfileData(record, fieldMappings);
 
-            return createFinalPayload(identityValue, profileData, syncConfig.CleverTap_Entity__c);
+            return createFinalPayload(identityValue, profileData, syncConfig.CleverTap__Entity__c);
         } catch (Exception e) {
-            System.debug(LoggingLevel.ERROR, 'Error mapping record: ' + e.getMessage());
             return null;
         }
     }
 
-    private Map<String, Object> createProfileData(SObject record, List<CleverTap_Mapping__c> fieldMappings) {
+    private Map<String, Object> createProfileData(SObject record, List<CleverTap__Mapping__c> fieldMappings) {
         ValueExtractor valueExtractor = new ValueExtractor();
         Map<String, Object> profileData = new Map<String, Object>();
         
-        for (CleverTap_Mapping__c mapping : fieldMappings) {
-            if (mapping.Is_Mandatory__c || 
-                mapping.CleverTap_Field__c == 'customer_id' ||
-                mapping.CleverTap_Field__c == 'evtName') {
+        for (CleverTap__Mapping__c mapping : fieldMappings) {
+            if (mapping.CleverTap__Is_Mandatory__c || 
+                mapping.CleverTap__Field__c == 'customer_id' ||
+                mapping.CleverTap__Field__c == 'evtName') {
                 continue;
             }
 
-            if (String.isBlank(mapping.Salesforce_Field__c) || 
-                !record.getPopulatedFieldsAsMap().containsKey(mapping.Salesforce_Field__c)) {
+            if (String.isBlank(mapping.CleverTap__Salesforce_Field__c) || 
+                !record.getPopulatedFieldsAsMap().containsKey(mapping.CleverTap__Salesforce_Field__c)) {
                 continue;
             }
 
-            Object fieldValue = record.get(mapping.Salesforce_Field__c);
+            Object fieldValue = record.get(mapping.CleverTap__Salesforce_Field__c);
             if (fieldValue != null) {
                 Object convertedValue = valueExtractor.convertFieldValue(
-                    fieldValue, mapping.Data_Type__c
+                    fieldValue, mapping.CleverTap__Data_Type__c
                 );
-                profileData.put(mapping.CleverTap_Field__c, convertedValue);
+                profileData.put(mapping.CleverTap__Field__c, convertedValue);
             }
         }
         
@@ -303,10 +297,10 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
     }
 
     private String getEventName() {
-        CleverTap_Mapping__c eventNameMapping = specialMappings.get('evtName');
+        CleverTap__Mapping__c eventNameMapping = specialMappings.get('evtName');
         
-        if (eventNameMapping != null && String.isNotBlank(eventNameMapping.Salesforce_Field__c)) {
-            return eventNameMapping.Salesforce_Field__c;
+        if (eventNameMapping != null && String.isNotBlank(eventNameMapping.CleverTap__Salesforce_Field__c)) {
+            return eventNameMapping.CleverTap__Salesforce_Field__c;
         } else {
             return 'sf_' + objectName.toLowerCase();
         }
@@ -318,10 +312,10 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
                 return null;
             }
             
-            List<CleverTap_Config__c> configs = [
-                SELECT Name, CleverTap_API_URL__c, CleverTap_Account_ID__c, 
-                       CleverTap_Passcode__c, Region__c
-                FROM CleverTap_Config__c
+            List<CleverTap__Config__c> configs = [
+                SELECT Name, CleverTap__API_URL__c, CleverTap__Account_ID__c, 
+                       CleverTap__Passcode__c, CleverTap__Region__c
+                FROM CleverTap__Config__c
                 WHERE Id = :connectionId OR Name = :connectionId
                 LIMIT 1
             ];
@@ -330,19 +324,18 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
                 return null;
             }
             
-            CleverTap_Config__c config = configs[0];
+            CleverTap__Config__c config = configs[0];
             
             return new Map<String, String>{
                 'NAME' => config.Name,
                 'DEV_NAME' => config.Name,
-                'API_URL' => config.CleverTap_API_URL__c,
-                'ACCOUNT_ID' => config.CleverTap_Account_ID__c,
-                'PASSCODE' => config.CleverTap_Passcode__c,
-                'REGION' => config.Region__c
+                'API_URL' => config.CleverTap__API_URL__c,
+                'ACCOUNT_ID' => config.CleverTap__Account_ID__c,
+                'PASSCODE' => config.CleverTap__Passcode__c,
+                'REGION' => config.CleverTap__Region__c
             };
             
         } catch (Exception e) {
-            System.debug(LoggingLevel.ERROR, 'Error getting credentials: ' + e.getMessage());
             return null;
         }
     }
@@ -369,7 +362,6 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             return http.send(req);
             
         } catch (Exception e) {
-            System.debug(LoggingLevel.ERROR, 'Error sending to CleverTap: ' + e.getMessage());
             return null;
         }
     }
@@ -411,15 +403,15 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         createDetailedLogs();
     }
 
+    @SuppressWarnings('PMD.AvoidDebugStatements')
     private void createSummaryLog() {
         try {
-            CleverTap_Event__c syncLog = new CleverTap_Event__c(
-                Status__c = (recordsFailed == 0) ? 'Success' : 'Failed',
-                Response__c = buildSummaryLogMessage()
+            CleverTap__Event__c syncLog = new CleverTap__Event__c(
+                CleverTap__Status__c = (recordsFailed == 0) ? 'Success' : 'Failed',
+                CleverTap__Response__c = buildSummaryLogMessage()
             );
             
             insert syncLog;
-            System.debug(LoggingLevel.DEBUG, 'Inserted summary log: ' + syncLog.Id);
         } catch (Exception e) {
             System.debug(LoggingLevel.ERROR, 'Error creating summary log: ' + e.getMessage());
         }
@@ -433,24 +425,24 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
                'Sync Configuration ID: ' + syncConfigId;
     }
 
+    @SuppressWarnings('PMD.AvoidDebugStatements')
     private void createDetailedLogs() {
         if (eventLogs.isEmpty()) {
             return;
         }
         
         try {
-            List<CleverTap_Event__c> detailedLogs = new List<CleverTap_Event__c>();
+            List<CleverTap__Event__c> detailedLogs = new List<CleverTap__Event__c>();
             
             for (SerializableEventData eventData : eventLogs) {
                 Boolean isSuccess = determineSuccess(eventData);
 
-                CleverTap_Event__c eventLog = createDetailedLogEntry(eventData, isSuccess);
+                CleverTap__Event__c eventLog = createDetailedLogEntry(eventData, isSuccess);
                 detailedLogs.add(eventLog);
             }
             
             if (!detailedLogs.isEmpty()) {
                 insert detailedLogs;
-                System.debug(LoggingLevel.DEBUG, 'Inserted ' + detailedLogs.size() + ' detailed logs');
             }
         } catch (Exception e) {
             System.debug(LoggingLevel.ERROR, 'Error creating detailed logs: ' + e.getMessage());
@@ -474,10 +466,10 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         return true;
     }
 
-    private CleverTap_Event__c createDetailedLogEntry(SerializableEventData eventData, Boolean isSuccess) {
-        CleverTap_Event__c eventLog = new CleverTap_Event__c(
-            Status__c = isSuccess ? 'Success' : 'Failed',
-            Response__c = buildDetailedLogMessage(eventData)
+    private CleverTap__Event__c createDetailedLogEntry(SerializableEventData eventData, Boolean isSuccess) {
+        CleverTap__Event__c eventLog = new CleverTap__Event__c(
+            CleverTap__Status__c = isSuccess ? 'Success' : 'Failed',
+            CleverTap__Response__c = buildDetailedLogMessage(eventData)
         );
 
         setEventRecordReference(eventLog, eventData);
@@ -491,14 +483,14 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
             eventData.requestBody;
     }
 
-    private void setEventRecordReference(CleverTap_Event__c eventLog, SerializableEventData eventData) {
+    private void setEventRecordReference(CleverTap__Event__c eventLog, SerializableEventData eventData) {
         String fieldName = eventData.recordType + '__c';
-        Map<String, Schema.SObjectField> fieldsMap = Schema.SObjectType.CleverTap_Event__c.fields.getMap();
+        Map<String, Schema.SObjectField> fieldsMap = Schema.SObjectType.CleverTap__Event__c.fields.getMap();
         
         if (fieldsMap.containsKey(fieldName.toLowerCase())) {
             eventLog.put(fieldName, eventData.recordId);
         } else {
-            eventLog.Response__c = eventData.recordType + ' ID: ' + eventData.recordId + '\n' + eventLog.Response__c;
+            eventLog.CleverTap__Response__c = eventData.recordType + ' ID: ' + eventData.recordId + '\n' + eventLog.CleverTap__Response__c;
         }
     }
     

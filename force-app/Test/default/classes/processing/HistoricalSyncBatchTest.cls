@@ -8,110 +8,110 @@ private class HistoricalSyncBatchTest {
         
         try {
             // Create test connection
-            CleverTap_Config__c testConfig = new CleverTap_Config__c(
+            CleverTap__Config__c testConfig = new CleverTap__Config__c(
                 Name = 'Test Config',
-                Region__c = 'US',
-                CleverTap_Account_ID__c = 'test-account-id',
-                CleverTap_Passcode__c = 'test-passcode',
-                CleverTap_API_URL__c = 'https://us1.api.clevertap.com/1/upload'
+                CleverTap__Region__c = 'US',
+                CleverTap__Account_ID__c = 'test-account-id',
+                CleverTap__Passcode__c = 'test-passcode',
+                CleverTap__API_URL__c = 'https://us1.api.clevertap.com/1/upload'
             );
             insert testConfig;
             
             // Create sync configuration for profile
-            CleverTap_Sync_Configuration__c syncConfig = new CleverTap_Sync_Configuration__c(
+            CleverTap__Sync_Configuration__c syncConfig = new CleverTap__Sync_Configuration__c(
                 Name = 'Test Lead Sync',
-                Sync_Type__c = 'salesforce_to_clevertap',
-                Salesforce_Entity__c = 'Lead',
-                CleverTap_Entity__c = 'profile',
-                ConnectionId__c = testConfig.Id,
-                Status__c = 'Active'
+                CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
+                CleverTap__Salesforce_Entity__c = 'Lead',
+                CleverTap__Entity__c = 'profile',
+                CleverTap__ConnectionId__c = testConfig.Id,
+                CleverTap__Status__c = 'Active'
             );
             insert syncConfig;
             
             // Add a sync configuration for event type testing
-            CleverTap_Sync_Configuration__c eventSyncConfig = new CleverTap_Sync_Configuration__c(
+            CleverTap__Sync_Configuration__c eventSyncConfig = new CleverTap__Sync_Configuration__c(
                 Name = 'Test Lead Event Sync',
-                Sync_Type__c = 'salesforce_to_clevertap',
-                Salesforce_Entity__c = 'Lead',
-                CleverTap_Entity__c = 'event',
-                ConnectionId__c = testConfig.Id,
-                Status__c = 'Active'
+                CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
+                CleverTap__Salesforce_Entity__c = 'Lead',
+                CleverTap__Entity__c = 'event',
+                CleverTap__ConnectionId__c = testConfig.Id,
+                CleverTap__Status__c = 'Active'
             );
             insert eventSyncConfig;
             
             // Create field mappings
-            List<CleverTap_Mapping__c> mappings = new List<CleverTap_Mapping__c>();
+            List<CleverTap__Mapping__c> mappings = new List<CleverTap__Mapping__c>();
             
             // Customer ID mapping for profile sync
-            mappings.add(new CleverTap_Mapping__c(
+            mappings.add(new CleverTap__Mapping__c(
                 Name = 'Lead Email to Customer ID',
-                Sync_Configuration__c = syncConfig.Id,
-                CleverTap_Field__c = 'customer_id',
-                Salesforce_Field__c = 'Email',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = true
+                CleverTap__Sync_mapping__c = syncConfig.Id,
+                CleverTap__Field__c = 'customer_id',
+                CleverTap__Salesforce_Field__c = 'Email',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = true
             ));
             
             // Add a regular field mapping for profile sync
-            mappings.add(new CleverTap_Mapping__c(
+            mappings.add(new CleverTap__Mapping__c(
                 Name = 'Lead Name to First Name',
-                Sync_Configuration__c = syncConfig.Id,
-                CleverTap_Field__c = 'first_name',
-                Salesforce_Field__c = 'FirstName',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = false
+                CleverTap__Sync_mapping__c = syncConfig.Id,
+                CleverTap__Field__c = 'first_name',
+                CleverTap__Salesforce_Field__c = 'FirstName',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = false
             ));
             
             // Date field mapping
-            mappings.add(new CleverTap_Mapping__c(
+            mappings.add(new CleverTap__Mapping__c(
                 Name = 'Last Modified Date',
-                Sync_Configuration__c = syncConfig.Id,
-                CleverTap_Field__c = 'last_modified',
-                Salesforce_Field__c = 'LastModifiedDate',
-                Data_Type__c = 'Date',
-                Is_Mandatory__c = false
+                CleverTap__Sync_mapping__c = syncConfig.Id,
+                CleverTap__Field__c = 'last_modified',
+                CleverTap__Salesforce_Field__c = 'LastModifiedDate',
+                CleverTap__Data_Type__c = 'Date',
+                CleverTap__Is_Mandatory__c = false
             ));
             
 
             
             // Add another regular field mapping of different type
-            mappings.add(new CleverTap_Mapping__c(
+            mappings.add(new CleverTap__Mapping__c(
                 Name = 'Annual Revenue',
-                Sync_Configuration__c = syncConfig.Id,
-                CleverTap_Field__c = 'annual_revenue',
-                Salesforce_Field__c = 'AnnualRevenue',
-                Data_Type__c = 'Number',
-                Is_Mandatory__c = false
+                CleverTap__Sync_mapping__c = syncConfig.Id,
+                CleverTap__Field__c = 'annual_revenue',
+                CleverTap__Salesforce_Field__c = 'AnnualRevenue',
+                CleverTap__Data_Type__c = 'Number',
+                CleverTap__Is_Mandatory__c = false
             ));
             
             // Customer ID mapping for event sync
-            mappings.add(new CleverTap_Mapping__c(
+            mappings.add(new CleverTap__Mapping__c(
                 Name = 'Lead Email to Customer ID (Event)',
-                Sync_Configuration__c = eventSyncConfig.Id,
-                CleverTap_Field__c = 'customer_id',
-                Salesforce_Field__c = 'Email',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = true
+                CleverTap__Sync_mapping__c = eventSyncConfig.Id,
+                CleverTap__Field__c = 'customer_id',
+                CleverTap__Salesforce_Field__c = 'Email',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = true
             ));
             
             // Event name mapping
-            mappings.add(new CleverTap_Mapping__c(
+            mappings.add(new CleverTap__Mapping__c(
                 Name = 'Lead Event Name',
-                Sync_Configuration__c = eventSyncConfig.Id,
-                CleverTap_Field__c = 'evtName',
-                Salesforce_Field__c = 'sf_lead_event',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = true
+                CleverTap__Sync_mapping__c = eventSyncConfig.Id,
+                CleverTap__Field__c = 'evtName',
+                CleverTap__Salesforce_Field__c = 'sf_lead_event',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = true
             ));
             
             // Status field for event
-            mappings.add(new CleverTap_Mapping__c(
+            mappings.add(new CleverTap__Mapping__c(
                 Name = 'Lead Status',
-                Sync_Configuration__c = eventSyncConfig.Id,
-                CleverTap_Field__c = 'status',
-                Salesforce_Field__c = 'Status',
-                Data_Type__c = 'Text',
-                Is_Mandatory__c = false
+                CleverTap__Sync_mapping__c = eventSyncConfig.Id,
+                CleverTap__Field__c = 'status',
+                CleverTap__Salesforce_Field__c = 'Status',
+                CleverTap__Data_Type__c = 'Text',
+                CleverTap__Is_Mandatory__c = false
             ));
             
             insert mappings;
@@ -170,8 +170,8 @@ private class HistoricalSyncBatchTest {
     @isTest
     static void testStartMethod() {
         // Get sync config ID for use in test
-        CleverTap_Sync_Configuration__c syncConfig = [
-            SELECT Id FROM CleverTap_Sync_Configuration__c 
+        CleverTap__Sync_Configuration__c syncConfig = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c 
             WHERE Name = 'Test Lead Sync' LIMIT 1
         ];
         
@@ -205,8 +205,8 @@ private class HistoricalSyncBatchTest {
     @isTest
     static void testExecuteWithDirectAccess() {
         // Get sync config ID
-        CleverTap_Sync_Configuration__c syncConfig = [
-            SELECT Id, CleverTap_Entity__c FROM CleverTap_Sync_Configuration__c 
+        CleverTap__Sync_Configuration__c syncConfig = [
+            SELECT Id, CleverTap__Entity__c FROM CleverTap__Sync_Configuration__c 
             WHERE Name = 'Test Lead Sync' LIMIT 1
         ];
         
@@ -232,7 +232,7 @@ private class HistoricalSyncBatchTest {
         Test.stopTest();
         
         // Verify log creation
-        List<CleverTap_Event__c> logs = [SELECT Id, Status__c FROM CleverTap_Event__c];
+        List<CleverTap__Event__c> logs = [SELECT Id, CleverTap__Status__c FROM CleverTap__Event__c];
         System.assertNotEquals(0, logs.size(), 'Should create logs');
     }
     
@@ -242,8 +242,8 @@ private class HistoricalSyncBatchTest {
     @isTest
     static void testEventEntityExecution() {
         // Get sync config ID for event
-        CleverTap_Sync_Configuration__c eventSyncConfig = [
-            SELECT Id FROM CleverTap_Sync_Configuration__c 
+        CleverTap__Sync_Configuration__c eventSyncConfig = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c 
             WHERE Name = 'Test Lead Event Sync' LIMIT 1
         ];
         
@@ -269,7 +269,7 @@ private class HistoricalSyncBatchTest {
         Test.stopTest();
         
         // Verify log creation
-        List<CleverTap_Event__c> logs = [SELECT Id FROM CleverTap_Event__c];
+        List<CleverTap__Event__c> logs = [SELECT Id FROM CleverTap__Event__c];
         System.assertNotEquals(0, logs.size(), 'Should create logs for event entity');
     }
     
@@ -279,8 +279,8 @@ private class HistoricalSyncBatchTest {
     @isTest
     static void testExecuteWithError() {
         // Get sync config ID
-        CleverTap_Sync_Configuration__c syncConfig = [
-            SELECT Id FROM CleverTap_Sync_Configuration__c 
+        CleverTap__Sync_Configuration__c syncConfig = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c 
             WHERE Name = 'Test Lead Sync' LIMIT 1
         ];
         
@@ -306,7 +306,7 @@ private class HistoricalSyncBatchTest {
         Test.stopTest();
         
         // Verify log creation with error status
-        List<CleverTap_Event__c> logs = [SELECT Id, Status__c FROM CleverTap_Event__c];
+        List<CleverTap__Event__c> logs = [SELECT Id, CleverTap__Status__c FROM CleverTap__Event__c];
         System.assertNotEquals(0, logs.size(), 'Should create logs for error case');
     }
     /**
@@ -315,8 +315,8 @@ private class HistoricalSyncBatchTest {
     @isTest
     static void testWithMultipleRecords() {
         // Get sync config ID
-        CleverTap_Sync_Configuration__c syncConfig = [
-            SELECT Id FROM CleverTap_Sync_Configuration__c 
+        CleverTap__Sync_Configuration__c syncConfig = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c 
             WHERE Name = 'Test Lead Sync' LIMIT 1
         ];
         
@@ -342,7 +342,7 @@ private class HistoricalSyncBatchTest {
         Test.stopTest();
         
         // Verify log creation
-        List<CleverTap_Event__c> logs = [SELECT Id FROM CleverTap_Event__c];
+        List<CleverTap__Event__c> logs = [SELECT Id FROM CleverTap__Event__c];
         System.assertNotEquals(0, logs.size(), 'Should create logs for multiple records');
     }
     
@@ -352,8 +352,8 @@ private class HistoricalSyncBatchTest {
     @isTest
     static void testFullBatchProcess() {
         // Get sync config ID
-        CleverTap_Sync_Configuration__c syncConfig = [
-            SELECT Id FROM CleverTap_Sync_Configuration__c 
+        CleverTap__Sync_Configuration__c syncConfig = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c 
             WHERE Name = 'Test Lead Sync' LIMIT 1
         ];
         
@@ -369,7 +369,7 @@ private class HistoricalSyncBatchTest {
         Test.stopTest();
         
         // Verify logs were created
-        List<CleverTap_Event__c> logs = [SELECT Id FROM CleverTap_Event__c];
+        List<CleverTap__Event__c> logs = [SELECT Id FROM CleverTap__Event__c];
         System.assertNotEquals(0, logs.size(), 'Should create logs for full batch process');
     }
     
@@ -379,8 +379,8 @@ private class HistoricalSyncBatchTest {
     // @isTest
     // static void testDataTypeHandling() {
     //     // Get sync config ID
-    //     CleverTap_Sync_Configuration__c syncConfig = [
-    //         SELECT Id FROM CleverTap_Sync_Configuration__c 
+    //     CleverTap__Sync_Configuration__c syncConfig = [
+    //         SELECT Id FROM CleverTap__Sync_Configuration__c 
     //         WHERE Name = 'Test Lead Sync' LIMIT 1
     //     ];
         
@@ -411,7 +411,7 @@ private class HistoricalSyncBatchTest {
     //     Test.stopTest();
         
     //     // Verify log creation
-    //     List<CleverTap_Event__c> logs = [SELECT Id FROM CleverTap_Event__c];
+    //     List<CleverTap__Event__c> logs = [SELECT Id FROM CleverTap__Event__c];
     //     System.assertNotEquals(0, logs.size(), 'Should create logs for data type handling');
     // }
 }

@@ -3,18 +3,18 @@ private class IntegrationConfigControllerTest {
     @isTest
     static void testGetConfigurations() {
         // Create test data
-        CleverTap_Config__c testConfig = new CleverTap_Config__c(
+        CleverTap__Config__c testConfig = new CleverTap__Config__c(
             Name = 'Test Config',
-            Region__c = 'US',
-            CleverTap_Account_ID__c = 'test-account-id',
-            CleverTap_Passcode__c = 'test-passcode',
-            CleverTap_API_URL__c = 'https://us1.api.clevertap.com/1/upload'
+            CleverTap__Region__c = 'US',
+            CleverTap__Account_ID__c = 'test-account-id',
+            CleverTap__Passcode__c = 'test-passcode',
+            CleverTap__API_URL__c = 'https://us1.api.clevertap.com/1/upload'
         );
         insert testConfig;
         
         // Test
         Test.startTest();
-        List<CleverTap_Config__c> configs = IntegrationConfigController.getConfigurations();
+        List<CleverTap__Config__c> configs = IntegrationConfigController.getConfigurations();
         Test.stopTest();
         
         // Verify
@@ -39,19 +39,19 @@ private class IntegrationConfigControllerTest {
         
         // Verify
         System.assertEquals('Success', result, 'Save operation should return Success');
-        List<CleverTap_Config__c> savedConfigs = [SELECT Id FROM CleverTap_Config__c WHERE Name = 'Test Connection'];
+        List<CleverTap__Config__c> savedConfigs = [SELECT Id FROM CleverTap__Config__c WHERE Name = 'Test Connection'];
         System.assertEquals(1, savedConfigs.size(), 'One record should be created');
     }
     
     @isTest
     static void testUpdateConfiguration() {
         // Setup
-        CleverTap_Config__c testConfig = new CleverTap_Config__c(
+        CleverTap__Config__c testConfig = new CleverTap__Config__c(
             Name = 'Test Config',
-            Region__c = 'US',
-            CleverTap_Account_ID__c = 'test-account-id',
-            CleverTap_Passcode__c = 'test-passcode',
-            CleverTap_API_URL__c = 'https://us1.api.clevertap.com/1/upload'
+            CleverTap__Region__c = 'US',
+            CleverTap__Account_ID__c = 'test-account-id',
+            CleverTap__Passcode__c = 'test-passcode',
+            CleverTap__API_URL__c = 'https://us1.api.clevertap.com/1/upload'
         );
         insert testConfig;
         
@@ -70,25 +70,25 @@ private class IntegrationConfigControllerTest {
         
         // Verify
         System.assertEquals('Success', result, 'Update operation should return Success');
-        CleverTap_Config__c updated = [SELECT Name, Region__c FROM CleverTap_Config__c WHERE Id = :testConfig.Id];
+        CleverTap__Config__c updated = [SELECT Name, CleverTap__Region__c FROM CleverTap__Config__c WHERE Id = :testConfig.Id];
         System.assertEquals('Updated Config', updated.Name, 'Name should be updated');
-        System.assertEquals('EU', updated.Region__c, 'Region should be updated');
+        System.assertEquals('EU', updated.CleverTap__Region__c, 'Region should be updated');
     }
     
     @isTest
     static void testDeleteConfiguration() {
         // Setup
-        CleverTap_Config__c testConfig = new CleverTap_Config__c(
+        CleverTap__Config__c testConfig = new CleverTap__Config__c(
             Name = 'Test Config',
-            Region__c = 'US',
-            CleverTap_Account_ID__c = 'test-account-id',
-            CleverTap_Passcode__c = 'test-passcode',
-            CleverTap_API_URL__c = 'https://us1.api.clevertap.com/1/upload'
+            CleverTap__Region__c = 'US',
+            CleverTap__Account_ID__c = 'test-account-id',
+            CleverTap__Passcode__c = 'test-passcode',
+            CleverTap__API_URL__c = 'https://us1.api.clevertap.com/1/upload'
         );
         insert testConfig;
         
         // Verify config exists
-        List<CleverTap_Config__c> configsBefore = [SELECT Id FROM CleverTap_Config__c WHERE Id = :testConfig.Id];
+        List<CleverTap__Config__c> configsBefore = [SELECT Id FROM CleverTap__Config__c WHERE Id = :testConfig.Id];
         System.assertEquals(1, configsBefore.size(), 'Configuration should exist before deletion');
         
         // Test
@@ -98,7 +98,7 @@ private class IntegrationConfigControllerTest {
         
         // Verify
         System.assertEquals('Success', result, 'Delete operation should return Success');
-        List<CleverTap_Config__c> configsAfter = [SELECT Id FROM CleverTap_Config__c WHERE Id = :testConfig.Id];
+        List<CleverTap__Config__c> configsAfter = [SELECT Id FROM CleverTap__Config__c WHERE Id = :testConfig.Id];
         System.assertEquals(0, configsAfter.size(), 'Configuration should be deleted');
     }
     
@@ -191,7 +191,7 @@ private class IntegrationConfigControllerTest {
         // We can't directly test this, but we can verify the method completes
         try {
             // Our actual method call - the goal is just to execute the code path
-            List<CleverTap_Config__c> configs = IntegrationConfigController.getConfigurations();
+            List<CleverTap__Config__c> configs = IntegrationConfigController.getConfigurations();
             // If we get here without an exception, that's actually okay
             System.assert(true, 'Controller handled exception gracefully');
         } catch (Exception e) {

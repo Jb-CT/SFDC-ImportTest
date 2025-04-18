@@ -4,12 +4,12 @@ private class ConfigTest {
     @isTest
     static void testGetCredentials() {
         // Create test data
-        CleverTap_Config__c testConfig = new CleverTap_Config__c(
+        CleverTap__Config__c testConfig = new CleverTap__Config__c(
             Name = 'Test Config',
-            Region__c = 'US',
-            CleverTap_Account_ID__c = 'test-account-id',
-            CleverTap_Passcode__c = 'test-passcode',
-            CleverTap_API_URL__c = 'https://us1.api.clevertap.com/1/upload'
+            CleverTap__Region__c = 'US',
+            CleverTap__Account_ID__c = 'test-account-id',
+            CleverTap__Passcode__c = 'test-passcode',
+            CleverTap__API_URL__c = 'https://us1.api.clevertap.com/1/upload'
         );
         insert testConfig;
 

@@ -59,13 +59,13 @@ public with sharing class EntityTransformer {
         
         try {
             // Get all active sync configurations for this record type
-            List<CleverTap_Sync_Configuration__c> syncConfigs = getAllSyncConfigurations(recordType);
+            List<CleverTap__Sync_Configuration__c> syncConfigs = getAllSyncConfigurations(recordType);
             if (syncConfigs.isEmpty()) {
                 return allMappings;
             }
             
             // Process each sync configuration
-            for (CleverTap_Sync_Configuration__c syncConfig : syncConfigs) {
+            for (CleverTap__Sync_Configuration__c syncConfig : syncConfigs) {
                 ConnectionMapping mapping = processConfiguration(record, recordType, syncConfig);
                 if (mapping != null) {
                     allMappings.add(mapping);
@@ -79,15 +79,15 @@ public with sharing class EntityTransformer {
         return allMappings;
     }
 
-    private ConnectionMapping processConfiguration(SObject record, String recordType, CleverTap_Sync_Configuration__c syncConfig) {
+    private ConnectionMapping processConfiguration(SObject record, String recordType, CleverTap__Sync_Configuration__c syncConfig) {
         // Get the field mappings for this configuration
-        List<CleverTap_Mapping__c> fieldMappings = getFieldMappingsForConfig(syncConfig.Id);
+        List<CleverTap__Mapping__c> fieldMappings = getFieldMappingsForConfig(syncConfig.Id);
         if (fieldMappings.isEmpty()) {
             return null;
         }
         
         // Find the identity mapping
-        CleverTap_Mapping__c identityMapping = findIdentityMapping(fieldMappings);
+        CleverTap__Mapping__c identityMapping = findIdentityMapping(fieldMappings);
         if (identityMapping == null) {
             return null;
         }
@@ -99,13 +99,13 @@ public with sharing class EntityTransformer {
         }
         
         // Determine if this is an event or profile update
-        Boolean isEvent = (syncConfig.CleverTap_Entity__c == 'event');
+        Boolean isEvent = (syncConfig.CleverTap__Entity__c == 'event');
         
         // Get event information if this is an event
         String eventName = null;
         if (isEvent) {
-            CleverTap_Mapping__c eventNameMapping = findEventNameMapping(fieldMappings);
-            eventName = (eventNameMapping != null) ? String.valueOf(eventNameMapping.Salesforce_Field__c) : null;
+            CleverTap__Mapping__c eventNameMapping = findEventNameMapping(fieldMappings);
+            eventName = (eventNameMapping != null) ? String.valueOf(eventNameMapping.CleverTap__Salesforce_Field__c) : null;
         }
         
         // Create profile data
@@ -116,109 +116,109 @@ public with sharing class EntityTransformer {
         
         // Create and return the connection mapping
         ConnectionMapping mapping = new ConnectionMapping();
-        mapping.connectionId = syncConfig.ConnectionId__c;
+        mapping.connectionId = syncConfig.CleverTap__ConnectionId__c;
         mapping.payload = payload;
         return mapping;
     }
 
-    private List<CleverTap_Sync_Configuration__c> getAllSyncConfigurations(String recordType) {
+    private List<CleverTap__Sync_Configuration__c> getAllSyncConfigurations(String recordType) {
         // Check CRUD permissions
-        if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
-            return new List<CleverTap_Sync_Configuration__c>();
+        if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+            return new List<CleverTap__Sync_Configuration__c>();
         }
         
         return [
-            SELECT Id, CleverTap_Entity__c, ConnectionId__c
-            FROM CleverTap_Sync_Configuration__c
-            WHERE Salesforce_Entity__c = :recordType
-            AND Status__c = 'Active'
+            SELECT Id, CleverTap__Entity__c, CleverTap__ConnectionId__c
+            FROM CleverTap__Sync_Configuration__c
+            WHERE CleverTap__Salesforce_Entity__c = :recordType
+            AND CleverTap__Status__c = 'Active'
         ];
     }
 
-    private List<CleverTap_Mapping__c> getFieldMappingsForConfig(Id configId) {
+    private List<CleverTap__Mapping__c> getFieldMappingsForConfig(Id configId) {
         // Check CRUD permissions
-        if (!CleverTap_Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
-            return new List<CleverTap_Mapping__c>();
+        if (!CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+            return new List<CleverTap__Mapping__c>();
         }
         
         return [
-            SELECT Id, CleverTap_Field__c, Salesforce_Field__c, 
-                   Data_Type__c, Is_Mandatory__c
-            FROM CleverTap_Mapping__c
-            WHERE Sync_Configuration__c = :configId
+            SELECT Id, CleverTap__Field__c, CleverTap__Salesforce_Field__c, 
+                   CleverTap__Data_Type__c, CleverTap__Is_Mandatory__c
+            FROM CleverTap__Mapping__c
+            WHERE CleverTap__Sync_mapping__c = :configId
         ];
     }
 
-    private List<CleverTap_Mapping__c> getFieldMappings(String recordType) {
+    private List<CleverTap__Mapping__c> getFieldMappings(String recordType) {
         // Check CRUD permissions
-        if (!CleverTap_Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() || 
-            !CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
-            return new List<CleverTap_Mapping__c>();
+        if (!CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() || 
+            !CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+            return new List<CleverTap__Mapping__c>();
         }
         
         return [
-            SELECT Id, CleverTap_Field__c, Salesforce_Field__c, 
-                   Data_Type__c, Is_Mandatory__c
-            FROM CleverTap_Mapping__c
-            WHERE Sync_Configuration__c IN (
-                SELECT Id FROM CleverTap_Sync_Configuration__c 
-                WHERE Salesforce_Entity__c = :recordType 
-                AND Status__c = 'Active'
+            SELECT Id, CleverTap__Field__c, CleverTap__Salesforce_Field__c, 
+                   CleverTap__Data_Type__c, CleverTap__Is_Mandatory__c
+            FROM CleverTap__Mapping__c
+            WHERE CleverTap__Sync_mapping__c IN (
+                SELECT Id FROM CleverTap__Sync_Configuration__c 
+                WHERE CleverTap__Salesforce_Entity__c = :recordType 
+                AND CleverTap__Status__c = 'Active'
             )
         ];
     }
 
-    private CleverTap_Sync_Configuration__c getSyncConfiguration(String recordType) {
+    private CleverTap__Sync_Configuration__c getSyncConfiguration(String recordType) {
         // Check CRUD permissions
-        if (!CleverTap_Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+        if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return null;
         }
         
-        List<CleverTap_Sync_Configuration__c> configs = [
-            SELECT Id, CleverTap_Entity__c
-            FROM CleverTap_Sync_Configuration__c
-            WHERE Salesforce_Entity__c = :recordType
-            AND Status__c = 'Active'
+        List<CleverTap__Sync_Configuration__c> configs = [
+            SELECT Id, CleverTap__Entity__c
+            FROM CleverTap__Sync_Configuration__c
+            WHERE CleverTap__Salesforce_Entity__c = :recordType
+            AND CleverTap__Status__c = 'Active'
             LIMIT 1
         ];
         
         return configs.isEmpty() ? null : configs[0];
     }
 
-    private CleverTap_Mapping__c findIdentityMapping(List<CleverTap_Mapping__c> fieldMappings) {
-        for (CleverTap_Mapping__c mapping : fieldMappings) {
-            if (mapping.Is_Mandatory__c && mapping.CleverTap_Field__c == 'customer_id') {
+    private CleverTap__Mapping__c findIdentityMapping(List<CleverTap__Mapping__c> fieldMappings) {
+        for (CleverTap__Mapping__c mapping : fieldMappings) {
+            if (mapping.CleverTap__Is_Mandatory__c && mapping.CleverTap__Field__c == 'customer_id') {
                 return mapping;
             }
         }
         return null;
     }
 
-    private CleverTap_Mapping__c findEventNameMapping(List<CleverTap_Mapping__c> fieldMappings) {
-        for (CleverTap_Mapping__c mapping : fieldMappings) {
-            if (mapping.Is_Mandatory__c && mapping.CleverTap_Field__c == 'evtName') {
+    private CleverTap__Mapping__c findEventNameMapping(List<CleverTap__Mapping__c> fieldMappings) {
+        for (CleverTap__Mapping__c mapping : fieldMappings) {
+            if (mapping.CleverTap__Is_Mandatory__c && mapping.CleverTap__Field__c == 'evtName') {
                 return mapping;
             }
         }
         return null;
     }
 
-    private String getIdentityValue(SObject record, CleverTap_Mapping__c identityMapping) {
-        return String.valueOf(record.get(identityMapping.Salesforce_Field__c));
+    private String getIdentityValue(SObject record, CleverTap__Mapping__c identityMapping) {
+        return String.valueOf(record.get(identityMapping.CleverTap__Salesforce_Field__c));
     }
 
-    private Map<String, Object> createProfileData(SObject record, List<CleverTap_Mapping__c> fieldMappings) {
+    private Map<String, Object> createProfileData(SObject record, List<CleverTap__Mapping__c> fieldMappings) {
         Map<String, Object> profileData = new Map<String, Object>();
         ValueExtractor valueExtractor = new ValueExtractor();
         
-        for (CleverTap_Mapping__c mapping : fieldMappings) {
+        for (CleverTap__Mapping__c mapping : fieldMappings) {
             // Skip special field types
             if (isSpecialField(mapping)) {
                 continue;
             }
             
             // Skip if field doesn't exist in record
-            String fieldName = mapping.Salesforce_Field__c;
+            String fieldName = mapping.CleverTap__Salesforce_Field__c;
             if (String.isBlank(fieldName) || !record.getPopulatedFieldsAsMap().containsKey(fieldName)) {
                 continue;
             }
@@ -231,18 +231,18 @@ public with sharing class EntityTransformer {
             
             // Convert and add the field value to the profile data
             Object convertedValue = valueExtractor.convertFieldValue(
-                fieldValue, mapping.Data_Type__c
+                fieldValue, mapping.CleverTap__Data_Type__c
             );
-            profileData.put(mapping.CleverTap_Field__c, convertedValue);
+            profileData.put(mapping.CleverTap__Field__c, convertedValue);
         }
         
         return profileData;
     }
 
-    private Boolean isSpecialField(CleverTap_Mapping__c mapping) {
-        return mapping.Is_Mandatory__c || 
-               mapping.CleverTap_Field__c == 'customer_id' || 
-               mapping.CleverTap_Field__c == 'evtName';
+    private Boolean isSpecialField(CleverTap__Mapping__c mapping) {
+        return mapping.CleverTap__Is_Mandatory__c || 
+               mapping.CleverTap__Field__c == 'customer_id' || 
+               mapping.CleverTap__Field__c == 'evtName';
     }
 
     private Map<String, Object> createPayload(String identityValue, Map<String, Object> profileData, 

@@ -1,7 +1,7 @@
 /**
  * @class FieldMappingManager
  * @description Manager class for handling field mapping operations.
- * Handles CRUD operations for CleverTap_Mapping__c records.
+ * Handles CRUD operations for CleverTap__Mapping__c records.
  */
 public with sharing class FieldMappingManager {
     /**
@@ -10,16 +10,16 @@ public with sharing class FieldMappingManager {
      * @return List of field mappings
      * @throws AuraHandledException If there is an error accessing the mappings
      */
-    public List<CleverTap_Mapping__c> getExistingMappings(Id syncId) {
-        if (!CleverTap_Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+    public List<CleverTap__Mapping__c> getExistingMappings(Id syncId) {
+        if (!CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             throw new AuraHandledException('You do not have access to field mappings');
         }
         
         return [
-            SELECT Id, CleverTap_Field__c, Salesforce_Field__c, 
-                   Data_Type__c, Is_Mandatory__c
-            FROM CleverTap_Mapping__c
-            WHERE Sync_Configuration__c = :syncId
+            SELECT Id, CleverTap__Field__c, CleverTap__Salesforce_Field__c, 
+                   CleverTap__Data_Type__c, CleverTap__Is_Mandatory__c
+            FROM CleverTap__Mapping__c
+            WHERE CleverTap__Sync_mapping__c = :syncId
         ];
     }
 
@@ -45,8 +45,8 @@ public with sharing class FieldMappingManager {
     }
 
     private void checkMappingPermissions() {
-        if (!CleverTap_Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isCreateable() ||
-            !CleverTap_Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {
+        if (!CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isCreateable() ||
+            !CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {
             throw new AuraHandledException('Insufficient permissions to manage field mappings');
         }
     }
@@ -88,35 +88,35 @@ public with sharing class FieldMappingManager {
     private void processFieldMappings(Id syncId, List<Object> mappingsObj) {
         deleteExistingMappings(syncId);
 
-        List<CleverTap_Mapping__c> newMappings = createNewMappings(syncId, mappingsObj);
+        List<CleverTap__Mapping__c> newMappings = createNewMappings(syncId, mappingsObj);
 
         insertMappings(newMappings);
     }
 
     private void deleteExistingMappings(Id syncId) {
         try {
-            delete [SELECT Id FROM CleverTap_Mapping__c WHERE Sync_Configuration__c = :syncId];
+            delete [SELECT Id FROM CleverTap__Mapping__c WHERE CleverTap__Sync_mapping__c = :syncId];
         } catch (Exception e) {
             throw new AuraHandledException('Error deleting existing mappings: ' + e.getMessage());
         }
     }
 
-    private List<CleverTap_Mapping__c> createNewMappings(Id syncId, List<Object> mappingsObj) {
-        List<CleverTap_Mapping__c> newMappings = new List<CleverTap_Mapping__c>();
+    private List<CleverTap__Mapping__c> createNewMappings(Id syncId, List<Object> mappingsObj) {
+        List<CleverTap__Mapping__c> newMappings = new List<CleverTap__Mapping__c>();
         
         for(Object mappingObj : mappingsObj) {
             Map<String, Object> mapping = (Map<String, Object>)mappingObj;
-            CleverTap_Mapping__c newMapping = createMappingRecord(syncId, mapping);
+            CleverTap__Mapping__c newMapping = createMappingRecord(syncId, mapping);
             newMappings.add(newMapping);
         }
         
         return newMappings;
     }
 
-    private CleverTap_Mapping__c createMappingRecord(Id syncId, Map<String, Object> mapping) {
+    private CleverTap__Mapping__c createMappingRecord(Id syncId, Map<String, Object> mapping) {
         // Validate required fields
-        String targetField = (String)mapping.get('CleverTap_Field__c');
-        String sourceField = (String)mapping.get('Salesforce_Field__c');
+        String targetField = (String)mapping.get('CleverTap__Field__c');
+        String sourceField = (String)mapping.get('CleverTap__Salesforce_Field__c');
         
         if (String.isBlank(targetField)) {
             throw new AuraHandledException('Target field name is required');
@@ -125,16 +125,16 @@ public with sharing class FieldMappingManager {
             throw new AuraHandledException('Source field name is required');
         }
 
-        return new CleverTap_Mapping__c(
-            Sync_Configuration__c = syncId,
-            CleverTap_Field__c = targetField,
-            Salesforce_Field__c = sourceField,
-            Data_Type__c = (String)mapping.get('Data_Type__c'),
-            Is_Mandatory__c = (Boolean)mapping.get('Is_Mandatory__c')
+        return new CleverTap__Mapping__c(
+            CleverTap__Sync_mapping__c = syncId,
+            CleverTap__Field__c = targetField,
+            CleverTap__Salesforce_Field__c = sourceField,
+            CleverTap__Data_Type__c = (String)mapping.get('CleverTap__Data_Type__c'),
+            CleverTap__Is_Mandatory__c = (Boolean)mapping.get('CleverTap__Is_Mandatory__c')
         );
     }
 
-    private void insertMappings(List<CleverTap_Mapping__c> newMappings) {
+    private void insertMappings(List<CleverTap__Mapping__c> newMappings) {
         try {
             insert newMappings;
         } catch (Exception e) {
