@@ -34,7 +34,6 @@ private class IntegrationHandlerTest {
      */
     @testSetup
     static void setupTestData() {
-        // Create test lead
         Lead testLead = new Lead(
             FirstName = 'Test',
             LastName = 'Lead',
@@ -42,12 +41,10 @@ private class IntegrationHandlerTest {
             Email = 'test@example.com'
         );
         insert testLead;
-        
-        // Create test account
+
         Account testAccount = new Account(Name = 'Test Account');
         insert testAccount;
-        
-        // Create test contact
+
         Contact testContact = new Contact(
             FirstName = 'Test',
             LastName = 'Contact',
@@ -55,8 +52,7 @@ private class IntegrationHandlerTest {
             AccountId = testAccount.Id
         );
         insert testContact;
-        
-        // Create test opportunity
+
         Opportunity testOpportunity = new Opportunity(
             Name = 'Test Opportunity',
             StageName = 'Prospecting',
@@ -71,16 +67,12 @@ private class IntegrationHandlerTest {
      */
     @isTest
     static void testProcessLeads() {
-        // Setup
         List<Lead> leads = [SELECT Id, FirstName, LastName, Email FROM Lead LIMIT 1];
-        
-        // Test
+
         Test.startTest();
         integrationHandler.processLeads(leads);
-        // In a test context, queueable jobs are executed synchronously at the end of Test.stopTest()
         Test.stopTest();
-        
-        // For lead tests, we can only verify that no exceptions were thrown
+
         System.assert(true, 'No exceptions were thrown during Lead processing');
     }
     
@@ -89,15 +81,12 @@ private class IntegrationHandlerTest {
      */
     @isTest
     static void testProcessContacts() {
-        // Setup
         List<Contact> contacts = [SELECT Id, FirstName, LastName, Email FROM Contact LIMIT 1];
-        
-        // Test
+
         Test.startTest();
         integrationHandler.processContacts(contacts);
         Test.stopTest();
-        
-        // For contact tests, we can only verify that no exceptions were thrown
+
         System.assert(true, 'No exceptions were thrown during Contact processing');
     }
     
@@ -106,15 +95,12 @@ private class IntegrationHandlerTest {
      */
     @isTest
     static void testProcessAccounts() {
-        // Setup
         List<Account> accounts = [SELECT Id, Name FROM Account LIMIT 1];
-        
-        // Test
+
         Test.startTest();
         integrationHandler.processAccounts(accounts);
         Test.stopTest();
-        
-        // For account tests, we can only verify that no exceptions were thrown
+
         System.assert(true, 'No exceptions were thrown during Account processing');
     }
     
@@ -123,15 +109,12 @@ private class IntegrationHandlerTest {
      */
     @isTest
     static void testProcessOpportunities() {
-        // Setup
         List<Opportunity> opportunities = [SELECT Id, Name, StageName FROM Opportunity LIMIT 1];
-        
-        // Test
+
         Test.startTest();
         integrationHandler.processOpportunities(opportunities);
         Test.stopTest();
-        
-        // For opportunity tests, we can only verify that no exceptions were thrown
+
         System.assert(true, 'No exceptions were thrown during Opportunity processing');
     }
     
@@ -140,15 +123,12 @@ private class IntegrationHandlerTest {
      */
     @isTest
     static void testProcessNullRecords() {
-        // Setup
         List<SObject> nullRecords = null;
         
-        // Test
         Test.startTest();
         integrationHandler.processRecords(nullRecords);
         Test.stopTest();
-        
-        // For null record tests, we can only verify that no exceptions were thrown
+
         System.assert(true, 'No exceptions were thrown during null record processing');
     }
     
@@ -157,15 +137,12 @@ private class IntegrationHandlerTest {
      */
     @isTest
     static void testProcessEmptyRecords() {
-        // Setup
         List<SObject> emptyRecords = new List<SObject>();
-        
-        // Test
+
         Test.startTest();
         integrationHandler.processRecords(emptyRecords);
         Test.stopTest();
-        
-        // For empty record tests, we can only verify that no exceptions were thrown
+
         System.assert(true, 'No exceptions were thrown during empty record processing');
     }
     
@@ -174,16 +151,13 @@ private class IntegrationHandlerTest {
      */
     @isTest
     static void testProcessRecordsGeneric() {
-        // Setup
         List<SObject> mixedRecords = new List<SObject>();
         mixedRecords.addAll([SELECT Id FROM Lead LIMIT 1]);
-        
-        // Test
+
         Test.startTest();
         integrationHandler.processRecords(mixedRecords);
         Test.stopTest();
-        
-        // For generic record tests, we can only verify that no exceptions were thrown
+
         System.assert(true, 'No exceptions were thrown during generic record processing');
     }
 }

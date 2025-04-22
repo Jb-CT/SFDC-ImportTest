@@ -28,21 +28,34 @@ public with sharing class IntegrationConfigController {
         }
     }
 
-    // Helper method to implement security checks
     private static List<CleverTap__Config__c> getConfigurationsWithSecurity() {
-        // Security check required by PMD immediately before SOQL
-        if (Schema.sObjectType.CleverTap__Config__c.isAccessible()) {
-            // SOQL immediately after security check
-            return [
-                SELECT Id, Name, CleverTap__Account_ID__c, 
-                       CleverTap__Passcode__c, CleverTap__Region__c, CleverTap__API_URL__c
-                FROM CleverTap__Config__c
-                WHERE Name != '[Deleted]%'
-                ORDER BY Name
-            ];
-        } else {
+        // Security check for object-level accessibility
+        if (!Schema.sObjectType.CleverTap__Config__c.isAccessible()) {
             throw new AuraHandledException('You do not have access to CleverTap configurations');
         }
+        
+        // Check field-level security for each field we're querying
+        Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.CleverTap__Config__c.fields.getMap();
+        List<String> fieldsToCheck = new List<String>{
+            'Id', 'Name', 'CleverTap__Account_ID__c', 'CleverTap__Passcode__c', 
+            'CleverTap__Region__c', 'CleverTap__API_URL__c'
+        };
+        
+        // Validate each field's accessibility
+        for (String field : fieldsToCheck) {
+            if (!fieldMap.get(field.toLowerCase()).getDescribe().isAccessible()) {
+                throw new AuraHandledException('You do not have access to the ' + field + ' field');
+            }
+        }
+        
+        // Only after both object and field level security checks pass, we perform the SOQL query
+        return [
+            SELECT Id, Name, CleverTap__Account_ID__c, 
+                   CleverTap__Passcode__c, CleverTap__Region__c, CleverTap__API_URL__c
+            FROM CleverTap__Config__c
+            WHERE Name != '[Deleted]%'
+            ORDER BY Name
+        ];
     }
 
     /**
@@ -62,7 +75,6 @@ public with sharing class IntegrationConfigController {
     @AuraEnabled
     public static String saveConfiguration(Map<String, Object> config) {
         try {
-            // Validation
             validateConfigData(config);
 
             boolean isNew = !config.containsKey('id') || String.isBlank((String)config.get('id'));
@@ -76,10 +88,8 @@ public with sharing class IntegrationConfigController {
             throw new AuraHandledException('Error saving configuration: ' + e.getMessage());
         }
     }
-    
-    // Helper method for creating a new configuration
+
     private static String createNewConfiguration(Map<String, Object> config) {
-        // Create new config object
         CleverTap__Config__c newConfig = new CleverTap__Config__c(
             Name = (String)config.get('name'),
             CleverTap__Region__c = (String)config.get('region'),
@@ -87,30 +97,26 @@ public with sharing class IntegrationConfigController {
             CleverTap__Passcode__c = (String)config.get('passcode'),
             CleverTap__API_URL__c = regionToUrl.get(((String)config.get('region')).toUpperCase())
         );
-        
-        // Security check required by PMD immediately before DML
+
         if (Schema.sObjectType.CleverTap__Config__c.isCreateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.Name.isCreateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Region__c.isCreateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Account_ID__c.isCreateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Passcode__c.isCreateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__API_URL__c.isCreateable()) {
-            // DML immediately after security check
+
             insert newConfig;
             return 'Success';
         } else {
             throw new AuraHandledException('You do not have permission to create CleverTap configurations');
         }
     }
-    
-    // Helper method for updating an existing configuration
+
     private static String updateExistingConfiguration(Map<String, Object> config) {
         String configId = (String)config.get('id');
         CleverTap__Config__c existingConfig;
-        
-        // Security check required by PMD immediately before SOQL
+
         if (Schema.sObjectType.CleverTap__Config__c.isAccessible()) {
-            // SOQL immediately after security check
             List<CleverTap__Config__c> configs = [
                 SELECT Id FROM CleverTap__Config__c WHERE Id = :configId LIMIT 1
             ];
@@ -123,22 +129,20 @@ public with sharing class IntegrationConfigController {
         } else {
             throw new AuraHandledException('You do not have permission to access CleverTap configurations');
         }
-        
-        // Update fields
+
         existingConfig.Name = (String)config.get('name');
         existingConfig.CleverTap__Region__c = (String)config.get('region');
         existingConfig.CleverTap__Account_ID__c = (String)config.get('accountId');
         existingConfig.CleverTap__Passcode__c = (String)config.get('passcode');
         existingConfig.CleverTap__API_URL__c = regionToUrl.get(((String)config.get('region')).toUpperCase());
-        
-        // Security check required by PMD immediately before DML
+
         if (Schema.sObjectType.CleverTap__Config__c.isUpdateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.Name.isUpdateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Region__c.isUpdateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Account_ID__c.isUpdateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Passcode__c.isUpdateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__API_URL__c.isUpdateable()) {
-            // DML immediately after security check
+
             update existingConfig;
             return 'Success';
         } else {
@@ -159,31 +163,27 @@ public with sharing class IntegrationConfigController {
         }
     }
     
-    // Helper method to implement security checks for deletion
     private static String deleteConfigWithSecurity(String configId) {
-        List<CleverTap__Config__c> configToDelete;
-        
-        // Security check required by PMD immediately before SOQL
-        if (Schema.sObjectType.CleverTap__Config__c.isAccessible()) {
-            // SOQL immediately after security check
-            configToDelete = [
+        try {
+            // Check permission with the exact same pattern
+            if (!CleverTap__Config__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {
+                throw new AuraHandledException('You do not have permission to delete CleverTap configurations');
+            }
+            
+            // Query the record - same structure
+            List<CleverTap__Config__c> configToDelete = [
                 SELECT Id FROM CleverTap__Config__c WHERE Id = :configId LIMIT 1
             ];
             
             if (configToDelete.isEmpty()) {
                 throw new AuraHandledException('Configuration not found');
             }
-        } else {
-            throw new AuraHandledException('You do not have permission to access CleverTap configurations');
-        }
-        
-        // Security check required by PMD immediately before DML
-        if (Schema.sObjectType.CleverTap__Config__c.isDeletable()) {
-            // DML immediately after security check
+            
+            // Delete since we have permission
             delete configToDelete;
             return 'Success';
-        } else {
-            throw new AuraHandledException('You do not have permission to delete CleverTap configurations');
+        } catch (Exception e) {
+            throw new AuraHandledException('Error during deletion: ' + e.getMessage());
         }
     }
     

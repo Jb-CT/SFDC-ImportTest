@@ -24,17 +24,18 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         if (record == null) {
             return;
         }
-
+    
         if (isProcessing) {
             return;
         }
         
         try {
             isProcessing = true;
-
+    
             if (!isConfigurationAccessible()) {
                 return;
             }
+            
             List<EntityTransformer.ConnectionMapping> connectionMappings = 
                 entityTransformer.mapToMultipleConnections(record, recordType);
             
@@ -42,10 +43,8 @@ public with sharing class DataProcessorImpl implements DataProcessor {
                 return;
             }
             
-
             List<ResultLogger.EventData> eventDataList = new List<ResultLogger.EventData>();
             
-
             for (EntityTransformer.ConnectionMapping mapping : connectionMappings) {
                 // Get credentials for this connection
                 Map<String, String> credentials = getCredentialsForConnection(mapping.connectionId);
@@ -69,9 +68,7 @@ public with sharing class DataProcessorImpl implements DataProcessor {
                     System.enqueueJob(new ResultLoggerJob(eventDataList));
                 } else {
                     ResultLogger directLogger = new ResultLogger();
-                    for (ResultLogger.EventData data : eventDataList) {
-                        directLogger.logEvent(data);
-                    }
+                    directLogger.logEventBatch(eventDataList);
                 }
             }
         } catch (Exception e) {
@@ -83,9 +80,7 @@ public with sharing class DataProcessorImpl implements DataProcessor {
                 System.enqueueJob(new ResultLoggerJob(errorData));
             } else {
                 ResultLogger directLogger = new ResultLogger();
-                for (ResultLogger.EventData data : errorData) {
-                    directLogger.logEvent(data);
-                }
+                directLogger.logEventBatch(errorData); 
             }
         } finally {
             isProcessing = false;

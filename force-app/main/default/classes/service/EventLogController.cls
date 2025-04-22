@@ -12,9 +12,17 @@ public with sharing class EventLogController {
      */
     @AuraEnabled(cacheable=true)
     public static List<CleverTap__Event__c> getEventLogs(Integer recordLimit, String status, Integer days) {
-        // Check object-level CRUD permissions
+        
         if (!Schema.SObjectType.CleverTap__Event__c.isAccessible()) {
             throw new AuraHandledException('You do not have access to event logs');
+        }
+        
+        // Check field-level security
+        Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.CleverTap__Event__c.fields.getMap();
+        for (String field : new List<String>{'Name', 'CleverTap__Status__c', 'CleverTap__Response__c', 'CreatedDate'}) {
+            if (!fieldMap.get(field.toLowerCase()).getDescribe().isAccessible()) {
+                throw new AuraHandledException('You do not have access to the ' + field + ' field');
+            }
         }
         
         List<String> queryParts = new List<String>{
@@ -22,33 +30,26 @@ public with sharing class EventLogController {
             'FROM CleverTap__Event__c'
         };
         
-        // WHERE clause construction
         List<String> whereConditions = new List<String>();
         
-        // Filter by status if provided (using bind variable for safety)
         if (String.isNotBlank(status)) {
             whereConditions.add('CleverTap__Status__c = :status');
         }
-        
-        // Filter by date if days is provided (using bind variable for safety)
+
         if (days != null && days > 0) {
             DateTime filterDate = DateTime.now().addDays(-days);
             whereConditions.add('CreatedDate >= :filterDate');
         }
-        
-        // Add WHERE clause if conditions exist
+
         if (!whereConditions.isEmpty()) {
             queryParts.add('WHERE ' + String.join(whereConditions, ' AND '));
         }
-        
-        // Add ORDER BY and LIMIT clauses
+
         queryParts.add('ORDER BY CreatedDate DESC');
         queryParts.add('LIMIT :recordLimit');
-        
-        // Join all query parts
+
         String finalQuery = String.join(queryParts, ' ');
-        
-        // Execute the query with safely bound parameters
+
         return Database.query(finalQuery);
     }
     

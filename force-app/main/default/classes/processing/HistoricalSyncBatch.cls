@@ -2,7 +2,7 @@
  * @class HistoricalSyncBatch
  * @description Batch class for handling historical data sync between Salesforce and CleverTap.
  */
-public class HistoricalSyncBatch implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts {
+public with sharing class HistoricalSyncBatch implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts {
     private final String objectName;
     private final String syncConfigId;
 
@@ -399,22 +399,7 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
      * @param bc The batch context
      */
     public void finish(Database.BatchableContext bc) {
-        //createSummaryLog();
         createDetailedLogs();
-    }
-
-    @SuppressWarnings('PMD.AvoidDebugStatements')
-    private void createSummaryLog() {
-        try {
-            CleverTap__Event__c syncLog = new CleverTap__Event__c(
-                CleverTap__Status__c = (recordsFailed == 0) ? 'Success' : 'Failed',
-                CleverTap__Response__c = buildSummaryLogMessage()
-            );
-            
-            insert syncLog;
-        } catch (Exception e) {
-            System.debug(LoggingLevel.ERROR, 'Error creating summary log: ' + e.getMessage());
-        }
     }
 
     private String buildSummaryLogMessage() {
@@ -432,6 +417,17 @@ public class HistoricalSyncBatch implements Database.Batchable<SObject>, Databas
         }
         
         try {
+            if (!Schema.SObjectType.CleverTap__Event__c.isCreateable()) {
+                System.debug(LoggingLevel.ERROR, 'User does not have permission to create CleverTap__Event__c records');
+                return;
+            }
+    
+            if (!Schema.SObjectType.CleverTap__Event__c.fields.CleverTap__Status__c.isCreateable() ||
+                !Schema.SObjectType.CleverTap__Event__c.fields.CleverTap__Response__c.isCreateable()) {
+                System.debug(LoggingLevel.ERROR, 'User does not have permission to create some required fields');
+                return;
+            }
+            
             List<CleverTap__Event__c> detailedLogs = new List<CleverTap__Event__c>();
             
             for (SerializableEventData eventData : eventLogs) {

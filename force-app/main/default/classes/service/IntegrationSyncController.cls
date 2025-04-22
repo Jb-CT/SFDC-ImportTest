@@ -97,10 +97,9 @@ public with sharing class IntegrationSyncController {
             if (config.status != 'Active') {
                 throw new AuraHandledException('Sync configuration must be active to run historical sync');
             }
-            
-            // Start the batch process to sync all records
+
             HistoricalSyncBatch batchProcess = new HistoricalSyncBatch(config.sourceEntity, syncId);
-            Database.executeBatch(batchProcess, 10); // Process 10 records at a time
+            Database.executeBatch(batchProcess, 10); 
             
             return 'Success';
         } catch (Exception e) {

@@ -112,6 +112,12 @@ public with sharing class SyncConfigurationManager {
             if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
                 throw new AuraHandledException('You do not have permission to update configurations');
             }
+            if (!Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.Name.isUpdateable() ||
+            !Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.CleverTap__Sync_Type__c.isUpdateable() ||
+            !Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.CleverTap__Salesforce_Entity__c.isUpdateable() ||
+            !Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.CleverTap__Entity__c.isUpdateable()) {
+            throw new AuraHandledException('You do not have permission to update some fields');
+            }
             
             Map<String, Object> syncMap = (Map<String, Object>) JSON.deserializeUntyped(syncData);
             
@@ -128,7 +134,6 @@ public with sharing class SyncConfigurationManager {
             
             update syncConfig;
             
-            // Return the updated record
             return getSyncConfigurationById(syncId);
         } catch (Exception e) {
             throw new AuraHandledException('Error updating sync configuration: ' + e.getMessage());
@@ -139,6 +144,9 @@ public with sharing class SyncConfigurationManager {
         try {
             if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
                 throw new AuraHandledException('You do not have permission to update configurations');
+            }
+            if (!Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.CleverTap__Status__c.isUpdateable()) {
+                throw new AuraHandledException('You do not have permission to update the Status field');
             }
             
             CleverTap__Sync_Configuration__c config = [

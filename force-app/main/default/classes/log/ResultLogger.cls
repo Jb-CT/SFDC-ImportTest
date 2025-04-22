@@ -89,6 +89,11 @@ public with sharing class ResultLogger {
     }
 
     private CleverTap__Event__c createEventLog(EventData eventData, Boolean isSuccess) {
+        if (!Schema.sObjectType.CleverTap__Event__c.fields.CleverTap__Status__c.isCreateable() ||
+        !Schema.sObjectType.CleverTap__Event__c.fields.CleverTap__Response__c.isCreateable()) {
+        return null;
+        }
+
         CleverTap__Event__c eventLog = new CleverTap__Event__c();
         eventLog.CleverTap__Status__c = isSuccess ? 'Success' : 'Failed';
         
@@ -109,18 +114,69 @@ public with sharing class ResultLogger {
     }
 
     private void setRecordReference(CleverTap__Event__c eventLog, EventData eventData) {
-        String fieldName = eventData.recordType + '__c';
+        // Handle specific known record types directly
+        if (eventData.recordType == 'Contact') {
+            // Explicitly set the Contact field
+            eventLog.CleverTap__Contact__c = eventData.recordId;
+            return;
+        } else if (eventData.recordType == 'Lead') {
+            // Explicitly set the Lead field
+            eventLog.CleverTap__Lead__c = eventData.recordId;
+            return;
+        } else if (eventData.recordType == 'Account') {
+            // Explicitly set the Account field if it exists
+            eventLog.put('CleverTap__Account__c', eventData.recordId);
+            return;
+        } else if (eventData.recordType == 'Opportunity') {
+            // Explicitly set the Opportunity field if it exists
+            eventLog.put('CleverTap__Opportunity__c', eventData.recordId);
+            return;
+        }
         
-        if (hasField(CleverTap__Event__c.SObjectType, fieldName)) {
+        // For other record types, try to resolve dynamically
+        String fieldName = 'CleverTap__' + eventData.recordType + '__c';
+        Map<String, Schema.SObjectField> fieldMap = CleverTap__Event__c.SObjectType.getDescribe().fields.getMap();
+        
+        if (fieldMap.containsKey(fieldName.toLowerCase())) {
             eventLog.put(fieldName, eventData.recordId);
         } else {
-            // Fallback - store record ID in description
+            // Fallback to description
             eventLog.CleverTap__Response__c = eventData.recordType + ' ID: ' + eventData.recordId + '\n' + eventLog.CleverTap__Response__c;
         }
     }
 
     private Boolean hasField(Schema.SObjectType sObjType, String fieldName) {
         Map<String, Schema.SObjectField> fieldMap = sObjType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
-        return fieldMap.containsKey(fieldName);
+        return fieldMap.containsKey(fieldName.toLowerCase());  // Add toLowerCase() here
+    }
+
+
+    public void logEventBatch(List<EventData> eventDataBatch) {
+        // Check object-level permission first
+        if (!Schema.sObjectType.CleverTap__Event__c.isCreateable()) {
+            System.debug(LoggingLevel.ERROR, 'Insufficient permissions to create CleverTap Event log records');
+            return;
+        }
+        
+        // Also check field-level permissions
+        if (!Schema.sObjectType.CleverTap__Event__c.fields.CleverTap__Status__c.isCreateable() ||
+            !Schema.sObjectType.CleverTap__Event__c.fields.CleverTap__Response__c.isCreateable()) {
+            System.debug(LoggingLevel.ERROR, 'Insufficient permissions to create some required fields');
+            return;
+        }
+        
+        List<CleverTap__Event__c> eventLogs = new List<CleverTap__Event__c>();
+        
+        for (EventData eventData : eventDataBatch) {
+            Boolean isSuccess = determineSuccessStatus(eventData);
+            CleverTap__Event__c eventLog = createEventLog(eventData, isSuccess);
+            if (eventLog != null) {
+                eventLogs.add(eventLog);
+            }
+        }
+        
+        if (!eventLogs.isEmpty()) {
+            insert eventLogs;
+        }
     }
 }

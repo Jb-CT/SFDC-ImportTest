@@ -4,10 +4,8 @@
  * Provides cached access to schema information to improve performance.
  */
 public with sharing class SchemaUtility {
-    // Cache for field describe results to avoid repeated API calls
     private final Map<String, Map<String, Schema.SObjectField>> objectFieldsCache;
-    
-    // Cache for object describe results
+
     private final Map<String, Schema.DescribeSObjectResult> objectDescribeCache;
 
     public SchemaUtility() {

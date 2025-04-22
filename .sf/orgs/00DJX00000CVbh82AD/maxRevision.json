@@ -56,7 +56,7 @@
             "lastRetrievedFromServer": 481,
             "isNameObsolete": false
         },
-        "CustomField__CleverTap_Event__c.Lead__c": {
+        "CustomField__CleverTap_Event__c.CleverTap__Lead__c": {
             "memberType": "CustomField",
             "serverRevisionCounter": 453,
             "lastRetrievedFromServer": 453,

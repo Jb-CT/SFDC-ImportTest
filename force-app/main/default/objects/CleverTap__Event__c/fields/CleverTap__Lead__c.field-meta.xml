@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Lead__c</fullName>
+    <fullName>CleverTap__Lead__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Related Lead record for this sync event</description>
     <externalId>false</externalId>

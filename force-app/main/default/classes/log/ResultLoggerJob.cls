@@ -3,7 +3,7 @@
  * @description Queueable job for asynchronously logging CleverTap integration events.
  * Uses a serializable wrapper to handle HttpResponse data that cannot be serialized directly.
  */
-public class ResultLoggerJob implements Queueable {
+public with sharing class ResultLoggerJob implements Queueable {
     private static final String STATUS_FIELD = 'CleverTap__Status__c';
     private static final String RESPONSE_FIELD = 'CleverTap__Response__c';
     

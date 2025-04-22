@@ -3,100 +3,90 @@ private class ValueExtractorTest {
     static ValueExtractor valueExtractor = new ValueExtractor();
     @isTest
     static void testConvertFieldValueText() {
-        // Test converting a string value with text data type
+
         Object result = valueExtractor.convertFieldValue('Test String', 'Text');
         System.assertEquals('Test String', result, 'Text value should remain unchanged');
         
-        // Test with null value
+
         result = valueExtractor.convertFieldValue(null, 'Text');
         System.assertEquals(null, result, 'Null value should remain null');
     }
     
     @isTest
     static void testConvertFieldValueNumber() {
-        // Test converting a number value with number data type
+
         Object result = valueExtractor.convertFieldValue(123.45, 'Number');
         System.assertEquals(123.45, result, 'Number value should remain as a number');
         
-        // Test converting a string to number
+
         result = valueExtractor.convertFieldValue('678.90', 'Number');
         System.assertEquals(678.90, (Decimal)result, 'String number should be converted to number');
         
-        // Test invalid number
+
         result = valueExtractor.convertFieldValue('not-a-number', 'Number');
         System.assertEquals(0, result, 'Invalid number should convert to 0');
         
-        // Test with null value
+
         result = valueExtractor.convertFieldValue(null, 'Number');
         System.assertEquals(null, result, 'Null value should remain null');
     }
     
     @isTest
     static void testConvertFieldValueBoolean() {
-        // Test boolean true value
+
         Object result = valueExtractor.convertFieldValue(true, 'Boolean');
         System.assertEquals(true, result, 'Boolean true should remain true');
         
-        // Test boolean false value
+
         result = valueExtractor.convertFieldValue(false, 'Boolean');
         System.assertEquals(false, result, 'Boolean false should remain false');
         
-        // Test string 'true'
+
         result = valueExtractor.convertFieldValue('true', 'Boolean');
         System.assertEquals(true, result, 'String "true" should convert to boolean true');
         
-        // Test string 'false'
+
         result = valueExtractor.convertFieldValue('false', 'Boolean');
         System.assertEquals(false, result, 'String "false" should convert to boolean false');
         
-        // Test with mixed case
+
         result = valueExtractor.convertFieldValue('TrUe', 'Boolean');
         System.assertEquals(true, result, 'String "TrUe" should convert to boolean true');
-        
-        // Test with other strings that should become false
+
         result = valueExtractor.convertFieldValue('random string', 'Boolean');
         System.assertEquals(false, result, 'Random string should convert to boolean false');
-        
-        // Test with null value
+
         result = valueExtractor.convertFieldValue(null, 'Boolean');
         System.assertEquals(null, result, 'Null value should remain null');
     }
     
     @isTest
     static void testConvertFieldValueDate() {
-        // Test with Date
         Date testDate = Date.newInstance(2023, 1, 1);
         Object result = valueExtractor.convertFieldValue(testDate, 'Date');
         String resultStr = (String)result;
         System.assert(resultStr.startsWith('$D_'), 'Date should be converted to $D_ format');
-        
-        // Test with DateTime
+
         DateTime testDateTime = DateTime.newInstance(2023, 1, 1, 12, 30, 45);
         result = valueExtractor.convertFieldValue(testDateTime, 'Date');
         resultStr = (String)result;
         System.assert(resultStr.startsWith('$D_'), 'DateTime should be converted to $D_ format');
-        
-        // Test with String that isn't a date - should just return the string
+
         result = valueExtractor.convertFieldValue('2023-01-01', 'Date');
         System.assertEquals('2023-01-01', result, 'String date should remain as string');
-        
-        // Test with null value
+
         result = valueExtractor.convertFieldValue(null, 'Date');
         System.assertEquals(null, result, 'Null value should remain null');
-        
-        // Additional test for numeric string date conversion path
+
         DateTime now = DateTime.now();
         result = valueExtractor.convertFieldValue(now, 'Date');
         resultStr = (String)result;
-        
-        // Verify the resulting string is in the expected format (prefix + timestamp)
+
         System.assert(resultStr.startsWith('$D_'), 'DateTime should convert to $D_ format');
-        
-        // Extract the timestamp part and check if it's a valid number
-        String timestampStr = resultStr.substring(3); // strip $D_
+
+        String timestampStr = resultStr.substring(3); 
         Long timestamp = Long.valueOf(timestampStr);
-        
-        // The timestamp should be a reasonable epoch value (not 0 or negative)
+
         System.assert(timestamp > 0, 'Timestamp should be a positive value');
     }
     

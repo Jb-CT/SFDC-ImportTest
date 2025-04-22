@@ -28,17 +28,14 @@ public with sharing class FieldMappingManager {
         try {
             checkMappingPermissions();
             validateMappingData(mappingData);
-            
-            // Parse the mapping data
+
             Map<String, Object> mappingsMap = parseMappingJson(mappingData);
             Id syncId = validateSyncId(mappingsMap);
             List<Object> mappingsObj = validateMappingsList(mappingsMap);
 
-            // Process the mappings
             processFieldMappings(syncId, mappingsObj);
             
         } catch (Exception e) {
-            // Rollback on error
             Database.rollback(sp);
             throw new AuraHandledException('Error saving mappings: ' + e.getMessage());
         }
@@ -95,7 +92,19 @@ public with sharing class FieldMappingManager {
 
     private void deleteExistingMappings(Id syncId) {
         try {
-            delete [SELECT Id FROM CleverTap__Mapping__c WHERE CleverTap__Sync_mapping__c = :syncId];
+            // Check permission with the exact same pattern that's working for you
+            if (!CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {
+                throw new AuraHandledException('Insufficient permissions to delete mapping records');
+            }
+            
+            // Query and delete - following the same structure
+            List<CleverTap__Mapping__c> mappingsToDelete = [
+                SELECT Id FROM CleverTap__Mapping__c WHERE CleverTap__Sync_mapping__c = :syncId
+            ];
+            
+            if (!mappingsToDelete.isEmpty()) {
+                delete mappingsToDelete;
+            }
         } catch (Exception e) {
             throw new AuraHandledException('Error deleting existing mappings: ' + e.getMessage());
         }
@@ -114,7 +123,6 @@ public with sharing class FieldMappingManager {
     }
 
     private CleverTap__Mapping__c createMappingRecord(Id syncId, Map<String, Object> mapping) {
-        // Validate required fields
         String targetField = (String)mapping.get('CleverTap__Field__c');
         String sourceField = (String)mapping.get('CleverTap__Salesforce_Field__c');
         
