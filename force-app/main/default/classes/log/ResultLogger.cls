@@ -157,8 +157,7 @@ public with sharing class ResultLogger {
             System.debug(LoggingLevel.ERROR, 'Insufficient permissions to create CleverTap Event log records');
             return;
         }
-        
-        // Also check field-level permissions
+
         if (!Schema.sObjectType.CleverTap__Event__c.fields.CleverTap__Status__c.isCreateable() ||
             !Schema.sObjectType.CleverTap__Event__c.fields.CleverTap__Response__c.isCreateable()) {
             System.debug(LoggingLevel.ERROR, 'Insufficient permissions to create some required fields');
