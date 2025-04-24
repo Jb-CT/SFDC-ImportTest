@@ -19,7 +19,7 @@ public with sharing class EventLogController {
         
         // Check field-level security
         Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.CleverTap__Event__c.fields.getMap();
-        for (String field : new List<String>{'Name', 'CleverTap__Status__c', 'CleverTap__Response__c', 'CreatedDate'}) {
+        for (String field : new List<String>{'Name', 'CleverTap__Status__c', 'CreatedDate'}) {
             if (!fieldMap.get(field.toLowerCase()).getDescribe().isAccessible()) {
                 throw new AuraHandledException('You do not have access to the ' + field + ' field');
             }

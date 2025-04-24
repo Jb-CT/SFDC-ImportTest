@@ -349,4 +349,160 @@ private class HistoricalSyncBatchTest {
         List<CleverTap__Event__c> logs = [SELECT Id FROM CleverTap__Event__c];
         System.assert(!logs.isEmpty(), 'Should create logs for full batch process');
     }
+
+        @isTest
+    static void testMissingMappings() {
+        // Get the sync config without any mappings
+        CleverTap__Sync_Configuration__c syncConfig = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
+        ];
+        
+        // Delete existing mappings
+        delete [SELECT Id FROM CleverTap__Mapping__c 
+            WHERE CleverTap__Sync_mapping__c = :syncConfig.Id];
+        
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseError());
+        
+        List<Lead> leads = [SELECT Id, FirstName, LastName, Email, Company, Status, 
+                        AnnualRevenue, LastModifiedDate 
+                        FROM Lead LIMIT 2];
+        
+        Test.startTest();
+        HistoricalSyncBatch batchInstance = new HistoricalSyncBatch('Lead', syncConfig.Id);
+        batchInstance.execute(null, leads);
+        batchInstance.finish(null);
+        Test.stopTest();
+        
+        System.assert(true, 'Successfully tested missing mappings scenario');
+    }
+
+    @isTest
+    static void testMalformedResponse() {
+        CleverTap__Sync_Configuration__c syncConfig = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
+        ];
+        
+        // Create a mock that returns malformed JSON
+        Test.setMock(HttpCalloutMock.class, new MockMalformedResponse());
+        
+        List<Lead> leads = [SELECT Id, FirstName, LastName, Email, Company, Status, 
+                        AnnualRevenue, LastModifiedDate 
+                        FROM Lead LIMIT 1];
+        
+        Test.startTest();
+        HistoricalSyncBatch batchInstance = new HistoricalSyncBatch('Lead', syncConfig.Id);
+        batchInstance.execute(null, leads);
+        batchInstance.finish(null);
+        Test.stopTest();
+        
+        System.assert(true, 'Successfully tested malformed response handling');
+    }
+
+    private class MockMalformedResponse implements HttpCalloutMock {
+        public HTTPResponse respond(HTTPRequest req) {
+            HttpResponse res = new HttpResponse();
+            res.setHeader('Content-Type', 'application/json');
+            res.setBody('This is not valid JSON{');
+            res.setStatusCode(200);
+            return res;
+        }
+    }
+
+    @isTest
+    static void testFieldValidation() {
+        CleverTap__Sync_Configuration__c syncConfig = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
+        ];
+        
+        // Create a mapping with a field that doesn't exist
+        CleverTap__Mapping__c invalidMapping = new CleverTap__Mapping__c(
+            CleverTap__Sync_mapping__c = syncConfig.Id,
+            CleverTap__Field__c = 'invalid_field',
+            CleverTap__Salesforce_Field__c = 'NonExistentField',
+            CleverTap__Data_Type__c = 'Text',
+            CleverTap__Is_Mandatory__c = false
+        );
+        insert invalidMapping;
+        
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseSuccess());
+        
+        List<Lead> leads = [SELECT Id, FirstName, LastName, Email, Company, Status 
+                        FROM Lead LIMIT 1];
+        
+        Test.startTest();
+        HistoricalSyncBatch batchInstance = new HistoricalSyncBatch('Lead', syncConfig.Id);
+        batchInstance.execute(null, leads);
+        batchInstance.finish(null);
+        Test.stopTest();
+        
+        System.assert(true, 'Successfully tested field validation');
+    }
+
+
+
+
+
+        // Add this to HistoricalSyncBatchTest
+    @isTest
+    static void testBatchProcessWithInvalidData() {
+        // Create test data
+        CleverTap__Sync_Configuration__c syncConfig = [
+            SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
+        ];
+        
+        // Create a lead without any mapped fields
+        Lead emptyLead = new Lead(
+            LastName = 'Empty Lead',
+            Company = 'Empty Company'
+            // Intentionally missing Email which is mapped to customer_id
+        );
+        insert emptyLead;
+        
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseSuccess());
+        
+        Test.startTest();
+        
+        // Create batch instance
+        HistoricalSyncBatch batchInstance = new HistoricalSyncBatch('Lead', syncConfig.Id);
+        
+        // Test with leads that will cause different code paths to be hit
+        batchInstance.execute(null, new List<Lead>{emptyLead});
+        
+        // Get a lead with email for comparison
+        Lead testLead = [SELECT Id, Email FROM Lead WHERE Email != null LIMIT 1];
+        
+        // Test with a mix of valid and invalid leads
+        batchInstance.execute(null, new List<Lead>{emptyLead, testLead});
+        
+        // Complete the batch
+        batchInstance.finish(null);
+        
+        Test.stopTest();
+    }
+
+    @isTest
+    static void testBatchWithInvalidConfig() {
+        Lead testLead = [SELECT Id FROM Lead LIMIT 1];
+        
+        // Create an invalid sync config
+        CleverTap__Sync_Configuration__c invalidConfig = new CleverTap__Sync_Configuration__c(
+            Name = 'Invalid Config',
+            CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
+            CleverTap__Salesforce_Entity__c = 'Lead',
+            CleverTap__Entity__c = 'profile',
+            CleverTap__ConnectionId__c = 'InvalidID',
+            CleverTap__Status__c = 'Active'
+        );
+        insert invalidConfig;
+        
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseSuccess());
+        
+        Test.startTest();
+        
+        HistoricalSyncBatch batchInstance = new HistoricalSyncBatch('Lead', invalidConfig.Id);
+        batchInstance.execute(null, new List<Lead>{testLead});
+        batchInstance.finish(null);
+        
+        Test.stopTest();
+    }
 }

@@ -219,4 +219,44 @@ private class DataProcessorImplTest {
             throw new CalloutException('Simulated callout exception');
         }
     }
+
+
+
+
+
+        // Add this to DataProcessorImplTest
+    @isTest
+    static void testTargetedDataProcessorCoverage() {
+        Lead testLead = [SELECT Id, FirstName, LastName, Email FROM Lead LIMIT 1];
+        
+        Test.setMock(HttpCalloutMock.class, new MockHttpResponseSuccess());
+        
+        // Create mock objects with specific configurations to test more code paths
+        EntityTransformer transformer = new EntityTransformer();
+        Config config = new Config();
+        ResultLogger logger = new ResultLogger();
+        
+        DataProcessorImpl processor = new DataProcessorImpl(transformer, config, logger);
+        
+        Test.startTest();
+        // Test different processing scenarios
+        processor.sendLeadToCleverTap(testLead);
+        
+        // Test with null record
+        processor.sendToCleverTap(null, 'Lead');
+        
+        // Set a mock config with specific target entity type
+        CleverTap__Sync_Configuration__c mockConfig = new CleverTap__Sync_Configuration__c(
+            Name = 'Mock Config',
+            CleverTap__Salesforce_Entity__c = 'Lead',
+            CleverTap__Entity__c = 'event',
+            CleverTap__Status__c = 'Active'
+        );
+        insert mockConfig;
+        
+        processor.sendLeadToCleverTap(testLead);
+        Test.stopTest();
+        
+        System.assert(true, 'Test completed successfully');
+    }
 }

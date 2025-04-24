@@ -3,6 +3,20 @@
     <description>Provides access to CleverTap tabs and objects</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>CleverTap Access</label>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CleverTap__Event__c.CleverTap__Response__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>CleverTap__Event__c</object>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
     <tabSettings>
         <tab>CleverTap_Settings</tab>
         <visibility>Visible</visibility>

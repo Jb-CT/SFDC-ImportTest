@@ -1,0 +1,606 @@
+{
+    "fileVersion": 0,
+    "serverMaxRevisionCounter": 324,
+    "sourceMembers": {
+        "Profile__Admin": {
+            "memberType": "Profile",
+            "serverRevisionCounter": 323,
+            "lastRetrievedFromServer": 323,
+            "isNameObsolete": false
+        },
+        "CustomField__Mapping__c.Sync_mapping__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 290,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomObject__Mapping__c": {
+            "memberType": "CustomObject",
+            "serverRevisionCounter": 321,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Config__c.API_URL__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 41,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Config__c.Account_ID__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 42,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Config__c.Passcode__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 43,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Config__c.Region__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 44,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Event__c.Contact__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 45,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomObject__Event__c": {
+            "memberType": "CustomObject",
+            "serverRevisionCounter": 320,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Event__c.Lead__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 292,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Event__c.Response__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 49,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Event__c.Status__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 50,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Mapping__c.Data_Type__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 51,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Mapping__c.Field__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 52,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Mapping__c.Is_Mandatory__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 53,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Mapping__c.Salesforce_Field__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 54,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Sync_Configuration__c.ConnectionId__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 55,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Sync_Configuration__c.Entity__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 56,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Sync_Configuration__c.Salesforce_Entity__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 57,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Sync_Configuration__c.Status__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 58,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomField__Sync_Configuration__c.Sync_Type__c": {
+            "memberType": "CustomField",
+            "serverRevisionCounter": 59,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "ApexClass__ApiRequest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 60,
+            "lastRetrievedFromServer": 60,
+            "isNameObsolete": false
+        },
+        "ApexClass__ApiRequestTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 61,
+            "lastRetrievedFromServer": 61,
+            "isNameObsolete": false
+        },
+        "ApexClass__Config": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 62,
+            "lastRetrievedFromServer": 62,
+            "isNameObsolete": false
+        },
+        "ApexClass__ConfigTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 63,
+            "lastRetrievedFromServer": 63,
+            "isNameObsolete": false
+        },
+        "ApexClass__CredentialValidator": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 64,
+            "lastRetrievedFromServer": 64,
+            "isNameObsolete": false
+        },
+        "ApexClass__CredentialValidatorTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 65,
+            "lastRetrievedFromServer": 65,
+            "isNameObsolete": false
+        },
+        "ApexClass__DIModule": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 66,
+            "lastRetrievedFromServer": 66,
+            "isNameObsolete": false
+        },
+        "ApexClass__DIModuleMain": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 67,
+            "lastRetrievedFromServer": 67,
+            "isNameObsolete": false
+        },
+        "ApexClass__DataProcessor": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 68,
+            "lastRetrievedFromServer": 68,
+            "isNameObsolete": false
+        },
+        "ApexClass__DataProcessorImpl": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 69,
+            "lastRetrievedFromServer": 69,
+            "isNameObsolete": false
+        },
+        "ApexClass__DataProcessorImplTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 70,
+            "lastRetrievedFromServer": 70,
+            "isNameObsolete": false
+        },
+        "ApexClass__EntityExportJob": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 71,
+            "lastRetrievedFromServer": 71,
+            "isNameObsolete": false
+        },
+        "ApexClass__EntityExportJobTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 72,
+            "lastRetrievedFromServer": 72,
+            "isNameObsolete": false
+        },
+        "ApexClass__EntityTransformer": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 73,
+            "lastRetrievedFromServer": 73,
+            "isNameObsolete": false
+        },
+        "ApexClass__EntityTransformerTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 74,
+            "lastRetrievedFromServer": 74,
+            "isNameObsolete": false
+        },
+        "ApexClass__EventLogController": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 294,
+            "lastRetrievedFromServer": 294,
+            "isNameObsolete": false
+        },
+        "ApexClass__FieldMappingManager": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 76,
+            "lastRetrievedFromServer": 76,
+            "isNameObsolete": false
+        },
+        "ApexClass__HistoricalSyncBatch": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 77,
+            "lastRetrievedFromServer": 77,
+            "isNameObsolete": false
+        },
+        "ApexClass__HistoricalSyncBatchTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 78,
+            "lastRetrievedFromServer": 78,
+            "isNameObsolete": false
+        },
+        "ApexClass__IntegrationConfigController": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 79,
+            "lastRetrievedFromServer": 79,
+            "isNameObsolete": false
+        },
+        "ApexClass__IntegrationConfigControllerTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 80,
+            "lastRetrievedFromServer": 80,
+            "isNameObsolete": false
+        },
+        "ApexClass__IntegrationHandler": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 81,
+            "lastRetrievedFromServer": 81,
+            "isNameObsolete": false
+        },
+        "ApexClass__IntegrationHandlerTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 82,
+            "lastRetrievedFromServer": 82,
+            "isNameObsolete": false
+        },
+        "ApexClass__IntegrationSyncController": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 83,
+            "lastRetrievedFromServer": 83,
+            "isNameObsolete": false
+        },
+        "ApexClass__IntegrationSyncControllerTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 84,
+            "lastRetrievedFromServer": 84,
+            "isNameObsolete": false
+        },
+        "ApexClass__MockBatchClass": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 85,
+            "lastRetrievedFromServer": 85,
+            "isNameObsolete": false
+        },
+        "ApexClass__MockCleverTapService": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 86,
+            "lastRetrievedFromServer": 86,
+            "isNameObsolete": false
+        },
+        "ApexClass__ResultLogger": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 87,
+            "lastRetrievedFromServer": 87,
+            "isNameObsolete": false
+        },
+        "ApexClass__ResultLoggerJob": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 88,
+            "lastRetrievedFromServer": 88,
+            "isNameObsolete": false
+        },
+        "ApexClass__ResultLoggerTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 89,
+            "lastRetrievedFromServer": 89,
+            "isNameObsolete": false
+        },
+        "ApexClass__SchemaUtility": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 90,
+            "lastRetrievedFromServer": 90,
+            "isNameObsolete": false
+        },
+        "ApexClass__SchemaUtilityTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 91,
+            "lastRetrievedFromServer": 91,
+            "isNameObsolete": false
+        },
+        "ApexClass__SendLeadToCleverTapTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 92,
+            "lastRetrievedFromServer": 92,
+            "isNameObsolete": false
+        },
+        "ApexClass__SyncConfigurationManager": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 93,
+            "lastRetrievedFromServer": 93,
+            "isNameObsolete": false
+        },
+        "ApexClass__TestModule": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 94,
+            "lastRetrievedFromServer": 94,
+            "isNameObsolete": false
+        },
+        "ApexClass__TestUtils": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 95,
+            "lastRetrievedFromServer": 95,
+            "isNameObsolete": false
+        },
+        "ApexClass__ValueExtractor": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 96,
+            "lastRetrievedFromServer": 96,
+            "isNameObsolete": false
+        },
+        "ApexClass__ValueExtractorTest": {
+            "memberType": "ApexClass",
+            "serverRevisionCounter": 97,
+            "lastRetrievedFromServer": 97,
+            "isNameObsolete": false
+        },
+        "ApexTrigger__SendAccountToCleverTap": {
+            "memberType": "ApexTrigger",
+            "serverRevisionCounter": 98,
+            "lastRetrievedFromServer": 98,
+            "isNameObsolete": false
+        },
+        "ApexTrigger__SendContactToCleverTap": {
+            "memberType": "ApexTrigger",
+            "serverRevisionCounter": 99,
+            "lastRetrievedFromServer": 99,
+            "isNameObsolete": false
+        },
+        "ApexTrigger__SendLeadToCleverTap": {
+            "memberType": "ApexTrigger",
+            "serverRevisionCounter": 100,
+            "lastRetrievedFromServer": 100,
+            "isNameObsolete": false
+        },
+        "ApexTrigger__SendOpportunityToCleverTap": {
+            "memberType": "ApexTrigger",
+            "serverRevisionCounter": 101,
+            "lastRetrievedFromServer": 101,
+            "isNameObsolete": false
+        },
+        "LightningComponentBundle__eventLogViewer": {
+            "memberType": "LightningComponentBundle",
+            "serverRevisionCounter": 295,
+            "lastRetrievedFromServer": 295,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__eventLogViewer/eventLogViewer.html": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 296,
+            "lastRetrievedFromServer": 296,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__eventLogViewer/eventLogViewer.js": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 297,
+            "lastRetrievedFromServer": 297,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__eventLogViewer/eventLogViewer.js-meta.xml": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 298,
+            "lastRetrievedFromServer": 298,
+            "isNameObsolete": false
+        },
+        "LightningComponentBundle__integrationFieldMapping": {
+            "memberType": "LightningComponentBundle",
+            "serverRevisionCounter": 299,
+            "lastRetrievedFromServer": 299,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationFieldMapping/integrationFieldMapping.js": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 300,
+            "lastRetrievedFromServer": 300,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationFieldMapping/integrationFieldMapping.js-meta.xml": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 301,
+            "lastRetrievedFromServer": 301,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationFieldMapping/integrationFieldMapping.html": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 302,
+            "lastRetrievedFromServer": 302,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationFieldMapping/__tests__/integrationFieldMapping.test.js": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 303,
+            "lastRetrievedFromServer": 303,
+            "isNameObsolete": false
+        },
+        "LightningComponentBundle__integrationSettings": {
+            "memberType": "LightningComponentBundle",
+            "serverRevisionCounter": 304,
+            "lastRetrievedFromServer": 304,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationSettings/integrationSettings.js-meta.xml": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 305,
+            "lastRetrievedFromServer": 305,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationSettings/integrationSettings.js": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 306,
+            "lastRetrievedFromServer": 306,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationSettings/__tests__/integrationSettings.test.js": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 307,
+            "lastRetrievedFromServer": 307,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationSettings/integrationSettings.html": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 308,
+            "lastRetrievedFromServer": 308,
+            "isNameObsolete": false
+        },
+        "LightningComponentBundle__integrationSyncConfig": {
+            "memberType": "LightningComponentBundle",
+            "serverRevisionCounter": 309,
+            "lastRetrievedFromServer": 309,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationSyncConfig/integrationSyncConfig.js-meta.xml": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 310,
+            "lastRetrievedFromServer": 310,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationSyncConfig/integrationSyncConfig.js": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 311,
+            "lastRetrievedFromServer": 311,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationSyncConfig/__tests__/integrationSyncConfig.test.js": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 312,
+            "lastRetrievedFromServer": 312,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationSyncConfig/integrationSyncConfig.html": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 313,
+            "lastRetrievedFromServer": 313,
+            "isNameObsolete": false
+        },
+        "LightningComponentBundle__integrationSyncList": {
+            "memberType": "LightningComponentBundle",
+            "serverRevisionCounter": 314,
+            "lastRetrievedFromServer": 314,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationSyncList/integrationSyncList.js-meta.xml": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 315,
+            "lastRetrievedFromServer": 315,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationSyncList/__tests__/integrationSyncList.test.js": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 316,
+            "lastRetrievedFromServer": 316,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationSyncList/integrationSyncList.html": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 317,
+            "lastRetrievedFromServer": 317,
+            "isNameObsolete": false
+        },
+        "LightningComponentResource__integrationSyncList/integrationSyncList.js": {
+            "memberType": "LightningComponentResource",
+            "serverRevisionCounter": 318,
+            "lastRetrievedFromServer": 318,
+            "isNameObsolete": false
+        },
+        "CustomObject__Config__c": {
+            "memberType": "CustomObject",
+            "serverRevisionCounter": 319,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "CustomObject__Sync_Configuration__c": {
+            "memberType": "CustomObject",
+            "serverRevisionCounter": 322,
+            "lastRetrievedFromServer": null,
+            "isNameObsolete": false
+        },
+        "FlexiPage__CleverTap_UtilityBar": {
+            "memberType": "FlexiPage",
+            "serverRevisionCounter": 130,
+            "lastRetrievedFromServer": 130,
+            "isNameObsolete": false
+        },
+        "CustomTab__CleverTap_Event_Logs": {
+            "memberType": "CustomTab",
+            "serverRevisionCounter": 131,
+            "lastRetrievedFromServer": 131,
+            "isNameObsolete": false
+        },
+        "CustomTab__CleverTap_Settings": {
+            "memberType": "CustomTab",
+            "serverRevisionCounter": 132,
+            "lastRetrievedFromServer": 132,
+            "isNameObsolete": false
+        },
+        "CustomApplication__CleverTapIntegration": {
+            "memberType": "CustomApplication",
+            "serverRevisionCounter": 133,
+            "lastRetrievedFromServer": 133,
+            "isNameObsolete": false
+        },
+        "PermissionSet__CleverTapIntegrationAccess": {
+            "memberType": "PermissionSet",
+            "serverRevisionCounter": 324,
+            "lastRetrievedFromServer": 324,
+            "isNameObsolete": false
+        },
+        "RemoteSiteSetting__CleverTap_EU": {
+            "memberType": "RemoteSiteSetting",
+            "serverRevisionCounter": 136,
+            "lastRetrievedFromServer": 136,
+            "isNameObsolete": false
+        },
+        "RemoteSiteSetting__CleverTap_ID": {
+            "memberType": "RemoteSiteSetting",
+            "serverRevisionCounter": 137,
+            "lastRetrievedFromServer": 137,
+            "isNameObsolete": false
+        },
+        "RemoteSiteSetting__CleverTap_IN": {
+            "memberType": "RemoteSiteSetting",
+            "serverRevisionCounter": 138,
+            "lastRetrievedFromServer": 138,
+            "isNameObsolete": false
+        },
+        "RemoteSiteSetting__CleverTap_SG": {
+            "memberType": "RemoteSiteSetting",
+            "serverRevisionCounter": 139,
+            "lastRetrievedFromServer": 139,
+            "isNameObsolete": false
+        },
+        "RemoteSiteSetting__CleverTap_UAE": {
+            "memberType": "RemoteSiteSetting",
+            "serverRevisionCounter": 140,
+            "lastRetrievedFromServer": 140,
+            "isNameObsolete": false
+        },
+        "RemoteSiteSetting__CleverTap_US": {
+            "memberType": "RemoteSiteSetting",
+            "serverRevisionCounter": 141,
+            "lastRetrievedFromServer": 141,
+            "isNameObsolete": false
+        }
+    }
+}
