@@ -9,10 +9,9 @@ private class IntegrationSyncControllerTest {
      */
     @testSetup
     static void setupTestData() {
-        // Create test connection ID
+
         String testConnectionId = 'TEST_CONN_123';
-        
-        // Create test sync configuration
+
         CleverTap__Sync_Configuration__c config = new CleverTap__Sync_Configuration__c(
             Name = 'Test Sync Config',
             CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
@@ -23,10 +22,8 @@ private class IntegrationSyncControllerTest {
         );
         insert config;
         
-        // Create test field mappings
         List<CleverTap__Mapping__c> mappings = new List<CleverTap__Mapping__c>();
         
-        // Mandatory mapping
         mappings.add(new CleverTap__Mapping__c(
             Name = 'Customer ID Mapping',
             CleverTap__Sync_mapping__c = config.Id,
@@ -35,8 +32,7 @@ private class IntegrationSyncControllerTest {
             CleverTap__Data_Type__c = 'Text',
             CleverTap__Is_Mandatory__c = true
         ));
-        
-        // Regular mapping
+
         mappings.add(new CleverTap__Mapping__c(
             Name = 'First Name Mapping',
             CleverTap__Sync_mapping__c = config.Id,
@@ -54,16 +50,13 @@ private class IntegrationSyncControllerTest {
      */
     @isTest
     static void testGetSyncConfigurations() {
-        // Get connection ID
         String connectionId = 'TEST_CONN_123';
         
-        // Execute the method
         Test.startTest();
         List<SyncConfigurationManager.SyncConfigWrapper> configs = 
             IntegrationSyncController.getSyncConfigurations(connectionId);
         Test.stopTest();
-        
-        // Verify results
+
         System.assertEquals(1, configs.size(), 'Should return one configuration');
         
         SyncConfigurationManager.SyncConfigWrapper config = configs[0];
@@ -79,7 +72,6 @@ private class IntegrationSyncControllerTest {
      */
     @isTest
     static void testGetPicklistValues() {
-        // Prepare mock data for picklist
         List<Map<String, String>> mockPicklist = new List<Map<String, String>>();
         Map<String, String> option1 = new Map<String, String>{'label' => 'Text', 'value' => 'Text'};
         mockPicklist.add(option1);
@@ -88,15 +80,12 @@ private class IntegrationSyncControllerTest {
         CleverTap__Mapping__c testMapping = new CleverTap__Mapping__c(
             CleverTap__Data_Type__c = 'Text'
         );
-        
-        // Execute the method
+
         Test.startTest();
         List<Map<String, String>> picklistValues = 
             IntegrationSyncController.getPicklistValues('CleverTap__Mapping__c', 'CleverTap__Data_Type__c');
         Test.stopTest();
-        
-        // The assertion below has a condition to make it more resilient
-        // If no picklist values are returned in the test environment, the test won't fail
+
         if (picklistValues.isEmpty()) {
             // If picklist values could not be retrieved in test, make a dummy assertion that passes
             System.assert(true, 'No picklist values in test environment is acceptable');
@@ -118,26 +107,22 @@ private class IntegrationSyncControllerTest {
      */
     @isTest
     static void testSaveFieldMappings() {
-        // Get existing configuration
         CleverTap__Sync_Configuration__c config = [
             SELECT Id, Name FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
-        
-        // Prepare test mapping data
+
         Map<String, Object> mappingDataMap = new Map<String, Object>();
         mappingDataMap.put('syncId', config.Id);
         
         List<Map<String, Object>> mappings = new List<Map<String, Object>>();
-        
-        // Add mandatory customer_id mapping
+
         Map<String, Object> mandatoryMapping = new Map<String, Object>{
             'CleverTap__Field__c' => 'customer_id',
             'CleverTap__Salesforce_Field__c' => 'Email',
             'CleverTap__Data_Type__c' => 'Text',
             'CleverTap__Is_Mandatory__c' => true
         };
-        
-        // Add a new additional mapping
+
         Map<String, Object> additionalMapping = new Map<String, Object>{
             'CleverTap__Field__c' => 'last_name',
             'CleverTap__Salesforce_Field__c' => 'LastName',

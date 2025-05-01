@@ -422,8 +422,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
                 return;
             }
     
-            if (!Schema.SObjectType.CleverTap__Event__c.fields.CleverTap__Status__c.isCreateable() ||
-                !Schema.SObjectType.CleverTap__Event__c.fields.CleverTap__Response__c.isCreateable()) {
+            if (!Schema.SObjectType.CleverTap__Event__c.fields.CleverTap__Status__c.isCreateable()) {
                 System.debug(LoggingLevel.ERROR, 'User does not have permission to create some required fields');
                 return;
             }
