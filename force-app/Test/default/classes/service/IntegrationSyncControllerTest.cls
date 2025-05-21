@@ -27,7 +27,7 @@ private class IntegrationSyncControllerTest {
         mappings.add(new CleverTap__Mapping__c(
             Name = 'Customer ID Mapping',
             CleverTap__Sync_mapping__c = config.Id,
-            CleverTap__Field__c = 'customer_id',
+            CleverTap__Field__c = 'Identity',
             CleverTap__Salesforce_Field__c = 'Email',
             CleverTap__Data_Type__c = 'Text',
             CleverTap__Is_Mandatory__c = true
@@ -117,7 +117,7 @@ private class IntegrationSyncControllerTest {
         List<Map<String, Object>> mappings = new List<Map<String, Object>>();
 
         Map<String, Object> mandatoryMapping = new Map<String, Object>{
-            'CleverTap__Field__c' => 'customer_id',
+            'CleverTap__Field__c' => 'Identity',
             'CleverTap__Salesforce_Field__c' => 'Email',
             'CleverTap__Data_Type__c' => 'Text',
             'CleverTap__Is_Mandatory__c' => true
@@ -153,10 +153,10 @@ private class IntegrationSyncControllerTest {
         System.assertEquals(2, updatedMappings.size(), 'Should have 2 mappings after update');
         
         // First should be the mandatory mapping
-        System.assertEquals('customer_id', updatedMappings[0].CleverTap__Field__c, 
-            'First mapping should be customer_id');
+        System.assertEquals('Identity', updatedMappings[0].CleverTap__Field__c, 
+            'First mapping should be Identity');
         System.assertEquals(true, updatedMappings[0].CleverTap__Is_Mandatory__c, 
-            'customer_id mapping should be mandatory');
+            'Identity mapping should be mandatory');
         
         // Second should be the new last_name mapping
         System.assertEquals('last_name', updatedMappings[1].CleverTap__Field__c, 
@@ -243,9 +243,9 @@ private class IntegrationSyncControllerTest {
         Boolean hasFirstName = false;
         
         for (CleverTap__Mapping__c mapping : mappings) {
-            if (mapping.CleverTap__Field__c == 'customer_id') {
+            if (mapping.CleverTap__Field__c == 'Identity') {
                 hasCustomerId = true;
-                System.assertEquals(true, mapping.CleverTap__Is_Mandatory__c, 'customer_id should be mandatory');
+                System.assertEquals(true, mapping.CleverTap__Is_Mandatory__c, 'Identity should be mandatory');
             }
             if (mapping.CleverTap__Field__c == 'first_name') {
                 hasFirstName = true;
@@ -253,7 +253,7 @@ private class IntegrationSyncControllerTest {
             }
         }
         
-        System.assertEquals(true, hasCustomerId, 'Should include customer_id mapping');
+        System.assertEquals(true, hasCustomerId, 'Should include Identity mapping');
         System.assertEquals(true, hasFirstName, 'Should include first_name mapping');
     }
     

@@ -99,13 +99,9 @@
                         <div class="slds-modal__content slds-var-p-around_medium">
                             <!-- Help text -->
                             <div class="slds-box slds-theme_info slds-var-m-bottom_medium">
-                                <div class="slds-media">
-                                    <div class="slds-media__figure">
-                                        <lightning-icon icon-name="utility:info" size="small"></lightning-icon>
-                                    </div>
-                                    <div class="slds-media__body">
-                                        <p>Enter your CleverTap credentials. These will be validated with CleverTap before saving.</p>
-                                    </div>
+                                <div class="slds-align_absolute-center">
+                                    <lightning-icon icon-name="utility:info" size="small" class="slds-m-right_x-small"></lightning-icon>
+                                    <span>Enter your CleverTap credentials.</span>
                                 </div>
                             </div>
 
@@ -139,7 +135,7 @@
 
                             <lightning-input
                                 name="passcode"
-                                label="API Passcode"
+                                label="Passcode"
                                 type="password"
                                 value={connection.passcode}
                                 onchange={handlePasscodeChange}

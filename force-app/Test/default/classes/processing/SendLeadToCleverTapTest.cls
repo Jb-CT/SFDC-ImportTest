@@ -2,7 +2,6 @@
 private class SendLeadToCleverTapTest {
     @testSetup
     static void setupTestData() {
-        // Create test config
         CleverTap__Config__c testConfig = new CleverTap__Config__c(
             Name = 'Test Config',
             CleverTap__Region__c = 'US',
@@ -11,8 +10,7 @@ private class SendLeadToCleverTapTest {
             CleverTap__API_URL__c = 'https://test-api.example.com'
         );
         insert testConfig;
-
-        // Create sync configuration
+        
         CleverTap__Sync_Configuration__c syncConfig = new CleverTap__Sync_Configuration__c(
             Name = 'Test Lead Sync',
             CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
@@ -23,11 +21,10 @@ private class SendLeadToCleverTapTest {
         );
         insert syncConfig;
 
-        // Create field mapping
         CleverTap__Mapping__c mapping = new CleverTap__Mapping__c(
             Name = 'Test Mapping',
             CleverTap__Sync_mapping__c = syncConfig.Id,
-            CleverTap__Field__c = 'customer_id',
+            CleverTap__Field__c = 'Identity',
             CleverTap__Salesforce_Field__c = 'Email',
             CleverTap__Data_Type__c = 'Text',
             CleverTap__Is_Mandatory__c = true
@@ -37,7 +34,6 @@ private class SendLeadToCleverTapTest {
 
     @isTest
     static void testInsertLead() {
-        // Test the insert path
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
         TestUtils.bypassTriggers = false;
         
@@ -50,17 +46,14 @@ private class SendLeadToCleverTapTest {
         );
         insert testLead;
         Test.stopTest();
-        
-        // Just verify the test completes
+
         System.assert(true, 'Lead insert should complete without errors');
     }
 
     @isTest
     static void testUpdateLead() {
-        // Test the update path
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
-        
-        // Create lead with triggers bypassed
+
         TestUtils.bypassTriggers = true;
         Lead testLead = new Lead(
             FirstName = 'Test',
@@ -69,8 +62,7 @@ private class SendLeadToCleverTapTest {
             Company = 'Test Company'
         );
         insert testLead;
-        
-        // Now update with triggers enabled
+
         TestUtils.bypassTriggers = false;
         
         Test.startTest();
@@ -79,17 +71,14 @@ private class SendLeadToCleverTapTest {
         testLead.Email = 'updated@example.com';
         update testLead;
         Test.stopTest();
-        
-        // Just verify the test completes
+
         System.assert(true, 'Lead update should complete without errors');
     }
     
     @isTest
     static void testMultipleFieldUpdates() {
-        // Test the update detection logic with multiple fields
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
-        
-        // Create lead with triggers bypassed
+
         TestUtils.bypassTriggers = true;
         Lead testLead = new Lead(
             FirstName = 'Test',
@@ -101,8 +90,7 @@ private class SendLeadToCleverTapTest {
             Title = 'CEO'
         );
         insert testLead;
-        
-        // Now update with triggers enabled
+
         TestUtils.bypassTriggers = false;
         
         Test.startTest();
@@ -112,8 +100,7 @@ private class SendLeadToCleverTapTest {
         testLead.Industry = 'Healthcare';
         update testLead;
         Test.stopTest();
-        
-        // Just verify the test completes
+
         System.assert(true, 'Multiple field updates should complete without errors');
     }
 
@@ -128,7 +115,6 @@ private class SendLeadToCleverTapTest {
     }
     @isTest
     static void testFieldByFieldUpdate() {
-        // Setup test data without bypassing the trigger
         TestUtils.bypassTriggers = false;
         
         Lead testLead = new Lead(
@@ -140,27 +126,21 @@ private class SendLeadToCleverTapTest {
         insert testLead;
         
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
-        
-        // Test individual field updates to hit different branches
+    
         Test.startTest();
-        
-        // Update FirstName
+
         testLead.FirstName = 'Updated';
         update testLead;
-        
-        // Update LastName in a separate transaction
+
         testLead.LastName = 'NewLastName';
         update testLead;
-        
-        // Update Title
+
         testLead.Title = 'New Title';
         update testLead;
-        
-        // Update Phone
+
         testLead.Phone = '1234567890';
         update testLead;
         
-        // Update Status
         testLead.Status = 'Working - Contacted';
         update testLead;
         
@@ -184,19 +164,12 @@ private class SendLeadToCleverTapTest {
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
         
         Test.startTest();
-        // Create a batch context
         Database.executeBatch(new MockBatchClass());
         Test.stopTest();
         
         System.assert(true, 'Successfully tested batch context');
     }
-    
 
-
-
-
-
-        // Add this to SendLeadToCleverTapTest
     @isTest
     static void testLeadTriggerConditions() {
         TestUtils.bypassTriggers = false;
@@ -223,21 +196,16 @@ private class SendLeadToCleverTapTest {
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
         
         Test.startTest();
-        
-        // Make a series of individual field updates to hit various code paths
-        // Update OwnerId
-        testLead.OwnerId = UserInfo.getUserId(); // This should be a different user ideally
+
+        testLead.OwnerId = UserInfo.getUserId(); 
         update testLead;
-        
-        // Update Description
+
         testLead.Description = 'Updated Description';
         update testLead;
-        
-        // Update Rating
+
         testLead.Rating = 'Warm';
         update testLead;
-        
-        // Update multiple fields in one go
+
         testLead.AnnualRevenue = 6000000;
         testLead.NumberOfEmployees = 120;
         testLead.Title = 'Updated Title';

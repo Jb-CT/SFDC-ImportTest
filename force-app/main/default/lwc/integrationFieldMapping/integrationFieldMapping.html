@@ -24,7 +24,7 @@
                     <lightning-icon icon-name="utility:info" size="small"></lightning-icon>
                 </div>
                 <div class="slds-media__body">
-                    <p>Map source fields to target fields. The identifier field is mandatory and must be mapped.</p>
+                    <p>Map source fields to CleverTap fields. The identifier field is mandatory and must be mapped.</p>
                 </div>
             </div>
         </div>
@@ -41,14 +41,14 @@
                     <div class="slds-text-title slds-var-p-bottom_x-small">Target Field</div>
                     <div class="slds-text-body_regular slds-var-p-vertical_small">
                         <lightning-icon icon-name="utility:lock" size="xx-small" class="slds-var-m-right_x-small"></lightning-icon>
-                        customer_id
+                        Identity
                     </div>
                 </div>
                 <div class="slds-col slds-size_4-of-12">
                     <div class="slds-text-title slds-var-p-bottom_x-small">Source Field</div>
                     <lightning-combobox
                         name="customerId"
-                        value={mandatoryFieldMapping.customer_id}
+                        value={mandatoryFieldMapping.Identity}
                         options={sourceFields}
                         onchange={handleCustomerIdChange}
                         required>

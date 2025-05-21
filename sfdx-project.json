@@ -2,11 +2,19 @@
   "packageDirectories": [
     {
       "path": "force-app",
-      "default": true
+      "package": "CleverTap App",
+      "versionName": "ver 0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "versionDescription": "Salesforce to CleverTap integration"
     }
   ],
   "name": "sfdc-import",
   "namespace": "CleverTap",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "58.0"
+  "sourceApiVersion": "58.0",
+  "packageAliases": {
+    "CleverTap App": "0HoWU0000000cJp0AI",
+    "CleverTap App@0.1.0-1": "04tWU0000008VLBYA2",
+    "CleverTap App@0.1.0-2": "04tWU0000008VMnYAM"
+  }
 }

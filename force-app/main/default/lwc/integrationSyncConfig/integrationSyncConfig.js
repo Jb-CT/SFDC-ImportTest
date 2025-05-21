@@ -290,4 +290,9 @@ export default class IntegrationSyncConfig extends LightningElement {
             })
         );
     }
+
+    get capitalizedMode() {
+    if (!this.mode) return '';
+    return this.mode.charAt(0).toUpperCase() + this.mode.slice(1);
+}
 }

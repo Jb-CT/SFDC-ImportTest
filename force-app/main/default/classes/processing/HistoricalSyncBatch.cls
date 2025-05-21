@@ -210,8 +210,8 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
         ];
 
         for (CleverTap__Mapping__c mapping : cachedFieldMappings) {
-            if (mapping.CleverTap__Is_Mandatory__c && mapping.CleverTap__Field__c == 'customer_id') {
-                specialMappings.put('customer_id', mapping);
+            if (mapping.CleverTap__Is_Mandatory__c && mapping.CleverTap__Field__c == 'Identity') {
+                specialMappings.put('Identity', mapping);
             } else if (mapping.CleverTap__Field__c == 'evtName') {
                 specialMappings.put('evtName', mapping);
             }
@@ -227,7 +227,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
                 return null;
             }
 
-            CleverTap__Mapping__c identityMapping = specialMappings.get('customer_id');
+            CleverTap__Mapping__c identityMapping = specialMappings.get('Identity');
             if (identityMapping == null) {
                 return null;
             }
@@ -253,7 +253,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
         
         for (CleverTap__Mapping__c mapping : fieldMappings) {
             if (mapping.CleverTap__Is_Mandatory__c || 
-                mapping.CleverTap__Field__c == 'customer_id' ||
+                mapping.CleverTap__Field__c == 'Identity' ||
                 mapping.CleverTap__Field__c == 'evtName') {
                 continue;
             }
@@ -292,7 +292,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
             payload.put('profileData', profileData);
         }
         
-        payload.put('$source', 'SFDC');
+        payload.put('$source', 'Salesforce');
         return payload;
     }
 

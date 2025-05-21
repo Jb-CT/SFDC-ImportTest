@@ -38,7 +38,7 @@ private class EntityTransformerTest {
         List<CleverTap__Mapping__c> leadMappings = new List<CleverTap__Mapping__c>{
             new CleverTap__Mapping__c(
                 CleverTap__Sync_mapping__c = leadConfig.Id,
-                CleverTap__Field__c = 'customer_id',
+                CleverTap__Field__c = 'Identity',
                 CleverTap__Salesforce_Field__c = 'Email',
                 CleverTap__Data_Type__c = 'Text',
                 CleverTap__Is_Mandatory__c = true
@@ -73,7 +73,7 @@ private class EntityTransformerTest {
         List<CleverTap__Mapping__c> leadEventMappings = new List<CleverTap__Mapping__c>{
             new CleverTap__Mapping__c(
                 CleverTap__Sync_mapping__c = leadEventConfig.Id,
-                CleverTap__Field__c = 'customer_id',
+                CleverTap__Field__c = 'Identity',
                 CleverTap__Salesforce_Field__c = 'Email',
                 CleverTap__Data_Type__c = 'Text',
                 CleverTap__Is_Mandatory__c = true
@@ -108,7 +108,7 @@ private class EntityTransformerTest {
         List<CleverTap__Mapping__c> contactMappings = new List<CleverTap__Mapping__c>{
             new CleverTap__Mapping__c(
                 CleverTap__Sync_mapping__c = contactConfig.Id,
-                CleverTap__Field__c = 'customer_id',
+                CleverTap__Field__c = 'Identity',
                 CleverTap__Salesforce_Field__c = 'Email',
                 CleverTap__Data_Type__c = 'Text',
                 CleverTap__Is_Mandatory__c = true
@@ -228,7 +228,7 @@ private class EntityTransformerTest {
         Map<String, Object> result = entityTransformer.mapToCleverTap(testAccount, 'Account');
         Test.stopTest();
 
-        System.assertEquals(null, result, 'Result should be null when no customer_id mapping exists');
+        System.assertEquals(null, result, 'Result should be null when no Identity mapping exists');
     }
     
     @isTest

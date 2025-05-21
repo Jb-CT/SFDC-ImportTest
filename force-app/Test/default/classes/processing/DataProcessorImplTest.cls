@@ -25,7 +25,7 @@ private class DataProcessorImplTest {
         CleverTap__Mapping__c mapping = new CleverTap__Mapping__c(
             Name = 'Test Mapping',
             CleverTap__Sync_mapping__c = syncConfig.Id,
-            CleverTap__Field__c = 'customer_id',
+            CleverTap__Field__c = 'Identity',
             CleverTap__Salesforce_Field__c = 'Email',
             CleverTap__Data_Type__c = 'Text',
             CleverTap__Is_Mandatory__c = true

@@ -187,7 +187,7 @@ public with sharing class EntityTransformer {
 
     private CleverTap__Mapping__c findIdentityMapping(List<CleverTap__Mapping__c> fieldMappings) {
         for (CleverTap__Mapping__c mapping : fieldMappings) {
-            if (mapping.CleverTap__Is_Mandatory__c && mapping.CleverTap__Field__c == 'customer_id') {
+            if (mapping.CleverTap__Is_Mandatory__c && mapping.CleverTap__Field__c == 'Identity') {
                 return mapping;
             }
         }
@@ -241,7 +241,7 @@ public with sharing class EntityTransformer {
 
     private Boolean isSpecialField(CleverTap__Mapping__c mapping) {
         return mapping.CleverTap__Is_Mandatory__c || 
-               mapping.CleverTap__Field__c == 'customer_id' || 
+               mapping.CleverTap__Field__c == 'Identity' || 
                mapping.CleverTap__Field__c == 'evtName';
     }
 
@@ -260,7 +260,7 @@ public with sharing class EntityTransformer {
             payload.put('profileData', profileData);
         }
         
-        payload.put('$source', 'SFDC');
+        payload.put('$source', 'Salesforce');
         return payload;
     }
     

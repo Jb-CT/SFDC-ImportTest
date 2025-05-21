@@ -11,7 +11,7 @@ export default class IntegrationFieldMapping extends LightningElement {
 
     @track sourceFields = [];
     @track mandatoryFieldMapping = { 
-        customer_id: '',
+        Identity: '',
         event_name: '' // Added event_name field
     };
     @track additionalMappings = [];
@@ -69,10 +69,10 @@ export default class IntegrationFieldMapping extends LightningElement {
             this.addPredefinedFieldsIfNeeded();
             const existingMappings = await getExistingMappings({ syncId: this.syncId });
             if (existingMappings) {
-                // Process customer_id mapping
-                const customerIdMapping = existingMappings.find(m => m.CleverTap__Field__c === 'customer_id' && m.CleverTap__Is_Mandatory__c);
+                // Process Identity mapping
+                const customerIdMapping = existingMappings.find(m => m.CleverTap__Field__c === 'Identity' && m.CleverTap__Is_Mandatory__c);
                 if (customerIdMapping) {
-                    this.mandatoryFieldMapping.customer_id = customerIdMapping.CleverTap__Salesforce_Field__c;
+                    this.mandatoryFieldMapping.Identity = customerIdMapping.CleverTap__Salesforce_Field__c;
                 }
                 
                 // Process event_name mapping
@@ -120,7 +120,7 @@ export default class IntegrationFieldMapping extends LightningElement {
     }
 
     handleCustomerIdChange(event) {
-        this.mandatoryFieldMapping.customer_id = event.detail.value;
+        this.mandatoryFieldMapping.Identity = event.detail.value;
     }
     
     handleEventNameChange(event) {
@@ -183,8 +183,8 @@ export default class IntegrationFieldMapping extends LightningElement {
             const mappings = [
                 // Customer ID mapping
                 {
-                    CleverTap__Field__c: 'customer_id',
-                    CleverTap__Salesforce_Field__c: this.mandatoryFieldMapping.customer_id,
+                    CleverTap__Field__c: 'Identity',
+                    CleverTap__Salesforce_Field__c: this.mandatoryFieldMapping.Identity,
                     CleverTap__Data_Type__c: 'Text',
                     CleverTap__Is_Mandatory__c: true
                 }
@@ -240,7 +240,7 @@ export default class IntegrationFieldMapping extends LightningElement {
     }
 
     validateMappings() {
-        if (!this.mandatoryFieldMapping.customer_id) {
+        if (!this.mandatoryFieldMapping.Identity) {
             this.showToast('Error', 'Please map the mandatory customer ID field', 'error');
             return false;
         }
