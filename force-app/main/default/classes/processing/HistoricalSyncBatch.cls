@@ -45,7 +45,8 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
 
     @SuppressWarnings('PMD.AvoidDebugStatements')
     private Set<String> getFieldsFromMappings() {
-        Set<String> fields = new Set<String>{'Id'}; 
+        // Always include Id, LastModifiedDate and CreatedDate
+        Set<String> fields = new Set<String>{'Id', 'LastModifiedDate', 'CreatedDate'}; 
         
         try {
             List<CleverTap__Mapping__c> mappings = getFieldMappings();
@@ -241,7 +242,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
 
             Map<String, Object> profileData = createProfileData(record, fieldMappings);
 
-            return createFinalPayload(identityValue, profileData, syncConfig.CleverTap__Entity__c);
+            return createFinalPayload(identityValue, profileData, syncConfig.CleverTap__Entity__c,record);
         } catch (Exception e) {
             return null;
         }
@@ -275,15 +276,27 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
         return profileData;
     }
 
-    private Map<String, Object> createFinalPayload(String identityValue, Map<String, Object> profileData, String entityType) {
+    private Map<String, Object> createFinalPayload(String identityValue, Map<String, Object> profileData, String entityType, SObject record) {
         Map<String, Object> payload = new Map<String, Object>();
         payload.put('identity', identityValue);
         
         Boolean isEvent = (entityType == 'event');
         if (isEvent) {
             payload.put('type', 'event');
-            
             String eventName = getEventName();
+            
+            system.debug(record.get('LastModifiedDate'));
+            // Safely get timestamp - handle null cases
+            if (record.get('LastModifiedDate') != null) {
+                DateTime modifiedDate = (DateTime)record.get('LastModifiedDate');
+                Long v = modifiedDate.getTime() / 1000;
+                payload.put('ts', v);
+            } else if (record.get('CreatedDate') != null) {
+                DateTime createdDate = (DateTime)record.get('CreatedDate');
+                Long v = createdDate.getTime() / 1000;
+                payload.put('ts', v);
+            }
+            // If neither date is available, don't set ts at all
             
             payload.put('evtName', eventName);
             payload.put('evtData', profileData);
