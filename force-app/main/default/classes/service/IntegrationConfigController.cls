@@ -106,6 +106,7 @@ public with sharing class IntegrationConfigController {
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__API_URL__c.isCreateable()) {
 
             insert newConfig;
+            PasscodeHelper.savePasscode(newConfig.Id, (String)config.get('passcode'));
             return 'Success';
         } else {
             throw new AuraHandledException('You do not have permission to create CleverTap configurations');
@@ -144,6 +145,7 @@ public with sharing class IntegrationConfigController {
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__API_URL__c.isUpdateable()) {
 
             update existingConfig;
+            PasscodeHelper.savePasscode(existingConfig.Id, (String)config.get('passcode'));
             return 'Success';
         } else {
             throw new AuraHandledException('You do not have permission to update CleverTap configurations');
@@ -178,8 +180,8 @@ public with sharing class IntegrationConfigController {
             if (configToDelete.isEmpty()) {
                 throw new AuraHandledException('Configuration not found');
             }
-            
-            // Delete since we have permission
+
+            PasscodeHelper.deletePasscode(configId);
             delete configToDelete;
             return 'Success';
         } catch (Exception e) {

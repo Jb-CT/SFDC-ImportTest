@@ -34,7 +34,7 @@ public with sharing class Config {
             'DEV_NAME'   => config.Name, 
             'API_URL'    => config.CleverTap__API_URL__c,
             'ACCOUNT_ID' => config.CleverTap__Account_ID__c,
-            'PASSCODE'   => config.CleverTap__Passcode__c,
+            'PASSCODE'   => PasscodeHelper.getPasscode(config.Id),
             'REGION'     => config.CleverTap__Region__c
         };
         

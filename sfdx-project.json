@@ -6,6 +6,14 @@
       "versionName": "ver 0.1",
       "versionNumber": "0.1.0.NEXT",
       "versionDescription": "Salesforce to CleverTap integration"
+    },
+    {
+      "versionName": "ver 0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "path": "force-app",
+      "default": true,
+      "package": "CleverTap",
+      "versionDescription": "Salesforce to CleverTap integration"
     }
   ],
   "name": "sfdc-import",
@@ -15,6 +23,7 @@
   "packageAliases": {
     "CleverTap App": "0HoWU0000000cJp0AI",
     "CleverTap App@0.1.0-1": "04tWU0000008VLBYA2",
-    "CleverTap App@0.1.0-2": "04tWU0000008VMnYAM"
+    "CleverTap App@0.1.0-2": "04tWU0000008VMnYAM",
+    "CleverTap": "0HoWU0000000dnl0AA"
   }
 }

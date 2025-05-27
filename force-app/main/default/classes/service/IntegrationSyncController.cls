@@ -87,7 +87,6 @@ public with sharing class IntegrationSyncController {
     @AuraEnabled
     public static String runHistoricalSync(String syncId) {
         try {
-            // Get the sync configuration
             SyncConfigurationManager.SyncConfigWrapper config = getSyncConfigurationById(syncId);
             
             if (config == null) {
@@ -99,7 +98,7 @@ public with sharing class IntegrationSyncController {
             }
 
             HistoricalSyncBatch batchProcess = new HistoricalSyncBatch(config.sourceEntity, syncId);
-            Database.executeBatch(batchProcess, 10); 
+            Database.executeBatch(batchProcess, 65); 
             
             return 'Success';
         } catch (Exception e) {

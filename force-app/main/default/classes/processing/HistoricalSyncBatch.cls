@@ -17,6 +17,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
     private CleverTap__Sync_Configuration__c cachedSyncConfig;
     private List<CleverTap__Mapping__c> cachedFieldMappings;
     private Map<String, CleverTap__Mapping__c> specialMappings;
+    private Map<String, Set<String>> objectFieldsCache = new Map<String, Set<String>>();
     
     /**
      * @description Constructor for the batch class
@@ -45,7 +46,6 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
 
     @SuppressWarnings('PMD.AvoidDebugStatements')
     private Set<String> getFieldsFromMappings() {
-        // Always include Id, LastModifiedDate and CreatedDate
         Set<String> fields = new Set<String>{'Id', 'LastModifiedDate', 'CreatedDate'}; 
         
         try {
@@ -85,19 +85,49 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
             return true;
         }
 
-        Map<String, Set<String>> objectFields = getObjectSpecificFields();
-        
-        return objectFields.containsKey(objectType) && 
-               objectFields.get(objectType).contains(fieldName);
+        Set<String> objectFields = getObjectSpecificFields(objectType);
+        return objectFields.contains(fieldName);
     }
 
-    private Map<String, Set<String>> getObjectSpecificFields() {
-        return new Map<String, Set<String>>{
-            'Lead' => new Set<String>{'Email', 'FirstName', 'LastName', 'Company', 'Status', 'Phone'},
-            'Contact' => new Set<String>{'Email', 'FirstName', 'LastName', 'AccountId', 'Phone'},
-            'Account' => new Set<String>{'Industry', 'Type', 'BillingCity', 'Phone'},
-            'Opportunity' => new Set<String>{'Amount', 'CloseDate', 'StageName', 'AccountId'}
-        };
+    private Set<String> getObjectSpecificFields(String objectType) {
+        // Return from cache if available
+        if (objectFieldsCache.containsKey(objectType)) {
+            return objectFieldsCache.get(objectType);
+        }
+        
+        Set<String> fields = new Set<String>();
+        
+        try {
+            // Check if we have access to the sync config and mappings
+            if (CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() && 
+                CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+                
+                // Get all field mappings for this object type from all active sync configurations
+                List<CleverTap__Mapping__c> mappings = [
+                    SELECT CleverTap__Salesforce_Field__c
+                    FROM CleverTap__Mapping__c
+                    WHERE CleverTap__Sync_mapping__c IN (
+                        SELECT Id FROM CleverTap__Sync_Configuration__c 
+                        WHERE CleverTap__Salesforce_Entity__c = :objectType
+                        AND CleverTap__Status__c = 'Active'
+                    )
+                ];
+                
+                // Add all mapped Salesforce fields to our set
+                for (CleverTap__Mapping__c mapping : mappings) {
+                    if (String.isNotBlank(mapping.CleverTap__Salesforce_Field__c)) {
+                        fields.add(mapping.CleverTap__Salesforce_Field__c);
+                    }
+                }
+            }
+
+            objectFieldsCache.put(objectType, fields);
+            
+        } catch (Exception e) {
+            fields = new Set<String>();
+        }
+        
+        return fields;
     }
 
     private String buildQueryWithFields(Set<String> fields) {
@@ -242,7 +272,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
 
             Map<String, Object> profileData = createProfileData(record, fieldMappings);
 
-            return createFinalPayload(identityValue, profileData, syncConfig.CleverTap__Entity__c,record);
+            return createFinalPayload(identityValue, profileData, syncConfig.CleverTap__Entity__c, record);
         } catch (Exception e) {
             return null;
         }
@@ -284,9 +314,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
         if (isEvent) {
             payload.put('type', 'event');
             String eventName = getEventName();
-            
-            system.debug(record.get('LastModifiedDate'));
-            // Safely get timestamp - handle null cases
+
             if (record.get('LastModifiedDate') != null) {
                 DateTime modifiedDate = (DateTime)record.get('LastModifiedDate');
                 Long v = modifiedDate.getTime() / 1000;
@@ -296,7 +324,6 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
                 Long v = createdDate.getTime() / 1000;
                 payload.put('ts', v);
             }
-            // If neither date is available, don't set ts at all
             
             payload.put('evtName', eventName);
             payload.put('evtData', profileData);
@@ -344,7 +371,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
                 'DEV_NAME' => config.Name,
                 'API_URL' => config.CleverTap__API_URL__c,
                 'ACCOUNT_ID' => config.CleverTap__Account_ID__c,
-                'PASSCODE' => config.CleverTap__Passcode__c,
+                'PASSCODE' => PasscodeHelper.getPasscode(config.Id),
                 'REGION' => config.CleverTap__Region__c
             };
             
