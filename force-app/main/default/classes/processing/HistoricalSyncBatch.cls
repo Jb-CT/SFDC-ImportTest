@@ -354,7 +354,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
             
             List<CleverTap__Config__c> configs = [
                 SELECT Name, CleverTap__API_URL__c, CleverTap__Account_ID__c, 
-                       CleverTap__Passcode__c, CleverTap__Region__c
+                       CleverTap__Region__c
                 FROM CleverTap__Config__c
                 WHERE Id = :connectionId OR Name = :connectionId
                 LIMIT 1

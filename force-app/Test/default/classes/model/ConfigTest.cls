@@ -8,10 +8,12 @@ private class ConfigTest {
             Name = 'Test Config',
             CleverTap__Region__c = 'US',
             CleverTap__Account_ID__c = 'test-account-id',
-            CleverTap__Passcode__c = 'test-passcode',
             CleverTap__API_URL__c = 'https://us1.api.clevertap.com/1/upload'
         );
         insert testConfig;
+        
+        // Save passcode using helper
+        PasscodeHelper.savePasscode(testConfig.Id, 'test-passcode');
 
         // Test
         Test.startTest();

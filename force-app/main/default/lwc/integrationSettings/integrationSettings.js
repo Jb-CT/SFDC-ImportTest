@@ -52,7 +52,9 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
                 name: conn.Name,
                 region: conn.CleverTap__Region__c,
                 accountId: conn.CleverTap__Account_ID__c,
-                passcode: conn.CleverTap__Passcode__c
+                // Remove passcode mapping since it's no longer in the Config object
+                // passcode: conn.CleverTap__Passcode__c  // REMOVED - field no longer exists
+                passcode: '' // Keep empty for security - passcode is in protected setting
             }));
         } else if (error) {
             console.error('Error fetching configurations:', error);
@@ -64,6 +66,7 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
     get modalTitle() {
         return this.isEditing ? 'Edit Connection' : 'New Connection';
     }
+    
     get noConnections() {
         return !this.connections || this.connections.length === 0;
     }
@@ -118,7 +121,11 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
         const conn = this.connections.find(c => c.id === id);
         
         if (conn) {
-            this.connection = { ...conn };
+            this.connection = { 
+                ...conn,
+                // Clear passcode for security when editing - user needs to re-enter
+                passcode: '' 
+            };
             this.isEditing = true;
             this.showNewConnectionModal = true;
         }
@@ -160,6 +167,12 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
             return false;
         }
         
+        // Additional validation for editing mode
+        if (this.isEditing && !this.connection.passcode) {
+            this.showToast('Error', 'Please enter the passcode to validate credentials', 'error');
+            return false;
+        }
+        
         try {
             this.isValidating = true;
             this.showToast('Info', 'Validating credentials with CleverTap...', 'info');
@@ -188,6 +201,12 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
     }
 
     async handleSave() {
+        // Validation for passcode requirement
+        if (!this.connection.passcode) {
+            this.showToast('Error', 'Passcode is required', 'error');
+            return;
+        }
+        
         // First validate the credentials
         const isValid = await this.validateConnectionCredentials();
         

@@ -7,10 +7,10 @@ private class DataProcessorImplTest {
             Name = 'Test Config',
             CleverTap__Region__c = 'US',
             CleverTap__Account_ID__c = 'test-id',
-            CleverTap__Passcode__c = 'test-pass',
             CleverTap__API_URL__c = 'https://test-api.example.com'
         );
         insert testConfig;
+        PasscodeHelper.savePasscode(testConfig.Id, 'test-passcode');
 
         CleverTap__Sync_Configuration__c syncConfig = new CleverTap__Sync_Configuration__c(
             Name = 'Test Lead Sync',

@@ -37,7 +37,7 @@ public with sharing class IntegrationConfigController {
         // Check field-level security for each field we're querying
         Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.CleverTap__Config__c.fields.getMap();
         List<String> fieldsToCheck = new List<String>{
-            'Id', 'Name', 'CleverTap__Account_ID__c', 'CleverTap__Passcode__c', 
+            'Id', 'Name', 'CleverTap__Account_ID__c', 
             'CleverTap__Region__c', 'CleverTap__API_URL__c'
         };
         
@@ -51,7 +51,7 @@ public with sharing class IntegrationConfigController {
         // Only after both object and field level security checks pass, we perform the SOQL query
         return [
             SELECT Id, Name, CleverTap__Account_ID__c, 
-                   CleverTap__Passcode__c, CleverTap__Region__c, CleverTap__API_URL__c
+                   CleverTap__Region__c, CleverTap__API_URL__c
             FROM CleverTap__Config__c
             WHERE Name != '[Deleted]%'
             ORDER BY Name
@@ -94,7 +94,6 @@ public with sharing class IntegrationConfigController {
             Name = (String)config.get('name'),
             CleverTap__Region__c = (String)config.get('region'),
             CleverTap__Account_ID__c = (String)config.get('accountId'),
-            CleverTap__Passcode__c = (String)config.get('passcode'),
             CleverTap__API_URL__c = regionToUrl.get(((String)config.get('region')).toUpperCase())
         );
 
@@ -102,7 +101,6 @@ public with sharing class IntegrationConfigController {
             Schema.sObjectType.CleverTap__Config__c.fields.Name.isCreateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Region__c.isCreateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Account_ID__c.isCreateable() &&
-            Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Passcode__c.isCreateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__API_URL__c.isCreateable()) {
 
             insert newConfig;
@@ -134,14 +132,12 @@ public with sharing class IntegrationConfigController {
         existingConfig.Name = (String)config.get('name');
         existingConfig.CleverTap__Region__c = (String)config.get('region');
         existingConfig.CleverTap__Account_ID__c = (String)config.get('accountId');
-        existingConfig.CleverTap__Passcode__c = (String)config.get('passcode');
         existingConfig.CleverTap__API_URL__c = regionToUrl.get(((String)config.get('region')).toUpperCase());
 
         if (Schema.sObjectType.CleverTap__Config__c.isUpdateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.Name.isUpdateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Region__c.isUpdateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Account_ID__c.isUpdateable() &&
-            Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__Passcode__c.isUpdateable() &&
             Schema.sObjectType.CleverTap__Config__c.fields.CleverTap__API_URL__c.isUpdateable()) {
 
             update existingConfig;

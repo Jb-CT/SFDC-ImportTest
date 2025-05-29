@@ -7,10 +7,10 @@ private class IntegrationConfigControllerTest {
             Name = 'Test Config',
             CleverTap__Region__c = 'US',
             CleverTap__Account_ID__c = 'test-account-id',
-            CleverTap__Passcode__c = 'test-passcode',
             CleverTap__API_URL__c = 'https://us1.api.clevertap.com/1/upload'
         );
         insert testConfig;
+        PasscodeHelper.savePasscode(testConfig.Id, 'test-passcode');
         
         // Test
         Test.startTest();
@@ -50,10 +50,10 @@ private class IntegrationConfigControllerTest {
             Name = 'Test Config',
             CleverTap__Region__c = 'US',
             CleverTap__Account_ID__c = 'test-account-id',
-            CleverTap__Passcode__c = 'test-passcode',
             CleverTap__API_URL__c = 'https://us1.api.clevertap.com/1/upload'
         );
         insert testConfig;
+        PasscodeHelper.savePasscode(testConfig.Id, 'test-passcode');
         
         Map<String, Object> updatedConfig = new Map<String, Object>{
             'id' => testConfig.Id,
@@ -82,10 +82,10 @@ private class IntegrationConfigControllerTest {
             Name = 'Test Config',
             CleverTap__Region__c = 'US',
             CleverTap__Account_ID__c = 'test-account-id',
-            CleverTap__Passcode__c = 'test-passcode',
             CleverTap__API_URL__c = 'https://us1.api.clevertap.com/1/upload'
         );
         insert testConfig;
+        PasscodeHelper.savePasscode(testConfig.Id, 'test-passcode');
         
         // Verify config exists
         List<CleverTap__Config__c> configsBefore = [SELECT Id FROM CleverTap__Config__c WHERE Id = :testConfig.Id];

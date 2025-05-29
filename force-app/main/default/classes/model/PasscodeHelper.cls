@@ -25,8 +25,22 @@ public with sharing class PasscodeHelper {
     
     public static void deletePasscode(String configId) {
         CleverTap_Passcode__c setting = CleverTap_Passcode__c.getInstance(configId);
-        if (setting != null && Schema.sObjectType.CleverTap_Passcode__c.isDeletable()) {
-            delete setting;
+        
+        if (setting == null) {
+            return;
+        }
+        
+        // Explicit check to satisfy the scanner
+        if (!Schema.sObjectType.CleverTap_Passcode__c.isDeletable()) {
+            throw new AuraHandledException('Insufficient privileges to delete CleverTap_Passcode__c');
+        }
+        
+        try {
+            Database.delete(setting, AccessLevel.USER_MODE);
+        } catch (System.NoAccessException e) {
+            throw new AuraHandledException('Access denied: ' + e.getMessage());
+        } catch (DmlException e) {
+            throw new AuraHandledException('Delete failed: ' + e.getMessage());
         }
     }
 }
