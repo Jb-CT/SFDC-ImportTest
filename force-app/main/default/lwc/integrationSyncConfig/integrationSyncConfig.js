@@ -102,7 +102,13 @@ export default class IntegrationSyncConfig extends LightningElement {
             { label: 'Contact', value: 'Contact' },
             { label: 'Lead', value: 'Lead' },
             { label: 'Account', value: 'Account' },
-            { label: 'Opportunity', value: 'Opportunity' }
+            { label: 'Opportunity', value: 'Opportunity' },
+            { label: 'Case', value: 'Case' },
+            { label: 'Campaign', value: 'Campaign' },
+            { label: 'Activity|Event', value: 'Activity|Event' },
+            { label: 'Activity|Task', value: 'Activity|Task' },
+            { label: 'Campaign Member', value: 'CampaignMember' },
+            { label: 'Service Appointment', value: 'ServiceAppointment' }
         ];
     }
 

@@ -131,6 +131,30 @@ public with sharing class ResultLogger {
             // Explicitly set the Opportunity field if it exists
             eventLog.put('CleverTap__Opportunity__c', eventData.recordId);
             return;
+        } else if (eventData.recordType == 'Case') {
+            // Explicitly set the Case field if it exists
+            eventLog.put('CleverTap__Case__c', eventData.recordId);
+            return;
+        } else if (eventData.recordType == 'Campaign') {
+            // Explicitly set the Campaign field if it exists
+            eventLog.put('CleverTap__Campaign__c', eventData.recordId);
+            return;
+        } else if (eventData.recordType == 'Activity|Event') {
+            // Explicitly set the Activity Event field if it exists
+            eventLog.put('CleverTap__Activity_Event__c', eventData.recordId);
+            return;
+        } else if (eventData.recordType == 'Activity|Task') {
+            // Explicitly set the Activity Task field if it exists
+            eventLog.put('CleverTap__Activity_Task__c', eventData.recordId);
+            return;
+        } else if (eventData.recordType == 'CampaignMember') {
+            // Explicitly set the CampaignMember field if it exists
+            eventLog.put('CleverTap__CampaignMember__c', eventData.recordId);
+            return;
+        } else if (eventData.recordType == 'ServiceAppointment') {
+            // Explicitly set the ServiceAppointment field if it exists
+            eventLog.put('CleverTap__ServiceAppointment__c', eventData.recordId);
+            return;
         }
         
         // For other record types, try to resolve dynamically

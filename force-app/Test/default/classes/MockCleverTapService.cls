@@ -8,6 +8,12 @@ public class MockCleverTapService implements DataProcessor {
     public Integer contactCallCount = 0;
     public Integer accountCallCount = 0;
     public Integer opportunityCallCount = 0;
+    public Integer caseCallCount = 0;
+    public Integer campaignCallCount = 0;
+    public Integer eventCallCount = 0;
+    public Integer taskCallCount = 0;
+    public Integer campaignMemberCallCount = 0;
+    public Integer serviceAppointmentCallCount = 0;
     public Integer genericCallCount = 0;
 
     public List<SObject> processedRecords = new List<SObject>();

@@ -152,6 +152,30 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         sendToCleverTap(opportunity, 'Opportunity');
     }
 
+    public void sendCaseToCleverTap(Case caseRecord) {
+        sendToCleverTap(caseRecord, 'Case');
+    }
+
+    public void sendCampaignToCleverTap(Campaign campaign) {
+        sendToCleverTap(campaign, 'Campaign');
+    }
+
+    public void sendEventToCleverTap(Event event) {
+        sendToCleverTap(event, 'Activity|Event');
+    }
+
+    public void sendTaskToCleverTap(Task task) {
+        sendToCleverTap(task, 'Activity|Task');
+    }
+
+    public void sendCampaignMemberToCleverTap(CampaignMember campaignMember) {
+        sendToCleverTap(campaignMember, 'CampaignMember');
+    }
+
+    public void sendServiceAppointmentToCleverTap(ServiceAppointment serviceAppointment) {
+        sendToCleverTap(serviceAppointment, 'ServiceAppointment');
+    }
+
     private Boolean isConfigurationAccessible() {
         return CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible();
     }

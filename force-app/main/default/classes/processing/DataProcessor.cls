@@ -13,4 +13,10 @@ public interface DataProcessor {
     void sendContactToCleverTap(Contact contact);
     void sendAccountToCleverTap(Account account);
     void sendOpportunityToCleverTap(Opportunity opportunity);
+    void sendCaseToCleverTap(Case caseRecord);
+    void sendCampaignToCleverTap(Campaign campaign);
+    void sendEventToCleverTap(Event event);
+    void sendTaskToCleverTap(Task task);
+    void sendCampaignMemberToCleverTap(CampaignMember campaignMember);
+    void sendServiceAppointmentToCleverTap(ServiceAppointment serviceAppointment);
 }

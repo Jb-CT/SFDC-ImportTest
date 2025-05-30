@@ -39,16 +39,13 @@ public class EntityExportJob implements Queueable, Database.AllowsCallouts {
         if (records.isEmpty()) {
             return;
         }
-        
-        // Get the service implementation from the DI module
+
         DataProcessor service = diModule.provideCleverTapService();
-        
-        // Process one record at a time to avoid mixing callouts and DML
+
         SObject record = records[0];
         List<SObject> remainingRecords = new List<SObject>(records);
         remainingRecords.remove(0);
-        
-        // Process the first record based on its type
+
         switch on objectType {
             when 'Lead' {
                 service.sendLeadToCleverTap((Lead)record);
@@ -61,6 +58,24 @@ public class EntityExportJob implements Queueable, Database.AllowsCallouts {
             }
             when 'Opportunity' {
                 service.sendOpportunityToCleverTap((Opportunity)record);
+            }
+            when 'Case' {
+                service.sendCaseToCleverTap((Case)record);
+            }
+            when 'Campaign' {
+                service.sendCampaignToCleverTap((Campaign)record);
+            }
+            when 'Event' {
+                service.sendEventToCleverTap((Event)record);
+            }
+            when 'Task' {
+                service.sendTaskToCleverTap((Task)record);
+            }
+            when 'CampaignMember' {
+                service.sendCampaignMemberToCleverTap((CampaignMember)record);
+            }
+            when 'ServiceAppointment' {
+                service.sendServiceAppointmentToCleverTap((ServiceAppointment)record);
             }
         }
         

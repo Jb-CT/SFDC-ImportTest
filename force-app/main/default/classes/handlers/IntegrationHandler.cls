@@ -13,8 +13,7 @@ public with sharing class IntegrationHandler {
         if (records == null || records.isEmpty()) {
             return;
         }
-        
-        // Use the generic queueable class for all object types with DIModule
+
         System.enqueueJob(new EntityExportJob(records, diModule));
     }
 
@@ -32,5 +31,29 @@ public with sharing class IntegrationHandler {
 
     public void processOpportunities(List<Opportunity> opportunities) {
         processRecords(opportunities);
+    }
+    
+    public void processCases(List<Case> cases) {
+        processRecords(cases);
+    }
+
+    public void processCampaigns(List<Campaign> campaigns) {
+        processRecords(campaigns);
+    }
+
+    public void processEvents(List<Event> events) {
+        processRecords(events);
+    }
+
+    public void processTasks(List<Task> tasks) {
+        processRecords(tasks);
+    }
+
+    public void processCampaignMembers(List<CampaignMember> campaignMembers) {
+        processRecords(campaignMembers);
+    }
+
+    public void processServiceAppointments(List<ServiceAppointment> serviceAppointments) {
+        processRecords(serviceAppointments);
     }
 }

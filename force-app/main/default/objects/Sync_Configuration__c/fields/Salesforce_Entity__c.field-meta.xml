@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Salesforce_Entity__c</fullName>
+<fullName>Salesforce_Entity__c</fullName>
     <externalId>false</externalId>
     <label>Salesforce Entity</label>
     <required>true</required>
@@ -29,6 +29,36 @@
                 <fullName>Opportunity</fullName>
                 <default>false</default>
                 <label>Opportunity</label>
+            </value>
+            <value>
+                <fullName>Case</fullName>
+                <default>false</default>
+                <label>Case</label>
+            </value>
+            <value>
+                <fullName>Campaign</fullName>
+                <default>false</default>
+                <label>Campaign</label>
+            </value>
+            <value>
+                <fullName>Activity|Event</fullName>
+                <default>false</default>
+                <label>Activity|Event</label>
+            </value>
+            <value>
+                <fullName>Activity|Task</fullName>
+                <default>false</default>
+                <label>Activity|Task</label>
+            </value>
+            <value>
+                <fullName>CampaignMember</fullName>
+                <default>false</default>
+                <label>Campaign Member</label>
+            </value>
+            <value>
+                <fullName>ServiceAppointment</fullName>
+                <default>false</default>
+                <label>Service Appointment</label>
             </value>
         </valueSetDefinition>
     </valueSet>

@@ -102,13 +102,19 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
             if (CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() && 
                 CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
                 
+                // Handle special object type names
+                String queryObjectType = objectType;
+                if (objectType == 'Event' || objectType == 'Task') {
+                    queryObjectType = 'Activity|' + objectType;
+                }
+                
                 // Get all field mappings for this object type from all active sync configurations
                 List<CleverTap__Mapping__c> mappings = [
                     SELECT CleverTap__Salesforce_Field__c
                     FROM CleverTap__Mapping__c
                     WHERE CleverTap__Sync_mapping__c IN (
                         SELECT Id FROM CleverTap__Sync_Configuration__c 
-                        WHERE CleverTap__Salesforce_Entity__c = :objectType
+                        WHERE CleverTap__Salesforce_Entity__c = :queryObjectType
                         AND CleverTap__Status__c = 'Active'
                     )
                 ];
@@ -118,6 +124,17 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
                     if (String.isNotBlank(mapping.CleverTap__Salesforce_Field__c)) {
                         fields.add(mapping.CleverTap__Salesforce_Field__c);
                     }
+                }
+                
+                // Add special fields for specific objects
+                if (objectType == 'Event' || objectType == 'Task') {
+                    fields.addAll(new Set<String>{'WhoId', 'WhatId', 'Subject', 'Description'});
+                } else if (objectType == 'CampaignMember') {
+                    fields.addAll(new Set<String>{'CampaignId', 'ContactId', 'LeadId', 'Status'});
+                } else if (objectType == 'Case') {
+                    fields.addAll(new Set<String>{'CaseNumber', 'Subject', 'Status', 'ContactId', 'AccountId'});
+                } else if (objectType == 'ServiceAppointment') {
+                    fields.addAll(new Set<String>{'AppointmentNumber', 'Status', 'AccountId', 'ContactId'});
                 }
             }
 
@@ -518,8 +535,16 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
             eventData.requestBody;
     }
 
-    private void setEventRecordReference(CleverTap__Event__c eventLog, SerializableEventData eventData) {
-        String fieldName = eventData.recordType + '__c';
+    private void setEventRecordReference(CleverTap__Event__c eventLog, EventDataWrapper eventData) {
+        // Handle Activity object special names
+        String recordType = eventData.recordType;
+        if (recordType == 'Activity|Event') {
+            recordType = 'Activity_Event';
+        } else if (recordType == 'Activity|Task') {
+            recordType = 'Activity_Task';
+        }
+        
+        String fieldName = recordType + '__c';
         Map<String, Schema.SObjectField> fieldsMap = Schema.SObjectType.CleverTap__Event__c.fields.getMap();
         
         if (fieldsMap.containsKey(fieldName.toLowerCase())) {
