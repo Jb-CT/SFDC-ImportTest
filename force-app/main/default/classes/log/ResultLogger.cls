@@ -114,69 +114,55 @@ public with sharing class ResultLogger {
     }
 
     private void setRecordReference(CleverTap__Event__c eventLog, EventData eventData) {
-        // Handle specific known record types directly
         if (eventData.recordType == 'Contact') {
-            // Explicitly set the Contact field
             eventLog.CleverTap__Contact__c = eventData.recordId;
             return;
         } else if (eventData.recordType == 'Lead') {
-            // Explicitly set the Lead field
             eventLog.CleverTap__Lead__c = eventData.recordId;
             return;
         } else if (eventData.recordType == 'Account') {
-            // Explicitly set the Account field if it exists
             eventLog.put('CleverTap__Account__c', eventData.recordId);
             return;
         } else if (eventData.recordType == 'Opportunity') {
-            // Explicitly set the Opportunity field if it exists
             eventLog.put('CleverTap__Opportunity__c', eventData.recordId);
             return;
         } else if (eventData.recordType == 'Case') {
-            // Explicitly set the Case field if it exists
             eventLog.put('CleverTap__Case__c', eventData.recordId);
             return;
         } else if (eventData.recordType == 'Campaign') {
-            // Explicitly set the Campaign field if it exists
             eventLog.put('CleverTap__Campaign__c', eventData.recordId);
             return;
-        } else if (eventData.recordType == 'Activity|Event') {
-            // Explicitly set the Activity Event field if it exists
+        } else if (eventData.recordType == 'Event') {
             eventLog.put('CleverTap__Activity_Event__c', eventData.recordId);
             return;
-        } else if (eventData.recordType == 'Activity|Task') {
-            // Explicitly set the Activity Task field if it exists
+        } else if (eventData.recordType == 'Task') {
             eventLog.put('CleverTap__Activity_Task__c', eventData.recordId);
             return;
         } else if (eventData.recordType == 'CampaignMember') {
-            // Explicitly set the CampaignMember field if it exists
             eventLog.put('CleverTap__CampaignMember__c', eventData.recordId);
             return;
         } else if (eventData.recordType == 'ServiceAppointment') {
-            // Explicitly set the ServiceAppointment field if it exists
             eventLog.put('CleverTap__ServiceAppointment__c', eventData.recordId);
             return;
         }
         
-        // For other record types, try to resolve dynamically
         String fieldName = 'CleverTap__' + eventData.recordType + '__c';
         Map<String, Schema.SObjectField> fieldMap = CleverTap__Event__c.SObjectType.getDescribe().fields.getMap();
         
         if (fieldMap.containsKey(fieldName.toLowerCase())) {
             eventLog.put(fieldName, eventData.recordId);
         } else {
-            // Fallback to description
             eventLog.CleverTap__Response__c = eventData.recordType + ' ID: ' + eventData.recordId + '\n' + eventLog.CleverTap__Response__c;
         }
     }
 
     private Boolean hasField(Schema.SObjectType sObjType, String fieldName) {
         Map<String, Schema.SObjectField> fieldMap = sObjType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
-        return fieldMap.containsKey(fieldName.toLowerCase());  // Add toLowerCase() here
+        return fieldMap.containsKey(fieldName.toLowerCase());
     }
 
 
     public void logEventBatch(List<EventData> eventDataBatch) {
-        // Check object-level permission first
         if (!Schema.sObjectType.CleverTap__Event__c.isCreateable()) {
             System.debug(LoggingLevel.ERROR, 'Insufficient permissions to create CleverTap Event log records');
             return;

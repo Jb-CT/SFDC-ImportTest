@@ -41,14 +41,14 @@
                 <label>Campaign</label>
             </value>
             <value>
-                <fullName>Activity|Event</fullName>
+                <fullName>Event</fullName>
                 <default>false</default>
-                <label>Activity|Event</label>
+                <label>Event</label>
             </value>
             <value>
-                <fullName>Activity|Task</fullName>
+                <fullName>Task</fullName>
                 <default>false</default>
-                <label>Activity|Task</label>
+                <label>Task</label>
             </value>
             <value>
                 <fullName>CampaignMember</fullName>

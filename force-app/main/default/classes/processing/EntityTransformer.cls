@@ -80,41 +80,58 @@ public with sharing class EntityTransformer {
     }
 
     private ConnectionMapping processConfiguration(SObject record, String recordType, CleverTap__Sync_Configuration__c syncConfig) {
-        // Get the field mappings for this configuration
         List<CleverTap__Mapping__c> fieldMappings = getFieldMappingsForConfig(syncConfig.Id);
         if (fieldMappings.isEmpty()) {
             return null;
         }
-        
-        // Find the identity mapping
+
         CleverTap__Mapping__c identityMapping = findIdentityMapping(fieldMappings);
         if (identityMapping == null) {
             return null;
         }
+
+        String identityValue = null;
+
+        if (recordType == 'Event' || recordType == 'Task') {
+            identityValue = getActivityIdentity(record, recordType);
+        }
+        else if (recordType == 'CampaignMember') {
+            identityValue = getCampaignMemberIdentity((CampaignMember)record);
+        }
+        else {
+            identityValue = getIdentityValue(record, identityMapping);
+        }
         
-        // Get identity value
-        String identityValue = getIdentityValue(record, identityMapping);
         if (String.isBlank(identityValue)) {
             return null;
         }
-        
-        // Determine if this is an event or profile update
+
         Boolean isEvent = (syncConfig.CleverTap__Entity__c == 'event');
         
-        // Get event information if this is an event
         String eventName = null;
         if (isEvent) {
             CleverTap__Mapping__c eventNameMapping = findEventNameMapping(fieldMappings);
             eventName = (eventNameMapping != null) ? String.valueOf(eventNameMapping.CleverTap__Salesforce_Field__c) : null;
+            
+            if (String.isBlank(eventName)) {
+                if (recordType == 'Event') {
+                    eventName = 'sf_activity_event';
+                } else if (recordType == 'Task') {
+                    eventName = 'sf_activity_task';
+                } else {
+                    eventName = 'sf_' + recordType.toLowerCase();
+                }
+            }
         }
         
-        // Create profile data
         Map<String, Object> profileData = createProfileData(record, fieldMappings);
         
-        // Create the CleverTap payload
+        if (recordType == 'Event' || recordType == 'Task') {
+            addActivityContext(record, profileData);
+        }
+        
         Map<String, Object> payload = createPayload(identityValue, profileData, eventName, isEvent);
         
-        // Create and return the connection mapping
         ConnectionMapping mapping = new ConnectionMapping();
         mapping.connectionId = syncConfig.CleverTap__ConnectionId__c;
         mapping.payload = payload;
@@ -352,65 +369,6 @@ public with sharing class EntityTransformer {
         }
         
         return identityValue;
-    }
-
-    private ConnectionMapping processConfiguration(SObject record, String recordType, CleverTap__Sync_Configuration__c syncConfig) {
-        List<CleverTap__Mapping__c> fieldMappings = getFieldMappingsForConfig(syncConfig.Id);
-        if (fieldMappings.isEmpty()) {
-            return null;
-        }
-
-        CleverTap__Mapping__c identityMapping = findIdentityMapping(fieldMappings);
-        if (identityMapping == null) {
-            return null;
-        }
-
-        String identityValue = null;
-=
-        if (recordType == 'Activity|Event' || recordType == 'Activity|Task') {
-            identityValue = getActivityIdentity(record, recordType);
-        }
-        else if (recordType == 'CampaignMember') {
-            identityValue = getCampaignMemberIdentity((CampaignMember)record);
-        }
-        else {
-            identityValue = getIdentityValue(record, identityMapping);
-        }
-        
-        if (String.isBlank(identityValue)) {
-            return null;
-        }
-
-        Boolean isEvent = (syncConfig.CleverTap__Entity__c == 'event');
-        
-        String eventName = null;
-        if (isEvent) {
-            CleverTap__Mapping__c eventNameMapping = findEventNameMapping(fieldMappings);
-            eventName = (eventNameMapping != null) ? String.valueOf(eventNameMapping.CleverTap__Salesforce_Field__c) : null;
-            
-            if (String.isBlank(eventName)) {
-                if (recordType == 'Activity|Event') {
-                    eventName = 'sf_activity_event';
-                } else if (recordType == 'Activity|Task') {
-                    eventName = 'sf_activity_task';
-                } else {
-                    eventName = 'sf_' + recordType.toLowerCase();
-                }
-            }
-        }
-        
-        Map<String, Object> profileData = createProfileData(record, fieldMappings);
-        
-        if (recordType == 'Activity|Event' || recordType == 'Activity|Task') {
-            addActivityContext(record, profileData);
-        }
-        
-        Map<String, Object> payload = createPayload(identityValue, profileData, eventName, isEvent);
-        
-        ConnectionMapping mapping = new ConnectionMapping();
-        mapping.connectionId = syncConfig.CleverTap__ConnectionId__c;
-        mapping.payload = payload;
-        return mapping;
     }
 
     private void addActivityContext(SObject record, Map<String, Object> profileData) {

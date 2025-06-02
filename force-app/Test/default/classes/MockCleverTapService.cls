@@ -58,6 +58,36 @@ public class MockCleverTapService implements DataProcessor {
         processedRecords.add(opportunity);
     }
 
+    public void sendCaseToCleverTap(Case caseRecord) {
+        caseCallCount++;
+        processedRecords.add(caseRecord);
+    }
+
+    public void sendCampaignToCleverTap(Campaign campaign) {
+        campaignCallCount++;
+        processedRecords.add(campaign);
+    }
+
+    public void sendEventToCleverTap(Event event) {
+        eventCallCount++;
+        processedRecords.add(event);
+    }
+
+    public void sendTaskToCleverTap(Task task) {
+        taskCallCount++;
+        processedRecords.add(task);
+    }
+
+    public void sendCampaignMemberToCleverTap(CampaignMember campaignMember) {
+        campaignMemberCallCount++;
+        processedRecords.add(campaignMember);
+    }
+
+    public void sendServiceAppointmentToCleverTap(ServiceAppointment serviceAppointment) {
+        serviceAppointmentCallCount++;
+        processedRecords.add(serviceAppointment);
+    }
+
     public void resetCounters() {
         leadCallCount = 0;
         contactCallCount = 0;

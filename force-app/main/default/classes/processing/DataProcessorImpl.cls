@@ -161,11 +161,11 @@ public with sharing class DataProcessorImpl implements DataProcessor {
     }
 
     public void sendEventToCleverTap(Event event) {
-        sendToCleverTap(event, 'Activity|Event');
+        sendToCleverTap(event, 'Event');
     }
 
     public void sendTaskToCleverTap(Task task) {
-        sendToCleverTap(task, 'Activity|Task');
+        sendToCleverTap(task, 'Task');
     }
 
     public void sendCampaignMemberToCleverTap(CampaignMember campaignMember) {

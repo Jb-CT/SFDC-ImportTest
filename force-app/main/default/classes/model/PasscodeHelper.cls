@@ -30,9 +30,10 @@ public with sharing class PasscodeHelper {
             return;
         }
         
-        // Explicit check to satisfy the scanner
-        if (!Schema.sObjectType.CleverTap_Passcode__c.isDeletable()) {
-            throw new AuraHandledException('Insufficient privileges to delete CleverTap_Passcode__c');
+        // Use the exact same pattern with getDescribe() 
+        if (!CleverTap_Passcode__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() ||
+            !CleverTap_Passcode__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {
+            throw new AuraHandledException('You do not have permission to delete CleverTap_Passcode__c');
         }
         
         try {

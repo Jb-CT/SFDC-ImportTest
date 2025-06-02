@@ -90,7 +90,6 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
     }
 
     private Set<String> getObjectSpecificFields(String objectType) {
-        // Return from cache if available
         if (objectFieldsCache.containsKey(objectType)) {
             return objectFieldsCache.get(objectType);
         }
@@ -98,17 +97,11 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
         Set<String> fields = new Set<String>();
         
         try {
-            // Check if we have access to the sync config and mappings
             if (CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() && 
                 CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
                 
-                // Handle special object type names
                 String queryObjectType = objectType;
-                if (objectType == 'Event' || objectType == 'Task') {
-                    queryObjectType = 'Activity|' + objectType;
-                }
                 
-                // Get all field mappings for this object type from all active sync configurations
                 List<CleverTap__Mapping__c> mappings = [
                     SELECT CleverTap__Salesforce_Field__c
                     FROM CleverTap__Mapping__c
@@ -119,14 +112,12 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
                     )
                 ];
                 
-                // Add all mapped Salesforce fields to our set
                 for (CleverTap__Mapping__c mapping : mappings) {
                     if (String.isNotBlank(mapping.CleverTap__Salesforce_Field__c)) {
                         fields.add(mapping.CleverTap__Salesforce_Field__c);
                     }
                 }
                 
-                // Add special fields for specific objects
                 if (objectType == 'Event' || objectType == 'Task') {
                     fields.addAll(new Set<String>{'WhoId', 'WhatId', 'Subject', 'Description'});
                 } else if (objectType == 'CampaignMember') {
@@ -523,9 +514,6 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
             CleverTap__Status__c = isSuccess ? 'Success' : 'Failed',
             CleverTap__Response__c = buildDetailedLogMessage(eventData)
         );
-
-        setEventRecordReference(eventLog, eventData);
-        
         return eventLog;
     }
 
@@ -535,24 +523,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
             eventData.requestBody;
     }
 
-    private void setEventRecordReference(CleverTap__Event__c eventLog, EventDataWrapper eventData) {
-        // Handle Activity object special names
-        String recordType = eventData.recordType;
-        if (recordType == 'Activity|Event') {
-            recordType = 'Activity_Event';
-        } else if (recordType == 'Activity|Task') {
-            recordType = 'Activity_Task';
-        }
-        
-        String fieldName = recordType + '__c';
-        Map<String, Schema.SObjectField> fieldsMap = Schema.SObjectType.CleverTap__Event__c.fields.getMap();
-        
-        if (fieldsMap.containsKey(fieldName.toLowerCase())) {
-            eventLog.put(fieldName, eventData.recordId);
-        } else {
-            eventLog.CleverTap__Response__c = eventData.recordType + ' ID: ' + eventData.recordId + '\n' + eventLog.CleverTap__Response__c;
-        }
-    }
+
     
     /**
      * @description Helper class for storing event data - simplified to reduce parameter list
