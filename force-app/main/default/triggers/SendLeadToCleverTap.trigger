@@ -1,19 +1,15 @@
 trigger SendLeadToCleverTap on Lead (after insert, after update) {
-    // Skip processing in test context if bypass flag is set
     if (TestUtils.bypassTriggers) {
         return;
     }
 
-    // Skip processing in batch, future, or queueable contexts
     if (System.isBatch() || System.isFuture() || System.isQueueable()) {
         return;
     }
 
-    // Leads to process
     List<Lead> leadsToProcess = new List<Lead>();
 
     if (Trigger.isInsert) {
-        // Process all new Leads
         leadsToProcess = Trigger.new;
     } else if (Trigger.isUpdate) {
         for (Lead lead : Trigger.new) {

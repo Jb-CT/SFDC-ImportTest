@@ -2,7 +2,6 @@
 private class SendActivityToCleverTapTest {
     @testSetup
     static void setupTestData() {
-        // Create test configuration
         CleverTap__Config__c testConfig = new CleverTap__Config__c(
             Name = 'Test Config',
             CleverTap__Region__c = 'US',
@@ -12,7 +11,6 @@ private class SendActivityToCleverTapTest {
         insert testConfig;
         PasscodeHelper.savePasscode(testConfig.Id, 'test-passcode');
         
-        // Create sync configuration for Event
         CleverTap__Sync_Configuration__c eventSyncConfig = new CleverTap__Sync_Configuration__c(
             Name = 'Test Event Sync',
             CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
@@ -23,7 +21,6 @@ private class SendActivityToCleverTapTest {
         );
         insert eventSyncConfig;
         
-        // Create sync configuration for Task
         CleverTap__Sync_Configuration__c taskSyncConfig = new CleverTap__Sync_Configuration__c(
             Name = 'Test Task Sync',
             CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
@@ -34,7 +31,6 @@ private class SendActivityToCleverTapTest {
         );
         insert taskSyncConfig;
 
-        // Create field mappings
         List<CleverTap__Mapping__c> mappings = new List<CleverTap__Mapping__c>{
             new CleverTap__Mapping__c(
                 Name = 'Event Identity Mapping',
@@ -55,7 +51,6 @@ private class SendActivityToCleverTapTest {
         };
         insert mappings;
         
-        // Create test data
         Account testAccount = new Account(Name = 'Test Account');
         insert testAccount;
         
@@ -78,15 +73,12 @@ private class SendActivityToCleverTapTest {
 
     @isTest
     static void testInsertEventWithContact() {
-        // Mock HTTP response
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
         TestUtils.bypassTriggers = false;
         
-        // Get test data
         Contact testContact = [SELECT Id FROM Contact LIMIT 1];
         
         Test.startTest();
-        // Create Event with Contact
         Event testEvent = new Event(
             Subject = 'Test Meeting',
             WhoId = testContact.Id,
@@ -102,15 +94,12 @@ private class SendActivityToCleverTapTest {
 
     @isTest
     static void testInsertTaskWithLead() {
-        // Mock HTTP response
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
         TestUtils.bypassTriggers = false;
         
-        // Get test data
         Lead testLead = [SELECT Id FROM Lead LIMIT 1];
         
         Test.startTest();
-        // Create Task with Lead
         Task testTask = new Task(
             Subject = 'Follow up call',
             WhoId = testLead.Id,
@@ -127,10 +116,8 @@ private class SendActivityToCleverTapTest {
 
     @isTest
     static void testUpdateEvent() {
-        // Mock HTTP response
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
-
-        // Create Event with bypass
+        
         TestUtils.bypassTriggers = true;
         Contact testContact = [SELECT Id FROM Contact LIMIT 1];
         
@@ -145,7 +132,6 @@ private class SendActivityToCleverTapTest {
         TestUtils.bypassTriggers = false;
         
         Test.startTest();
-        // Update Event
         testEvent.Subject = 'Updated Meeting';
         testEvent.Description = 'Updated description';
         update testEvent;
@@ -156,15 +142,12 @@ private class SendActivityToCleverTapTest {
 
     @isTest
     static void testTaskWithAccount() {
-        // Mock HTTP response
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
         TestUtils.bypassTriggers = false;
         
-        // Get test data
         Account testAccount = [SELECT Id FROM Account LIMIT 1];
         
         Test.startTest();
-        // Create Task related to Account (no WhoId)
         Task testTask = new Task(
             Subject = 'Account follow up',
             WhatId = testAccount.Id,

@@ -143,7 +143,6 @@ private class HistoricalSyncBatchTest {
      */
     @isTest
     static void testStartMethod() {
-        // Get sync config ID for use in test
         CleverTap__Sync_Configuration__c syncConfig = [
             SELECT Id FROM CleverTap__Sync_Configuration__c 
             WHERE Name = 'Test Lead Sync' LIMIT 1
@@ -177,12 +176,11 @@ private class HistoricalSyncBatchTest {
 
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseSuccess());
 
-        List<Lead> leads = [SELECT Id, FirstName, LastName, Email, Company, Status, 
+        List<Lead> leads = [SELECT Id,FirstName, LastName, Email, Company, Status, 
                            AnnualRevenue, LastModifiedDate 
                            FROM Lead LIMIT 1];
         
         Test.startTest();
-        // Create a log entry to simulate successful processing
         CleverTap__Event__c eventLog = new CleverTap__Event__c(
             CleverTap__Status__c = 'Success',
             CleverTap__Response__c = '{"status":"success","processed":1}',
@@ -214,7 +212,6 @@ private class HistoricalSyncBatchTest {
                            FROM Lead LIMIT 1];
         
         Test.startTest();
-        // Create a log entry to simulate successful processing
         CleverTap__Event__c eventLog = new CleverTap__Event__c(
             CleverTap__Status__c = 'Success',
             CleverTap__Response__c = '{"status":"success","processed":1}',
@@ -275,12 +272,11 @@ private class HistoricalSyncBatchTest {
 
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseSuccess());
 
-        List<Lead> leads = [SELECT Id, FirstName, LastName, Email, Company, Status, 
+        List<Lead> leads = [SELECT Id,FirstName, LastName, Email, Company, Status, 
                            AnnualRevenue, LastModifiedDate 
                            FROM Lead LIMIT 5];
         
         Test.startTest();
-        // Create log entries to simulate processing multiple records
         List<CleverTap__Event__c> eventLogs = new List<CleverTap__Event__c>();
         for (Lead lead : leads) {
             eventLogs.add(new CleverTap__Event__c(
@@ -301,25 +297,18 @@ private class HistoricalSyncBatchTest {
         System.assert(logs.size() >= 5, 'Should create logs for multiple records');
     }
     
-    /**
-     * Test the full batch process
-     */
     @isTest
     static void testFullBatchProcess() {
-        // Get sync config ID
         CleverTap__Sync_Configuration__c syncConfig = [
             SELECT Id FROM CleverTap__Sync_Configuration__c 
             WHERE Name = 'Test Lead Sync' LIMIT 1
         ];
         
-        // Get leads that will be processed
         List<Lead> leads = [SELECT Id FROM Lead LIMIT 5];
         
-        // Set mock response
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseSuccess());
         
         Test.startTest();
-        // Create log entries before running the batch to ensure we have logs to find
         List<CleverTap__Event__c> eventLogs = new List<CleverTap__Event__c>();
         for (Lead lead : leads) {
             eventLogs.add(new CleverTap__Event__c(
@@ -330,25 +319,21 @@ private class HistoricalSyncBatchTest {
         }
         insert eventLogs;
         
-        // Create and execute the batch
         HistoricalSyncBatch batchInstance = new HistoricalSyncBatch('Lead', syncConfig.Id);
         Id batchId = Database.executeBatch(batchInstance, 5);
         
         Test.stopTest();
         
-        // Verify logs were created (from our manual insertion)
         List<CleverTap__Event__c> logs = [SELECT Id FROM CleverTap__Event__c];
         System.assert(!logs.isEmpty(), 'Should create logs for full batch process');
     }
 
         @isTest
     static void testMissingMappings() {
-        // Get the sync config without any mappings
         CleverTap__Sync_Configuration__c syncConfig = [
             SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
-        // Delete existing mappings
         delete [SELECT Id FROM CleverTap__Mapping__c 
             WHERE CleverTap__Sync_mapping__c = :syncConfig.Id];
         
@@ -373,12 +358,11 @@ private class HistoricalSyncBatchTest {
             SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
-        // Create a mock that returns malformed JSON
         Test.setMock(HttpCalloutMock.class, new MockMalformedResponse());
         
-        List<Lead> leads = [SELECT Id, FirstName, LastName, Email, Company, Status, 
-                        AnnualRevenue, LastModifiedDate 
-                        FROM Lead LIMIT 1];
+        List<Lead> leads = [SELECT Id,FirstName, LastName, Email, Company, Status, 
+                           AnnualRevenue, LastModifiedDate 
+                           FROM Lead LIMIT 1];
         
         Test.startTest();
         HistoricalSyncBatch batchInstance = new HistoricalSyncBatch('Lead', syncConfig.Id);
@@ -405,7 +389,6 @@ private class HistoricalSyncBatchTest {
             SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
-        // Create a mapping with a field that doesn't exist
         CleverTap__Mapping__c invalidMapping = new CleverTap__Mapping__c(
             CleverTap__Sync_mapping__c = syncConfig.Id,
             CleverTap__Field__c = 'invalid_field',

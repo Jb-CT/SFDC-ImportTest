@@ -2,7 +2,6 @@
 private class SendCaseToCleverTapTest {
     @testSetup
     static void setupTestData() {
-        // Create test configuration
         CleverTap__Config__c testConfig = new CleverTap__Config__c(
             Name = 'Test Config',
             CleverTap__Region__c = 'US',
@@ -12,7 +11,6 @@ private class SendCaseToCleverTapTest {
         insert testConfig;
         PasscodeHelper.savePasscode(testConfig.Id, 'test-passcode');
         
-        // Create sync configuration for Case
         CleverTap__Sync_Configuration__c syncConfig = new CleverTap__Sync_Configuration__c(
             Name = 'Test Case Sync',
             CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
@@ -22,8 +20,7 @@ private class SendCaseToCleverTapTest {
             CleverTap__Status__c = 'Active'
         );
         insert syncConfig;
-
-        // Create field mapping
+        
         CleverTap__Mapping__c mapping = new CleverTap__Mapping__c(
             Name = 'Test Mapping',
             CleverTap__Sync_mapping__c = syncConfig.Id,
@@ -34,7 +31,6 @@ private class SendCaseToCleverTapTest {
         );
         insert mapping;
         
-        // Create test Account and Contact
         Account testAccount = new Account(Name = 'Test Account');
         insert testAccount;
         
@@ -49,16 +45,13 @@ private class SendCaseToCleverTapTest {
 
     @isTest
     static void testInsertCase() {
-        // Mock HTTP response
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
         TestUtils.bypassTriggers = false;
         
-        // Get test data
         Account testAccount = [SELECT Id FROM Account LIMIT 1];
         Contact testContact = [SELECT Id FROM Contact LIMIT 1];
         
         Test.startTest();
-        // Create new Case
         Case testCase = new Case(
             Subject = 'Test Case',
             Status = 'New',
@@ -76,10 +69,8 @@ private class SendCaseToCleverTapTest {
 
     @isTest
     static void testUpdateCase() {
-        // Mock HTTP response
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
-
-        // Create Case with bypass
+        
         TestUtils.bypassTriggers = true;
         Account testAccount = [SELECT Id FROM Account LIMIT 1];
         Case testCase = new Case(
@@ -92,7 +83,6 @@ private class SendCaseToCleverTapTest {
         TestUtils.bypassTriggers = false;
         
         Test.startTest();
-        // Update Case
         testCase.Status = 'Working';
         testCase.Priority = 'High';
         update testCase;

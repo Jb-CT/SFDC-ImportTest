@@ -8,14 +8,8 @@ public with sharing class EntityTransformer {
      * @description Inner class to hold connection mappings between Salesforce and CleverTap
      */
     public class ConnectionMapping {
-        /**
-         * @description The CleverTap connection ID
-         */
         public String connectionId { get; set; }
-        
-        /**
-         * @description The payload to be sent to CleverTap
-         */
+
         public Map<String, Object> payload { get; set; }
     }
     
@@ -31,15 +25,12 @@ public with sharing class EntityTransformer {
         }
         
         try {
-            // Use the multi-connection method but return only the first result
             List<ConnectionMapping> mappings = mapToMultipleConnections(record, recordType);
             if (!mappings.isEmpty()) {
                 return mappings[0].payload;
             }
             return null;
         } catch (Exception e) {
-            // Avoid using debug statement for performance reasons
-            // Instead, could use a custom logging solution if needed
             return null;
         }
     }
@@ -57,14 +48,12 @@ public with sharing class EntityTransformer {
         
         List<ConnectionMapping> allMappings = new List<ConnectionMapping>();
         
-        try {
-            // Get all active sync configurations for this record type
+        try {   
             List<CleverTap__Sync_Configuration__c> syncConfigs = getAllSyncConfigurations(recordType);
             if (syncConfigs.isEmpty()) {
                 return allMappings;
             }
-            
-            // Process each sync configuration
+
             for (CleverTap__Sync_Configuration__c syncConfig : syncConfigs) {
                 ConnectionMapping mapping = processConfiguration(record, recordType, syncConfig);
                 if (mapping != null) {
@@ -72,7 +61,6 @@ public with sharing class EntityTransformer {
                 }
             }
         } catch (Exception e) {
-            // Using a more efficient approach than debug logging
             logError('Error mapping ' + recordType + ' to CleverTap', e);
         }
         
@@ -90,17 +78,7 @@ public with sharing class EntityTransformer {
             return null;
         }
 
-        String identityValue = null;
-
-        if (recordType == 'Event' || recordType == 'Task') {
-            identityValue = getActivityIdentity(record, recordType);
-        }
-        else if (recordType == 'CampaignMember') {
-            identityValue = getCampaignMemberIdentity((CampaignMember)record);
-        }
-        else {
-            identityValue = getIdentityValue(record, identityMapping);
-        }
+        String identityValue = getIdentityValue(record, identityMapping);
         
         if (String.isBlank(identityValue)) {
             return null;
@@ -139,7 +117,6 @@ public with sharing class EntityTransformer {
     }
 
     private List<CleverTap__Sync_Configuration__c> getAllSyncConfigurations(String recordType) {
-        // Check CRUD permissions
         if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return new List<CleverTap__Sync_Configuration__c>();
         }
@@ -153,7 +130,6 @@ public with sharing class EntityTransformer {
     }
 
     private List<CleverTap__Mapping__c> getFieldMappingsForConfig(Id configId) {
-        // Check CRUD permissions
         if (!CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return new List<CleverTap__Mapping__c>();
         }
@@ -167,7 +143,6 @@ public with sharing class EntityTransformer {
     }
 
     private List<CleverTap__Mapping__c> getFieldMappings(String recordType) {
-        // Check CRUD permissions
         if (!CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() || 
             !CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return new List<CleverTap__Mapping__c>();
@@ -186,7 +161,6 @@ public with sharing class EntityTransformer {
     }
 
     private CleverTap__Sync_Configuration__c getSyncConfiguration(String recordType) {
-        // Check CRUD permissions
         if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return null;
         }
@@ -229,30 +203,25 @@ public with sharing class EntityTransformer {
         ValueExtractor valueExtractor = new ValueExtractor();
         
         for (CleverTap__Mapping__c mapping : fieldMappings) {
-            // Skip special field types
             if (isSpecialField(mapping)) {
                 continue;
             }
-            
-            // Skip if field doesn't exist in record
+
             String fieldName = mapping.CleverTap__Salesforce_Field__c;
             if (String.isBlank(fieldName) || !record.getPopulatedFieldsAsMap().containsKey(fieldName)) {
                 continue;
             }
             
-            // Skip if the field value is null
             Object fieldValue = record.get(fieldName);
             if (fieldValue == null) {
                 continue;
             }
-            
-            // Convert and add the field value to the profile data
+
             Object convertedValue = valueExtractor.convertFieldValue(
                 fieldValue, mapping.CleverTap__Data_Type__c
             );
             profileData.put(mapping.CleverTap__Field__c, convertedValue);
         }
-        
         return profileData;
     }
 
@@ -267,7 +236,6 @@ public with sharing class EntityTransformer {
         Map<String, Object> payload = new Map<String, Object>();
         payload.put('identity', identityValue);
         
-        // Set type-specific fields based on whether this is an event or profile
         if (isEvent && String.isNotBlank(eventName)) {
             payload.put('type', 'event');
             payload.put('evtName', eventName);
@@ -285,90 +253,6 @@ public with sharing class EntityTransformer {
         // Could implement a custom logging solution here
         // For now, we're just suppressing the debug statement
         // but maintaining the method signature for future enhancement
-    }
-
-    private String getActivityIdentity(SObject record, String recordType) {
-        String identityValue = null;
-        
-        try {
-            Id whoId = (Id)record.get('WhoId');
-            
-            if (whoId != null) {
-                String whoObjectType = whoId.getSObjectType().getDescribe().getName();
-                
-                if (whoObjectType == 'Contact') {
-                    if (Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() &&
-                        Contact.Email.getDescribe().isAccessible()) {
-                        List<Contact> contacts = [SELECT Email FROM Contact WHERE Id = :whoId LIMIT 1];
-                        if (!contacts.isEmpty() && contacts[0].Email != null) {
-                            identityValue = contacts[0].Email;
-                        }
-                    }
-                } else if (whoObjectType == 'Lead') {
-                    // Query Lead email with security checks
-                    if (Lead.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() &&
-                        Lead.Email.getDescribe().isAccessible()) {
-                        List<Lead> leads = [SELECT Email FROM Lead WHERE Id = :whoId LIMIT 1];
-                        if (!leads.isEmpty() && leads[0].Email != null) {
-                            identityValue = leads[0].Email;
-                        }
-                    }
-                }
-            }
-
-            if (String.isBlank(identityValue)) {
-                Id whatId = (Id)record.get('WhatId');
-                if (whatId != null) {
-                    String whatObjectType = whatId.getSObjectType().getDescribe().getName();
-                    
-                    if (whatObjectType == 'Account') {
-                        // Use Account Name as identity
-                        if (Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() &&
-                            Account.Name.getDescribe().isAccessible()) {
-                            List<Account> accounts = [SELECT Name FROM Account WHERE Id = :whatId LIMIT 1];
-                            if (!accounts.isEmpty()) {
-                                identityValue = 'account_' + accounts[0].Name;
-                            }
-                        }
-                    }
-                }
-            }
-            
-        } catch (Exception e) {
-            logError('Error getting activity identity for ' + recordType, e);
-        }
-        
-        return identityValue;
-    }
-
-    private String getCampaignMemberIdentity(CampaignMember campaignMember) {
-        String identityValue = null;
-        
-        try {
-            // Check if it's a Contact
-            if (campaignMember.ContactId != null) {
-                if (Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() &&
-                    Contact.Email.getDescribe().isAccessible()) {
-                    List<Contact> contacts = [SELECT Email FROM Contact WHERE Id = :campaignMember.ContactId LIMIT 1];
-                    if (!contacts.isEmpty() && contacts[0].Email != null) {
-                        identityValue = contacts[0].Email;
-                    }
-                }
-            }
-            else if (campaignMember.LeadId != null) {
-                if (Lead.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() &&
-                    Lead.Email.getDescribe().isAccessible()) {
-                    List<Lead> leads = [SELECT Email FROM Lead WHERE Id = :campaignMember.LeadId LIMIT 1];
-                    if (!leads.isEmpty() && leads[0].Email != null) {
-                        identityValue = leads[0].Email;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logError('Error getting campaign member identity', e);
-        }
-        
-        return identityValue;
     }
 
     private void addActivityContext(SObject record, Map<String, Object> profileData) {

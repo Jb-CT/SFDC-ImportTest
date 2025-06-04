@@ -33,7 +33,6 @@ public with sharing class ResultLogger {
      */
     public void logEvent(EventData eventData) {
         try {
-            // Check permissions
             if (!canCreateEventLog()) {
                 return;
             }
@@ -45,8 +44,7 @@ public with sharing class ResultLogger {
             if (!Schema.sObjectType.CleverTap__Event__c.isCreateable()) {
                 return;
                 }
-            
-            // Insert the log
+
             insert eventLog;
         } catch (Exception e) {
             //logError(e);
@@ -81,7 +79,6 @@ public with sharing class ResultLogger {
                 return 'success'.equalsIgnoreCase((String)responseMap.get('status'));
             }
         } catch (Exception e) {
-            // If can't parse JSON, default to HTTP status
             return true;
         }
         

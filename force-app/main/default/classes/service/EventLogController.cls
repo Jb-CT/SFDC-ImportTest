@@ -16,8 +16,7 @@ public with sharing class EventLogController {
         if (!Schema.SObjectType.CleverTap__Event__c.isAccessible()) {
             throw new AuraHandledException('You do not have access to event logs');
         }
-        
-        // Check field-level security
+
         Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.CleverTap__Event__c.fields.getMap();
         for (String field : new List<String>{'Name', 'CleverTap__Status__c', 'CreatedDate'}) {
             if (!fieldMap.get(field.toLowerCase()).getDescribe().isAccessible()) {
@@ -61,12 +60,10 @@ public with sharing class EventLogController {
     @AuraEnabled
     public static CleverTap__Event__c getEventDetails(Id recordId) {
         try {
-            // The WITH SECURITY_ENFORCED clause enforces field and object-level security
             List<CleverTap__Event__c> events = [
                 SELECT Id, Name, CleverTap__Status__c, CleverTap__Response__c, CreatedDate
                 FROM CleverTap__Event__c
                 WHERE Id = :recordId
-                //WITH SECURITY_ENFORCED
                 LIMIT 1
             ];
             
@@ -76,7 +73,6 @@ public with sharing class EventLogController {
             
             return events[0];
         } catch (System.QueryException e) {
-            // This exception is thrown when security enforcement fails
             throw new AuraHandledException('Insufficient access permissions: ' + e.getMessage());
         }
     }

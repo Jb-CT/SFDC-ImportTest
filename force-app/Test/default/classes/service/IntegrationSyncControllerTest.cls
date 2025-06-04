@@ -44,10 +44,7 @@ private class IntegrationSyncControllerTest {
         
         insert mappings;
     }
-    
-    /**
-     * @description Test getSyncConfigurations method
-     */
+
     @isTest
     static void testGetSyncConfigurations() {
         String connectionId = 'TEST_CONN_123';
@@ -66,17 +63,13 @@ private class IntegrationSyncControllerTest {
         System.assertEquals('profile', config.targetEntity, 'Target entity should match');
         System.assertEquals('Active', config.status, 'Status should match');
     }
-    
-    /**
-     * @description Test getPicklistValues method with a mock
-     */
+
     @isTest
     static void testGetPicklistValues() {
         List<Map<String, String>> mockPicklist = new List<Map<String, String>>();
         Map<String, String> option1 = new Map<String, String>{'label' => 'Text', 'value' => 'Text'};
         mockPicklist.add(option1);
         
-        // Create a test instance of CleverTap__Mapping__c to ensure field exists
         CleverTap__Mapping__c testMapping = new CleverTap__Mapping__c(
             CleverTap__Data_Type__c = 'Text'
         );
@@ -87,10 +80,8 @@ private class IntegrationSyncControllerTest {
         Test.stopTest();
 
         if (picklistValues.isEmpty()) {
-            // If picklist values could not be retrieved in test, make a dummy assertion that passes
             System.assert(true, 'No picklist values in test environment is acceptable');
         } else {
-            // If we do get values, verify they're as expected
             Boolean hasTextType = false;
             for (Map<String, String> option : picklistValues) {
                 if (option.get('value') == 'Text') {
@@ -101,10 +92,7 @@ private class IntegrationSyncControllerTest {
             System.assert(hasTextType, 'Should include Text data type');
         }
     }
-    
-    /**
-     * @description Test saveFieldMappings method
-     */
+
     @isTest
     static void testSaveFieldMappings() {
         CleverTap__Sync_Configuration__c config = [
@@ -136,12 +124,10 @@ private class IntegrationSyncControllerTest {
         
         String mappingDataJson = JSON.serialize(mappingDataMap);
         
-        // Execute the method
         Test.startTest();
         IntegrationSyncController.saveFieldMappings(mappingDataJson);
         Test.stopTest();
         
-        // Verify results
         List<CleverTap__Mapping__c> updatedMappings = [
             SELECT CleverTap__Field__c, CleverTap__Salesforce_Field__c, CleverTap__Is_Mandatory__c
             FROM CleverTap__Mapping__c
@@ -149,47 +135,36 @@ private class IntegrationSyncControllerTest {
             ORDER BY CleverTap__Is_Mandatory__c DESC
         ];
         
-        // Should have 2 mappings (1 mandatory, 1 regular)
         System.assertEquals(2, updatedMappings.size(), 'Should have 2 mappings after update');
         
-        // First should be the mandatory mapping
         System.assertEquals('Identity', updatedMappings[0].CleverTap__Field__c, 
             'First mapping should be Identity');
         System.assertEquals(true, updatedMappings[0].CleverTap__Is_Mandatory__c, 
             'Identity mapping should be mandatory');
         
-        // Second should be the new last_name mapping
         System.assertEquals('last_name', updatedMappings[1].CleverTap__Field__c, 
             'Second mapping should be last_name');
         System.assertEquals('LastName', updatedMappings[1].CleverTap__Salesforce_Field__c, 
             'Second mapping should map to LastName field');
     }
-    
-    /**
-     * @description Test saveFieldMappings with invalid data
-     */
+
     @isTest
     static void testSaveFieldMappingsInvalidData() {
-        // Test with empty data
         Test.startTest();
         try {
             IntegrationSyncController.saveFieldMappings('');
             System.assert(false, 'Should have thrown exception for empty data');
         } catch (AuraHandledException e) {
-            // Expected exception
             System.assert(true, 'AuraHandledException was thrown as expected for empty data');
         }
-        
-        // Test with invalid JSON
+
         try {
             IntegrationSyncController.saveFieldMappings('not valid json');
             System.assert(false, 'Should have thrown exception for invalid JSON');
         } catch (AuraHandledException e) {
-            // Expected exception
             System.assert(true, 'AuraHandledException was thrown as expected for invalid JSON');
         }
         
-        // Test with missing syncId
         try {
             Map<String, Object> invalidMap = new Map<String, Object>{
                 'mappings' => new List<Object>()
@@ -197,14 +172,11 @@ private class IntegrationSyncControllerTest {
             IntegrationSyncController.saveFieldMappings(JSON.serialize(invalidMap));
             System.assert(false, 'Should have thrown exception for missing syncId');
         } catch (AuraHandledException e) {
-            // Expected exception
             System.assert(true, 'AuraHandledException was thrown as expected for missing syncId');
         }
         
-        // Test with empty mappings list
         try {
-            // Create a valid-looking ID without hardcoding
-            Id mockId = UserInfo.getOrganizationId(); // Using Org ID as a valid ID pattern
+            Id mockId = UserInfo.getOrganizationId(); 
             
             Map<String, Object> invalidMap = new Map<String, Object>{
                 'syncId' => mockId,
@@ -213,7 +185,6 @@ private class IntegrationSyncControllerTest {
             IntegrationSyncController.saveFieldMappings(JSON.serialize(invalidMap));
             System.assert(false, 'Should have thrown exception for empty mappings');
         } catch (AuraHandledException e) {
-            // Expected exception
             System.assert(true, 'AuraHandledException was thrown as expected for empty mappings');
         }
         Test.stopTest();
@@ -224,21 +195,19 @@ private class IntegrationSyncControllerTest {
      */
     @isTest
     static void testGetExistingMappings() {
-        // Get existing configuration
         CleverTap__Sync_Configuration__c config = [
             SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
-        // Execute the method
+        Test.startTest();
         Test.startTest();
         List<CleverTap__Mapping__c> mappings = 
             IntegrationSyncController.getExistingMappings(config.Id);
         Test.stopTest();
         
-        // Verify results
+
         System.assertEquals(2, mappings.size(), 'Should return 2 mappings');
-        
-        // Verify mappings content
+
         Boolean hasCustomerId = false;
         Boolean hasFirstName = false;
         
@@ -256,36 +225,25 @@ private class IntegrationSyncControllerTest {
         System.assertEquals(true, hasCustomerId, 'Should include Identity mapping');
         System.assertEquals(true, hasFirstName, 'Should include first_name mapping');
     }
-    
-    /**
-     * @description Test updateSyncStatus method
-     */
+
     @isTest
     static void testUpdateSyncStatus() {
-        // Get existing configuration
         CleverTap__Sync_Configuration__c config = [
             SELECT Id, CleverTap__Status__c FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
-        
-        // Verify initial status
+
         System.assertEquals('Active', config.CleverTap__Status__c, 'Initial status should be Active');
-        
-        // Execute the method to deactivate
+
         Test.startTest();
         IntegrationSyncController.updateSyncStatus(config.Id, 'Inactive');
         Test.stopTest();
-        
-        // Verify status change
+
         config = [SELECT CleverTap__Status__c FROM CleverTap__Sync_Configuration__c WHERE Id = :config.Id];
         System.assertEquals('Inactive', config.CleverTap__Status__c, 'Status should be updated to Inactive');
     }
-    
-    /**
-     * @description Test createSyncConfiguration method
-     */
+
     @isTest
     static void testCreateSyncConfiguration() {
-        // Prepare data for new configuration
         String connectionId = 'TEST_CONN_456';
         Map<String, Object> syncData = new Map<String, Object>{
             'name' => 'New Test Config',
@@ -294,16 +252,13 @@ private class IntegrationSyncControllerTest {
             'targetEntity' => 'profile',
             'connectionId' => connectionId
         };
-        
-        // Execute the method
+
         Test.startTest();
         String newConfigId = IntegrationSyncController.createSyncConfiguration(JSON.serialize(syncData));
         Test.stopTest();
-        
-        // Verify results
+
         System.assertNotEquals(null, newConfigId, 'Should return new configuration Id');
-        
-        // Query the new configuration
+
         CleverTap__Sync_Configuration__c newConfig = [
             SELECT Name, CleverTap__Salesforce_Entity__c, CleverTap__Entity__c, CleverTap__Status__c, CleverTap__ConnectionId__c
             FROM CleverTap__Sync_Configuration__c
@@ -322,18 +277,15 @@ private class IntegrationSyncControllerTest {
      */
     @isTest
     static void testGetSyncConfigurationById() {
-        // Get existing configuration
         CleverTap__Sync_Configuration__c config = [
             SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
-        
-        // Execute the method
+
         Test.startTest();
         SyncConfigurationManager.SyncConfigWrapper wrapper = 
             IntegrationSyncController.getSyncConfigurationById(config.Id);
         Test.stopTest();
-        
-        // Verify results
+
         System.assertNotEquals(null, wrapper, 'Should return a config wrapper');
         System.assertEquals('Test Sync Config', wrapper.name, 'Name should match');
         System.assertEquals('salesforce_to_clevertap', wrapper.syncType, 'Sync type should match');
@@ -341,36 +293,28 @@ private class IntegrationSyncControllerTest {
         System.assertEquals('profile', wrapper.targetEntity, 'Target entity should match');
         System.assertEquals('Active', wrapper.status, 'Status should match');
     }
-    
-    /**
-     * @description Test updateSyncConfiguration method
-     */
+
     @isTest
     static void testUpdateSyncConfiguration() {
-        // Get existing configuration
         CleverTap__Sync_Configuration__c config = [
             SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
-        
-        // Prepare update data
+
         Map<String, Object> updateData = new Map<String, Object>{
             'name' => 'Updated Test Config',
             'syncType' => 'salesforce_to_clevertap',
             'sourceEntity' => 'Account',
             'targetEntity' => 'profile'
         };
-        
-        // Execute the method
+
         Test.startTest();
         SyncConfigurationManager.SyncConfigWrapper updatedWrapper = 
             IntegrationSyncController.updateSyncConfiguration(config.Id, JSON.serialize(updateData));
         Test.stopTest();
-        
-        // Verify results from wrapper
+
         System.assertEquals('Updated Test Config', updatedWrapper.name, 'Name should be updated');
         System.assertEquals('Account', updatedWrapper.sourceEntity, 'Source entity should be updated');
-        
-        // Verify database update
+
         CleverTap__Sync_Configuration__c updatedConfig = [
             SELECT Name, CleverTap__Salesforce_Entity__c
             FROM CleverTap__Sync_Configuration__c
@@ -387,29 +331,24 @@ private class IntegrationSyncControllerTest {
      */
     @isTest
     static void testDeleteSyncConfiguration() {
-        // Get existing configuration
         CleverTap__Sync_Configuration__c config = [
             SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
-        
-        // Count mappings before delete
+
         Integer initialMappingCount = [
             SELECT COUNT() FROM CleverTap__Mapping__c WHERE CleverTap__Sync_mapping__c = :config.Id
         ];
         System.assertEquals(2, initialMappingCount, 'Should have 2 mappings initially');
-        
-        // Execute the method
+
         Test.startTest();
         IntegrationSyncController.deleteSyncConfiguration(config.Id);
         Test.stopTest();
-        
-        // Verify configuration deleted
+
         List<CleverTap__Sync_Configuration__c> remainingConfigs = [
             SELECT Id FROM CleverTap__Sync_Configuration__c WHERE Id = :config.Id
         ];
         System.assertEquals(0, remainingConfigs.size(), 'Configuration should be deleted');
-        
-        // Verify cascade delete of mappings
+
         List<CleverTap__Mapping__c> remainingMappings = [
             SELECT Id FROM CleverTap__Mapping__c WHERE CleverTap__Sync_mapping__c = :config.Id
         ];
@@ -421,15 +360,12 @@ private class IntegrationSyncControllerTest {
      */
     @isTest
     static void testGetSalesforceFields() {
-        // Execute the method for Lead object
         Test.startTest();
         List<Map<String, String>> leadFields = IntegrationSyncController.getSalesforceFields('Lead');
         Test.stopTest();
-        
-        // Verify results
+
         System.assertNotEquals(0, leadFields.size(), 'Should return Lead fields');
-        
-        // Check for common fields
+
         Boolean hasEmailField = false;
         Boolean hasLastNameField = false;
         
@@ -455,32 +391,25 @@ private class IntegrationSyncControllerTest {
         
         Boolean exceptionThrown = false;
         try {
-            // This should throw an exception since the object doesn't exist
             IntegrationSyncController.getSalesforceFields('InvalidObject');
         } catch (Exception e) {
-            // We expect an exception here
             exceptionThrown = true;
         }
-        
-        // Either assertion passes the test to handle different behavior in different environments
+
         if (!exceptionThrown) {
-            // If no exception was thrown, verify empty results instead
             List<Map<String, String>> results = IntegrationSyncController.getSalesforceFields('InvalidObject');
             System.assertEquals(0, results.size(), 'Invalid object should return empty fields list');
         } else {
-            // If exception was thrown, just assert that it happened
             System.assert(exceptionThrown, 'Exception was thrown for invalid object');
         }
-        
-        // For empty string case
+
         exceptionThrown = false;
         try {
             IntegrationSyncController.getSalesforceFields('');
         } catch (Exception e) {
             exceptionThrown = true;
         }
-        
-        // Either assertion passes the test
+
         if (!exceptionThrown) {
             List<Map<String, String>> results = IntegrationSyncController.getSalesforceFields('');
             System.assertEquals(0, results.size(), 'Empty object name should return empty fields list');
@@ -490,17 +419,13 @@ private class IntegrationSyncControllerTest {
         
         Test.stopTest();
     }
-    /**
-     * @description Test runHistoricalSync method
-     */
+
     @isTest
     static void testRunHistoricalSync() {
-        // Set up a test configuration
         CleverTap__Sync_Configuration__c config = [
             SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
-        // Create a test Lead to ensure there's data for the batch to process
         Lead testLead = new Lead(
             FirstName = 'Test',
             LastName = 'Lead',
@@ -508,25 +433,19 @@ private class IntegrationSyncControllerTest {
             Company = 'Test Company'
         );
         insert testLead;
-        
-        // Execute the method
+
         Test.startTest();
         String result = IntegrationSyncController.runHistoricalSync(config.Id);
         Test.stopTest();
-        
-        // Verify results
+
         System.assertNotEquals(null, result, 'Should return a status string');
         System.assertEquals('Success', result, 'Should return success status');
-        
-        // Verify that an event log was created
+
         List<CleverTap__Event__c> events = [
             SELECT Id, CleverTap__Status__c, CleverTap__Response__c 
             FROM CleverTap__Event__c 
-            
         ];
-        
-        // This will pass even if no events were created, which might happen in test context
-        // where batch runs are simulated but not fully executed
+
         if (!events.isEmpty()) {
             System.assertEquals('Success', events[0].CleverTap__Status__c, 'Event status should be Success');
         } else {
@@ -534,22 +453,13 @@ private class IntegrationSyncControllerTest {
         }
     }
 
-
-
-
-
-
-
-        // Add this to IntegrationSyncControllerTest
     @isTest
     static void testSyncConfigManagerEdgeCases() {
-        // Create test data
         CleverTap__Sync_Configuration__c config = [SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1];
         
         Test.startTest();
         
         try {
-            // Test with very long configuration name
             String longName = 'Very long configuration name that exceeds the normal limits of what would be expected in a typical scenario';
             CleverTap__Sync_Configuration__c updatedConfig = new CleverTap__Sync_Configuration__c(
                 Id = config.Id,
@@ -557,18 +467,15 @@ private class IntegrationSyncControllerTest {
             );
             update updatedConfig;
             
-            // Now try to get it by ID
             SyncConfigurationManager.SyncConfigWrapper wrapper = IntegrationSyncController.getSyncConfigurationById(config.Id);
             System.assertNotEquals(null, wrapper, 'Should return a valid wrapper');
             
-            // Test exception handling by passing an invalid ID
             try {
                 IntegrationSyncController.getSyncConfigurationById('invalid_id');
             } catch (Exception e) {
                 // Expected exception
             }
         } catch (Exception e) {
-            // Catch any exceptions but don't fail the test
             System.debug('Exception in test: ' + e.getMessage());
         }
         

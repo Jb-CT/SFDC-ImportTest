@@ -66,21 +66,18 @@ private class DataProcessorImplTest {
         DataProcessorImpl processor = new DataProcessorImpl(transformer, config, logger);
         
         Test.startTest();
-        // Manually insert a log record to simulate the processor action
         CleverTap__Event__c eventLog = new CleverTap__Event__c(
             CleverTap__Status__c = 'Success',
             CleverTap__Response__c = '{"status":"success"}',
             CleverTap__Lead__c = testLead.Id
         );
         insert eventLog;
-        
-        // Execute the processor method
+
         processor.sendLeadToCleverTap(testLead);
         Test.stopTest();
  
         TestUtils.bypassTriggers = false;
 
-        // Verify using the manually inserted log
         List<CleverTap__Event__c> logs = [SELECT Id FROM CleverTap__Event__c WHERE CleverTap__Lead__c = :testLead.Id];
         System.assert(!logs.isEmpty(), 'Event log should be created');
     }
@@ -102,7 +99,6 @@ private class DataProcessorImplTest {
         DataProcessorImpl processor = new DataProcessorImpl(transformer, config, logger);
         
         Test.startTest();
-        // Manually insert a log record to simulate the processor action
         CleverTap__Event__c eventLog = new CleverTap__Event__c(
             CleverTap__Status__c = 'Success',
             CleverTap__Response__c = '{"status":"success","type":"profile"}',
@@ -110,11 +106,9 @@ private class DataProcessorImplTest {
         );
         insert eventLog;
         
-        // Execute the processor method
         processor.sendToCleverTap(testLead, 'Lead');
         Test.stopTest();
 
-        // Verify using the manually inserted log
         List<CleverTap__Event__c> logs = [SELECT Id, CleverTap__Response__c FROM CleverTap__Event__c WHERE CleverTap__Lead__c = :testLead.Id];
         System.assert(!logs.isEmpty(), 'Event log should be created for profile entity');
     }
@@ -146,7 +140,6 @@ private class DataProcessorImplTest {
         DataProcessorImpl processor = new DataProcessorImpl(transformer, config, logger);
         
         Test.startTest();
-        // Manually insert a log record to simulate the processor action
         CleverTap__Event__c eventLog = new CleverTap__Event__c(
             CleverTap__Status__c = 'Success',
             CleverTap__Response__c = '{"status":"success","type":"event"}',
@@ -154,11 +147,9 @@ private class DataProcessorImplTest {
         );
         insert eventLog;
         
-        // Execute the processor method
         processor.sendToCleverTap(testLead, 'Lead');
         Test.stopTest();
 
-        // Verify using the manually inserted log
         List<CleverTap__Event__c> logs = [SELECT Id FROM CleverTap__Event__c WHERE CleverTap__Lead__c = :testLead.Id];
         System.assert(!logs.isEmpty(), 'Event log should be created for event entity');
     }
@@ -184,54 +175,39 @@ private class DataProcessorImplTest {
     
     @isTest
     static void testDataProcessorErrorHandling() {
-        // Setup a mock that throws an exception
         Test.setMock(HttpCalloutMock.class, new MockExceptionThrowingHttpResponse());
         
-        // Get test lead
-        Lead testLead = [SELECT Id, FirstName, LastName, Email FROM Lead LIMIT 1];
+        Lead testLead = [SELECT Id,FirstName,LastName,Email FROM Lead LIMIT 1];
         
-        // Create test helpers
         EntityTransformer transformer = new EntityTransformer();
         Config config = new Config();
         ResultLogger logger = new ResultLogger();
         
-        // Create processor instance
         DataProcessorImpl processor = new DataProcessorImpl(transformer, config, logger);
         
-        // Enable bypass for trigger
         TestUtils.bypassTriggers = true;
         
         Test.startTest();
-        // This should exercise error handling paths in DataProcessorImpl
         processor.sendToCleverTap(testLead, 'Lead');
         Test.stopTest();
         
-        // Reset bypass flag
         TestUtils.bypassTriggers = false;
         
-        // No assertions needed - we're just exercising the code paths
         System.assert(true, 'Test completed without exceptions');
     }
     
-    // Mock that throws an exception during HTTP callout
     private class MockExceptionThrowingHttpResponse implements HttpCalloutMock {
         public HTTPResponse respond(HTTPRequest req) {
             throw new CalloutException('Simulated callout exception');
         }
     }
 
-
-
-
-
-        // Add this to DataProcessorImplTest
     @isTest
     static void testTargetedDataProcessorCoverage() {
         Lead testLead = [SELECT Id, FirstName, LastName, Email FROM Lead LIMIT 1];
         
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseSuccess());
-        
-        // Create mock objects with specific configurations to test more code paths
+
         EntityTransformer transformer = new EntityTransformer();
         Config config = new Config();
         ResultLogger logger = new ResultLogger();
@@ -239,13 +215,10 @@ private class DataProcessorImplTest {
         DataProcessorImpl processor = new DataProcessorImpl(transformer, config, logger);
         
         Test.startTest();
-        // Test different processing scenarios
         processor.sendLeadToCleverTap(testLead);
         
-        // Test with null record
         processor.sendToCleverTap(null, 'Lead');
-        
-        // Set a mock config with specific target entity type
+
         CleverTap__Sync_Configuration__c mockConfig = new CleverTap__Sync_Configuration__c(
             Name = 'Mock Config',
             CleverTap__Salesforce_Entity__c = 'Lead',

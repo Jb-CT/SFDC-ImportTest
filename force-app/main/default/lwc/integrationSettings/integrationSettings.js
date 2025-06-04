@@ -19,8 +19,7 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
     @track connections = [];
     @track isLoading = false;
     wiredConfigResult;
-    
-    // Add these properties
+
     @track showSettingsView = true;
     @track showSyncListView = false;
     @track selectedConnectionId;
@@ -48,13 +47,11 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
             console.log('Fetched configurations:', data);
             this.connections = data.map(conn => ({
                 id: conn.Id,
-                developerName: conn.Name, // Use Name instead of DeveloperName
+                developerName: conn.Name, 
                 name: conn.Name,
                 region: conn.CleverTap__Region__c,
                 accountId: conn.CleverTap__Account_ID__c,
-                // Remove passcode mapping since it's no longer in the Config object
-                // passcode: conn.CleverTap__Passcode__c  // REMOVED - field no longer exists
-                passcode: '' // Keep empty for security - passcode is in protected setting
+                passcode: '' 
             }));
         } else if (error) {
             console.error('Error fetching configurations:', error);
@@ -99,7 +96,6 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
         this.connection.passcode = event.detail.value;
     }
 
-    // Modified to use conditional rendering instead of navigation
     handleMapField(event) {
         const connId = event.currentTarget.dataset.id;
         const selectedConn = this.connections.find(conn => conn.id === connId);
@@ -108,7 +104,6 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
             this.selectedConnectionId = connId;
             this.selectedConnectionName = selectedConn.name;
             
-            // Toggle views instead of navigating
             this.showSettingsView = false;
             this.showSyncListView = true;
         } else {
@@ -123,7 +118,6 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
         if (conn) {
             this.connection = { 
                 ...conn,
-                // Clear passcode for security when editing - user needs to re-enter
                 passcode: '' 
             };
             this.isEditing = true;
@@ -167,7 +161,6 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
             return false;
         }
         
-        // Additional validation for editing mode
         if (this.isEditing && !this.connection.passcode) {
             this.showToast('Error', 'Please enter the passcode to validate credentials', 'error');
             return false;
@@ -201,17 +194,15 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
     }
 
     async handleSave() {
-        // Validation for passcode requirement
         if (!this.connection.passcode) {
             this.showToast('Error', 'Passcode is required', 'error');
             return;
         }
         
-        // First validate the credentials
         const isValid = await this.validateConnectionCredentials();
         
         if (!isValid) {
-            return; // Stop if validation fails
+            return; 
         }
         
         try {
@@ -222,7 +213,6 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
                 this.showNewConnectionModal = false;
                 this.showToast('Success', 'Configuration saved successfully', 'success');
                 
-                // Add a delay before refreshing to allow metadata deployment to complete
                 this.showToast('Info', 'Waiting for changes to process...', 'info');
                 await this.refreshAfterDelay(10000);
                 this.showToast('Success', 'Configuration refresh completed', 'success');
@@ -237,7 +227,6 @@ export default class IntegrationSettings extends NavigationMixin(LightningElemen
         }
     }
 
-    // Add method to handle returning from sync list view
     handleReturnToSettings() {
         this.showSettingsView = true;
         this.showSyncListView = false;

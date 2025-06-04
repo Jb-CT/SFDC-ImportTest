@@ -8,7 +8,6 @@ import updateSyncStatus from '@salesforce/apex/IntegrationSyncController.updateS
 import runHistoricalSync from '@salesforce/apex/IntegrationSyncController.runHistoricalSync';
 
 export default class IntegrationSyncList extends NavigationMixin(LightningElement) {
-    // Change these to API properties so they can be passed from parent
     @api connectionId;
     @api connectionName;
     
@@ -20,7 +19,6 @@ export default class IntegrationSyncList extends NavigationMixin(LightningElemen
     @track isLoading = false;
     @track wiredSyncResult;
     
-    // Add property to control showing sync config
     @track showSyncConfig = false;
     @track syncConfigMode = 'new';
     @track syncConfigRecordId;
@@ -68,12 +66,10 @@ export default class IntegrationSyncList extends NavigationMixin(LightningElemen
     ];
 
     connectedCallback() {
-        // Initial data load
         console.log('Connection ID loaded:', this.connectionId);
         this.loadData();
     }
 
-    // Wire the getSyncConfigurations Apex method with the connectionId parameter
     @wire(getSyncConfigurations, { connectionId: '$connectionId' })
     wiredConfigs(result) {
         this.wiredSyncResult = result;
@@ -82,7 +78,6 @@ export default class IntegrationSyncList extends NavigationMixin(LightningElemen
 
     loadData() {
         if (this.wiredSyncResult && this.wiredSyncResult.data) {
-            // Process the sync records
             this.syncRecords = this.wiredSyncResult.data.map(record => ({
                 ...record,
                 statusClass: this.getStatusClass(record.status),
@@ -112,7 +107,6 @@ export default class IntegrationSyncList extends NavigationMixin(LightningElemen
     
         if (row.status === 'Active') {
             actions.push({ label: 'Deactivate', name: 'deactivate' });
-            // Add Historical Sync action only for active configurations
             actions.push({ label: 'Historical Sync', name: 'historicalSync' });
         } else {
             actions.push({ label: 'Activate', name: 'activate' });
@@ -121,12 +115,9 @@ export default class IntegrationSyncList extends NavigationMixin(LightningElemen
         return actions;
     }
 
-    // Modified to dispatch an event to parent
     handleBack() {
         this.dispatchEvent(new CustomEvent('back'));
     }
-
-    // Modified to show sync config instead of navigating
     handleAddNewSync() {
         this.syncConfigMode = 'new';
         this.syncConfigRecordId = null;
@@ -164,7 +155,6 @@ export default class IntegrationSyncList extends NavigationMixin(LightningElemen
             this.isLoading = true;
             this.showToast('Info', `Starting historical sync for ${row.sourceEntity} records...`, 'info');
             
-            // Call Apex method to handle historical sync
             await runHistoricalSync({ syncId: row.id });
             
             this.showToast('Success', `Historical sync initiated for ${row.sourceEntity} records. This may take some time to complete depending on data volume.`, 'success');
@@ -176,7 +166,6 @@ export default class IntegrationSyncList extends NavigationMixin(LightningElemen
         }
     }
 
-    // Modified to show sync config instead of navigating
     navigateToEdit(row) {
         this.syncConfigMode = 'edit';
         this.syncConfigRecordId = row.id;
@@ -237,7 +226,6 @@ export default class IntegrationSyncList extends NavigationMixin(LightningElemen
         }
     }
 
-    // Add handler for return from sync config
     handleSyncConfigReturn() {
         this.showSyncConfig = false;
         this.refreshData();

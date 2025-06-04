@@ -92,12 +92,10 @@ public with sharing class FieldMappingManager {
 
     private void deleteExistingMappings(Id syncId) {
         try {
-            // Check permission with the exact same pattern that's working for you
             if (!CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {
                 throw new AuraHandledException('Insufficient permissions to delete mapping records');
             }
             
-            // Query and delete - following the same structure
             List<CleverTap__Mapping__c> mappingsToDelete = [
                 SELECT Id FROM CleverTap__Mapping__c WHERE CleverTap__Sync_mapping__c = :syncId
             ];

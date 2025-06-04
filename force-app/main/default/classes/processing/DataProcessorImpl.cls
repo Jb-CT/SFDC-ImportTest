@@ -3,11 +3,9 @@
  * @description Implementation of DataProcessor for handling integration between Salesforce and CleverTap.
  */
 public with sharing class DataProcessorImpl implements DataProcessor { 
-    // API endpoints
     private static final String PROFILE_API_PATH = '/1/upload';
     private static final String EVENT_API_PATH = '/1/upload';
-    
-    // Instance variables for the helper classes
+
     private final EntityTransformer entityTransformer;
     private final Config configHelper;
     private final ResultLogger resultLogger;
@@ -46,7 +44,6 @@ public with sharing class DataProcessorImpl implements DataProcessor {
             List<ResultLogger.EventData> eventDataList = new List<ResultLogger.EventData>();
             
             for (EntityTransformer.ConnectionMapping mapping : connectionMappings) {
-                // Get credentials for this connection
                 Map<String, String> credentials = getCredentialsForConnection(mapping.connectionId);
                 if (!areCredentialsValid(credentials)) {
                     continue;
@@ -94,7 +91,7 @@ public with sharing class DataProcessorImpl implements DataProcessor {
      */
     private String getTargetEntityType(String recordType) {
         if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
-            return 'profile'; // Default to profile if no access
+            return 'profile'; 
         }
         
         List<CleverTap__Sync_Configuration__c> configs = [
@@ -106,7 +103,7 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         ];
         
         if (configs.isEmpty()) {
-            return 'profile'; // Default to profile if no configuration found
+            return 'profile'; 
         }
         
         return configs[0].CleverTap__Entity__c;
@@ -114,23 +111,19 @@ public with sharing class DataProcessorImpl implements DataProcessor {
 
     private Map<String, String> adjustApiEndpoint(Map<String, String> credentials, String targetEntityType) {
         Map<String, String> adjustedCredentials = new Map<String, String>(credentials);
-        
-        // Base URL without path
+
         String baseUrl = credentials.get('API_URL');
         if (String.isBlank(baseUrl)) {
             return adjustedCredentials;
         }
-        
-        // Remove existing path if any
+
         Integer pathStart = baseUrl.indexOf('/1/');
         if (pathStart > 0) {
             baseUrl = baseUrl.substring(0, pathStart);
         }
-        
-        // Add appropriate path based on entity type
+
         String apiPath = (targetEntityType.toLowerCase() == 'event') ? EVENT_API_PATH : PROFILE_API_PATH;
         
-        // Update the API URL
         adjustedCredentials.put('API_URL', baseUrl + apiPath);
         
         return adjustedCredentials;
@@ -181,7 +174,6 @@ public with sharing class DataProcessorImpl implements DataProcessor {
     }
 
     private Boolean hasSyncConfiguration(String recordType) {
-        // Validate CRUD permission before SOQL operation
         if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return false;
         }
@@ -208,14 +200,12 @@ public with sharing class DataProcessorImpl implements DataProcessor {
 
     private HttpResponse sendRequest(Map<String, String> credentials, Map<String, Object> mappedRecord) {
         String jsonBody = getRequestBody(mappedRecord);
-        
-        // Create and validate request
+
         ApiRequest request = new ApiRequest(credentials, jsonBody);
         if (request.hasMissingCredentials()) {
             return null;
         }
         
-        // Prepare and send HTTP request
         HttpRequest req = prepareHttpRequest(request);
         Http http = new Http();
         return http.send(req);
@@ -225,9 +215,8 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         HttpRequest req = new HttpRequest();
         req.setEndpoint(request.apiUrl);
         req.setMethod('POST');
-        req.setTimeout(120000); // Set timeout to 120 seconds
-        
-        // Set headers
+        req.setTimeout(120000); 
+
         for (String headerKey : request.headers.keySet()) {
             req.setHeader(headerKey, request.headers.get(headerKey));
         }
@@ -237,17 +226,14 @@ public with sharing class DataProcessorImpl implements DataProcessor {
     }
 
     private Map<String, String> getCredentialsForConnection(String connectionId) {
-        // Query the specific connection by ID or developer name
         if (String.isBlank(connectionId)) {
-            return configHelper.getCredentials(); // Fallback to default method
+            return configHelper.getCredentials(); 
         }
-        
-        // Check CRUD permissions
+
         if (!CleverTap__Config__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
             return null;
         }
-        
-        // Query the connection by ID
+
         List<CleverTap__Config__c> configs = [
             SELECT Name, CleverTap__API_URL__c, CleverTap__Account_ID__c, 
                 CleverTap__Region__c
@@ -261,8 +247,7 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         }
         
         CleverTap__Config__c config = configs[0];
-        
-        // Build credentials map
+
         Map<String, String> credentials = new Map<String, String>{
             'NAME' => config.Name,
             'DEV_NAME' => config.Name,

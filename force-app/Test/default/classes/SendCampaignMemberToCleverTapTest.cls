@@ -2,7 +2,6 @@
 private class SendCampaignMemberToCleverTapTest {
     @testSetup
     static void setupTestData() {
-        // Create test configuration
         CleverTap__Config__c testConfig = new CleverTap__Config__c(
             Name = 'Test Config',
             CleverTap__Region__c = 'US',
@@ -12,7 +11,6 @@ private class SendCampaignMemberToCleverTapTest {
         insert testConfig;
         PasscodeHelper.savePasscode(testConfig.Id, 'test-passcode');
         
-        // Create sync configuration for CampaignMember
         CleverTap__Sync_Configuration__c syncConfig = new CleverTap__Sync_Configuration__c(
             Name = 'Test CampaignMember Sync',
             CleverTap__Sync_Type__c = 'salesforce_to_clevertap',
@@ -23,7 +21,6 @@ private class SendCampaignMemberToCleverTapTest {
         );
         insert syncConfig;
 
-        // Create field mapping (Identity will be fetched from parent Contact/Lead)
         CleverTap__Mapping__c mapping = new CleverTap__Mapping__c(
             Name = 'Test Mapping',
             CleverTap__Sync_mapping__c = syncConfig.Id,
@@ -34,7 +31,6 @@ private class SendCampaignMemberToCleverTapTest {
         );
         insert mapping;
         
-        // Create test Campaign
         Campaign testCampaign = new Campaign(
             Name = 'Test Campaign',
             Status = 'Planned',
@@ -43,7 +39,6 @@ private class SendCampaignMemberToCleverTapTest {
         );
         insert testCampaign;
         
-        // Create test Contact
         Contact testContact = new Contact(
             FirstName = 'Test',
             LastName = 'Contact',
@@ -51,7 +46,6 @@ private class SendCampaignMemberToCleverTapTest {
         );
         insert testContact;
         
-        // Create test Lead
         Lead testLead = new Lead(
             FirstName = 'Test',
             LastName = 'Lead',
@@ -63,16 +57,13 @@ private class SendCampaignMemberToCleverTapTest {
 
     @isTest
     static void testInsertCampaignMemberWithContact() {
-        // Mock HTTP response
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
         TestUtils.bypassTriggers = false;
         
-        // Get test data
         Campaign testCampaign = [SELECT Id FROM Campaign LIMIT 1];
         Contact testContact = [SELECT Id FROM Contact LIMIT 1];
         
         Test.startTest();
-        // Create CampaignMember with Contact
         CampaignMember cm = new CampaignMember(
             CampaignId = testCampaign.Id,
             ContactId = testContact.Id,
@@ -86,16 +77,13 @@ private class SendCampaignMemberToCleverTapTest {
 
     @isTest
     static void testInsertCampaignMemberWithLead() {
-        // Mock HTTP response
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
         TestUtils.bypassTriggers = false;
         
-        // Get test data
         Campaign testCampaign = [SELECT Id FROM Campaign LIMIT 1];
         Lead testLead = [SELECT Id FROM Lead LIMIT 1];
         
         Test.startTest();
-        // Create CampaignMember with Lead
         CampaignMember cm = new CampaignMember(
             CampaignId = testCampaign.Id,
             LeadId = testLead.Id,
@@ -109,10 +97,8 @@ private class SendCampaignMemberToCleverTapTest {
 
     @isTest
     static void testUpdateCampaignMember() {
-        // Mock HTTP response
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseImpl());
-
-        // Create CampaignMember with bypass
+        
         TestUtils.bypassTriggers = true;
         Campaign testCampaign = [SELECT Id FROM Campaign LIMIT 1];
         Contact testContact = [SELECT Id FROM Contact LIMIT 1];
@@ -127,9 +113,7 @@ private class SendCampaignMemberToCleverTapTest {
         TestUtils.bypassTriggers = false;
         
         Test.startTest();
-        // Update CampaignMember
         cm.Status = 'Responded';
-        //cm.HasResponded = true;
         update cm;
         Test.stopTest();
 

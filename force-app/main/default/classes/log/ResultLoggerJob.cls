@@ -33,7 +33,6 @@ public with sharing class ResultLoggerJob implements Queueable {
             this.recordType = recordType;
             this.requestBody = requestBody;
             
-            // Extract only what we need from HttpResponse
             if (response != null) {
                 this.statusCode = response.getStatusCode();
                 this.responseBody = response.getBody();
@@ -44,13 +43,12 @@ public with sharing class ResultLoggerJob implements Queueable {
     public ResultLoggerJob(List<ResultLogger.EventData> originalEventDataList) {
         this.eventDataList = new List<EventDataWrapper>();
         
-        // Convert non-serializable EventData to serializable EventDataWrapper
         for (ResultLogger.EventData data : originalEventDataList) {
             HttpResponse response = data.response;
             EventDataWrapper wrapper = new EventDataWrapper(
                 data.recordId,
                 data.recordType,
-                response,  // Will be extracted, not stored directly
+                response,  
                 data.requestBody
             );
             this.eventDataList.add(wrapper);
@@ -73,7 +71,6 @@ public with sharing class ResultLoggerJob implements Queueable {
         List<CleverTap__Event__c> logsToInsert = new List<CleverTap__Event__c>();
         
         for (EventDataWrapper eventData : eventDataList) {
-            // Create and add the log record
             CleverTap__Event__c eventLog = createSingleLogRecord(eventData);
             logsToInsert.add(eventLog);
         }
@@ -82,16 +79,13 @@ public with sharing class ResultLoggerJob implements Queueable {
     }
 
     private CleverTap__Event__c createSingleLogRecord(EventDataWrapper eventData) {
-        // Determine success status
         Boolean isSuccess = determineSuccessStatus(eventData);
-        
-        // Create event log record
+
         CleverTap__Event__c eventLog = new CleverTap__Event__c(
             CleverTap__Status__c = isSuccess ? 'Success' : 'Failed',
             CleverTap__Response__c = formatResponseContent(eventData)
         );
-        
-        // Set the record reference
+
         setRecordReference(eventLog, eventData);
         
         return eventLog;
@@ -108,7 +102,7 @@ public with sharing class ResultLoggerJob implements Queueable {
                 return 'success'.equalsIgnoreCase((String)responseMap.get('status'));
             }
         } catch (Exception e) {
-            return true; // Default to HTTP status
+            return true; 
         }
         
         return true;
@@ -123,18 +117,15 @@ public with sharing class ResultLoggerJob implements Queueable {
 
     private void setRecordReference(CleverTap__Event__c eventLog, EventDataWrapper eventData) {
         String fieldName = eventData.recordType + '__c';
-        
-        // Check if field exists before setting it
+
         if (Schema.SObjectType.CleverTap__Event__c.fields.getMap().containsKey(fieldName.toLowerCase())) {
             eventLog.put(fieldName, eventData.recordId);
         } else {
-            // Fallback - store record ID in description
             eventLog.CleverTap__Response__c = eventData.recordType + ' ID: ' + eventData.recordId + '\n' + eventLog.CleverTap__Response__c;
         }
     }
 
     private void insertLogs(List<CleverTap__Event__c> logsToInsert) {
-        // Verify field-level security and insert
         if (Schema.SObjectType.CleverTap__Event__c.isCreateable()) {
             insert logsToInsert;
         }

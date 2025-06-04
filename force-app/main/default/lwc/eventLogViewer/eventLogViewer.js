@@ -50,21 +50,17 @@ export default class EventLogViewer extends NavigationMixin(LightningElement) {
             }
         }
     ];
-    
-    // Event Details Modal properties
+
     @track showEventDetailsModal = false;
     @track selectedEvent = {};
     @track selectedEventId;
     
-    // Computed property for formatted response
     get formattedResponse() {
         if (this.selectedEvent && this.selectedEvent.CleverTap__Response__c) {
             try {
-                // Try to parse and format as JSON
                 const responseObj = JSON.parse(this.selectedEvent.CleverTap__Response__c);
                 return JSON.stringify(responseObj, null, 2);
             } catch (e) {
-                // If not valid JSON, return as is
                 return this.selectedEvent.CleverTap__Response__c;
             }
         }
@@ -78,12 +74,10 @@ export default class EventLogViewer extends NavigationMixin(LightningElement) {
         return '';
     }
     
-    // Computed properties for UI states
     get noRecordsFound() {
         return !this.isLoading && (!this.eventLogs || this.eventLogs.length === 0);
     }
     
-    // Filter options
     get statusOptions() {
         return [
             { label: 'All Statuses', value: '' },
@@ -111,7 +105,6 @@ export default class EventLogViewer extends NavigationMixin(LightningElement) {
         ];
     }
     
-    // Wire method to get event logs
     @wire(getEventLogs, { 
         recordLimit: '$recordLimit', 
         status: '$statusFilter', 
@@ -127,11 +120,9 @@ export default class EventLogViewer extends NavigationMixin(LightningElement) {
             this.handleError(error);
         }
     }
-    
-    // Process the log data
+
     processLogData(data) {
         this.eventLogs = data.map(log => {
-            // Determine status class
             const statusClass = log.CleverTap__Status__c === 'Success' ? 'slds-text-color_success' : 'slds-text-color_error';
             
             return {
@@ -141,7 +132,6 @@ export default class EventLogViewer extends NavigationMixin(LightningElement) {
         });
     }
     
-    // Handler methods
     handleStatusFilterChange(event) {
         this.statusFilter = event.detail.value;
     }
@@ -176,7 +166,6 @@ export default class EventLogViewer extends NavigationMixin(LightningElement) {
         }
     }
     
-    // View event details
     async viewEventDetails(eventId) {
         this.isLoading = true;
         this.selectedEventId = eventId;
@@ -198,7 +187,6 @@ export default class EventLogViewer extends NavigationMixin(LightningElement) {
         this.selectedEventId = null;
     }
     
-    // Error handling
     handleError(error) {
         console.error('Error:', error);
         let message = 'An error occurred while fetching data';
@@ -210,7 +198,6 @@ export default class EventLogViewer extends NavigationMixin(LightningElement) {
         this.showToast('Error', message, 'error');
     }
     
-    // Toast notification
     showToast(title, message, variant) {
         const toast = new ShowToastEvent({
             title,

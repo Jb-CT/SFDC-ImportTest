@@ -21,7 +21,7 @@ export default class IntegrationSyncConfig extends LightningElement {
         syncType: '',
         sourceEntity: '',
         targetEntity: '',
-        status: 'Active', // default status for new configurations
+        status: 'Active', 
         connectionId: ''
     };
     
@@ -40,7 +40,6 @@ export default class IntegrationSyncConfig extends LightningElement {
     }
 
     connectedCallback() {
-        // Set the connection ID from the API property
         if (this.connectionId) {
             this.syncData.connectionId = this.connectionId;
         }
@@ -68,10 +67,9 @@ export default class IntegrationSyncConfig extends LightningElement {
                     sourceEntity: result.sourceEntity || '',
                     targetEntity: result.targetEntity || '',
                     status: result.status || 'Inactive',
-                    connectionId: this.syncData.connectionId // Preserve connection ID
+                    connectionId: this.syncData.connectionId
                 };
                 
-                // Force a re-render
                 this.template.querySelectorAll('lightning-input, lightning-combobox').forEach(element => {
                     if (element.name && this.syncData[element.name] !== undefined) {
                         setTimeout(() => {
@@ -135,43 +133,34 @@ export default class IntegrationSyncConfig extends LightningElement {
         this.syncData.targetEntity = event.target.value;
     }
 
-    // Modified to dispatch cancel event instead of navigating
     handleCancel() {
         this.dispatchEvent(new CustomEvent('cancel'));
     }
 
     async handleBack() {
-        // If this is a new configuration (not edit mode), delete it when going back
         if (this.mode === 'new' && this.syncId) {
             try {
                 this.isLoading = true;
                 
-                // Delete the configuration
                 await deleteSyncConfiguration({ syncId: this.syncId });
                 
-                // Clear the ID since it's deleted
                 this.syncId = null;
                 this.recordId = null;
                 
             } catch (error) {
                 console.error('Error deleting sync configuration:', error);
-                // Continue even if delete fails - user is trying to go back anyway
             } finally {
                 this.isLoading = false;
             }
         }
         
-        // Dispatch cancel event to return to parent view
         this.dispatchEvent(new CustomEvent('cancel'));
     }
 
     validateDuplicateSourceEntity() {
-        // Skip validation if we're in edit mode
         if (this.mode === 'edit') {
             return true;
         }
-
-        // Check if the selected source entity already exists for this connection
         const duplicate = this.existingSyncConfigs.find(config => 
             config.sourceEntity === this.syncData.sourceEntity &&
             config.status === 'Active'
@@ -194,7 +183,6 @@ export default class IntegrationSyncConfig extends LightningElement {
             try {
                 this.isLoading = true;
                 
-                // Ensure status is set for new configurations
                 if (this.mode === 'new') {
                     this.syncData.status = 'Active';
                 }
@@ -255,34 +243,28 @@ export default class IntegrationSyncConfig extends LightningElement {
         return isValid;
     }
     
-    // Modified to dispatch save event instead of navigating
     handleMappingSave() {
         this.showToast('Success', 'Field mappings saved successfully', 'success');
         this.dispatchEvent(new CustomEvent('save'));
     }
 
     async handleMappingCancel() {
-        // If this is a new configuration (not edit mode), delete it when canceling
         if (this.mode === 'new' && this.syncId) {
             try {
                 this.isLoading = true;
                 
-                // Delete the configuration
                 await deleteSyncConfiguration({ syncId: this.syncId });
                 
-                // Clear the ID since it's deleted
                 this.syncId = null;
                 this.recordId = null;
                 
             } catch (error) {
                 console.error('Error deleting sync configuration:', error);
-                // Continue even if delete fails - user is trying to cancel anyway
             } finally {
                 this.isLoading = false;
             }
         }
-        
-        // Return to basic config screen
+
         this.showBasicConfig = true;
         this.showFieldMapping = false;
     }
