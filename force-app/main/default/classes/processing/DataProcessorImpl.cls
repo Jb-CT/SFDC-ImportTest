@@ -169,6 +169,34 @@ public with sharing class DataProcessorImpl implements DataProcessor {
         sendToCleverTap(serviceAppointment, 'ServiceAppointment');
     }
 
+    public void sendQuoteToCleverTap(Quote quote) {
+        sendToCleverTap(quote, 'Quote');
+    }
+
+    public void sendContractToCleverTap(Contract contract) {
+        sendToCleverTap(contract, 'Contract');
+    }
+
+    public void sendOrderToCleverTap(Order orderRecord) {
+        sendToCleverTap(orderRecord, 'Order');
+    }
+
+    public void sendProductToCleverTap(Product2 product) {
+        sendToCleverTap(product, 'Product2');
+    }
+
+    public void sendPricebookToCleverTap(Pricebook2 pricebook) {
+        sendToCleverTap(pricebook, 'Pricebook2');
+    }
+
+    public void sendAssetToCleverTap(Asset asset) {
+        sendToCleverTap(asset, 'Asset');
+    }
+
+    public void sendOpportunityLineItemToCleverTap(OpportunityLineItem lineItem) {
+        sendToCleverTap(lineItem, 'OpportunityLineItem');
+    }
+
     private Boolean isConfigurationAccessible() {
         return CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible();
     }

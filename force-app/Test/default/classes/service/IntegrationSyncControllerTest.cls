@@ -189,17 +189,13 @@ private class IntegrationSyncControllerTest {
         }
         Test.stopTest();
     }
-    
-    /**
-     * @description Test getExistingMappings method
-     */
+
     @isTest
     static void testGetExistingMappings() {
         CleverTap__Sync_Configuration__c config = [
             SELECT Id FROM CleverTap__Sync_Configuration__c LIMIT 1
         ];
         
-        Test.startTest();
         Test.startTest();
         List<CleverTap__Mapping__c> mappings = 
             IntegrationSyncController.getExistingMappings(config.Id);

@@ -15,6 +15,13 @@ public class MockCleverTapService implements DataProcessor {
     public Integer campaignMemberCallCount = 0;
     public Integer serviceAppointmentCallCount = 0;
     public Integer genericCallCount = 0;
+    public Integer quoteCallCount = 0;
+    public Integer contractCallCount = 0;
+    public Integer orderCallCount = 0;
+    public Integer productCallCount = 0;
+    public Integer pricebookCallCount = 0;
+    public Integer assetCallCount = 0;
+    public Integer opportunityLineItemCallCount = 0;
 
     public List<SObject> processedRecords = new List<SObject>();
     
@@ -35,6 +42,20 @@ public class MockCleverTapService implements DataProcessor {
             accountCallCount++;
         } else if (recordType == 'Opportunity') {
             opportunityCallCount++;
+        } else if (recordType == 'Quote') {
+            quoteCallCount++;
+        } else if (recordType == 'Contract') {
+            contractCallCount++;
+        } else if (recordType == 'Order') {
+            orderCallCount++;
+        } else if (recordType == 'Product2') {
+            productCallCount++;
+        } else if (recordType == 'Pricebook2') {
+            pricebookCallCount++;
+        } else if (recordType == 'Asset') {
+            assetCallCount++;
+        } else if (recordType == 'OpportunityLineItem') {
+            opportunityLineItemCallCount++;
         }
     }
 
@@ -86,6 +107,41 @@ public class MockCleverTapService implements DataProcessor {
     public void sendServiceAppointmentToCleverTap(ServiceAppointment serviceAppointment) {
         serviceAppointmentCallCount++;
         processedRecords.add(serviceAppointment);
+    }
+
+    public void sendQuoteToCleverTap(Quote quote) {
+        quoteCallCount++;
+        processedRecords.add(quote);
+    }
+
+    public void sendContractToCleverTap(Contract contract) {
+        contractCallCount++;
+        processedRecords.add(contract);
+    }
+
+    public void sendOrderToCleverTap(Order orderRecord) {
+        orderCallCount++;
+        processedRecords.add(orderRecord);
+    }
+
+    public void sendProductToCleverTap(Product2 product) {
+        productCallCount++;
+        processedRecords.add(product);
+    }
+
+    public void sendPricebookToCleverTap(Pricebook2 pricebook) {
+        pricebookCallCount++;
+        processedRecords.add(pricebook);
+    }
+
+    public void sendAssetToCleverTap(Asset asset) {
+        assetCallCount++;
+        processedRecords.add(asset);
+    }
+
+    public void sendOpportunityLineItemToCleverTap(OpportunityLineItem lineItem) {
+        opportunityLineItemCallCount++;
+        processedRecords.add(lineItem);
     }
 
     public void resetCounters() {

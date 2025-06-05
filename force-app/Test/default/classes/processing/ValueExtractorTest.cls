@@ -109,7 +109,6 @@ private class ValueExtractorTest {
         System.assertEquals(smallNumber, result, 'Small number should be preserved');
         
         Date futureDate = Date.newInstance(2100, 12, 31);
-        Date futureDate = Date.newInstance(2100, 12, 31);
         result = valueExtractor.convertFieldValue(futureDate, 'Date');
         String resultStr = (String)result;
         System.assert(resultStr.startsWith('$D_'), 'Future date should be converted to $D_ format');

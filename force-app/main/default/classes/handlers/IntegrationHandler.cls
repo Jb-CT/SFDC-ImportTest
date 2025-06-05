@@ -56,4 +56,32 @@ public with sharing class IntegrationHandler {
     public void processServiceAppointments(List<ServiceAppointment> serviceAppointments) {
         processRecords(serviceAppointments);
     }
+
+    public void processQuotes(List<Quote> quotes) {
+        processRecords(quotes);
+    }
+
+    public void processContracts(List<Contract> contracts) {
+        processRecords(contracts);
+    }
+
+    public void processOrders(List<Order> orders) {
+        processRecords(orders);
+    }
+
+    public void processProducts(List<Product2> products) {
+        processRecords(products);
+    }
+
+    public void processPricebooks(List<Pricebook2> pricebooks) {
+        processRecords(pricebooks);
+    }
+
+    public void processAssets(List<Asset> assets) {
+        processRecords(assets);
+    }
+
+    public void processOpportunityLineItems(List<OpportunityLineItem> lineItems) {
+        processRecords(lineItems);
+    }
 }

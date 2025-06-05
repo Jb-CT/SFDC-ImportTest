@@ -60,6 +60,41 @@
                 <default>false</default>
                 <label>Service Appointment</label>
             </value>
+            <value>
+                <fullName>Quote</fullName>
+                <default>false</default>
+                <label>Quote</label>
+            </value>
+            <value>
+                <fullName>Contract</fullName>
+                <default>false</default>
+                <label>Contract</label>
+            </value>
+            <value>
+                <fullName>Order</fullName>
+                <default>false</default>
+                <label>Order</label>
+            </value>
+            <value>
+                <fullName>Product2</fullName>
+                <default>false</default>
+                <label>Product</label>
+            </value>
+            <value>
+                <fullName>Pricebook2</fullName>
+                <default>false</default>
+                <label>Price Book</label>
+            </value>
+            <value>
+                <fullName>Asset</fullName>
+                <default>false</default>
+                <label>Asset</label>
+            </value>
+            <value>
+                <fullName>OpportunityLineItem</fullName>
+                <default>false</default>
+                <label>Opportunity Product</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

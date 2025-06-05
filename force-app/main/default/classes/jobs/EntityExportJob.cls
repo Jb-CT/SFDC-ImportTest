@@ -77,6 +77,27 @@ public class EntityExportJob implements Queueable, Database.AllowsCallouts {
             when 'ServiceAppointment' {
                 service.sendServiceAppointmentToCleverTap((ServiceAppointment)record);
             }
+            when 'Quote' {
+                service.sendQuoteToCleverTap((Quote)record);
+            }
+            when 'Contract' {
+                service.sendContractToCleverTap((Contract)record);
+            }
+            when 'Order' {
+                service.sendOrderToCleverTap((Order)record);
+            }
+            when 'Product2' {
+                service.sendProductToCleverTap((Product2)record);
+            }
+            when 'Pricebook2' {
+                service.sendPricebookToCleverTap((Pricebook2)record);
+            }
+            when 'Asset' {
+                service.sendAssetToCleverTap((Asset)record);
+            }
+            when 'OpportunityLineItem' {
+                service.sendOpportunityLineItemToCleverTap((OpportunityLineItem)record);
+            }
         }
         
         // Only enqueue the next batch if chaining is not disabled
