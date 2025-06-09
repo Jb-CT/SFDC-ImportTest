@@ -38,11 +38,14 @@ public with sharing class SyncConfigurationManager {
                        CleverTap__Status__c, CleverTap__ConnectionId__c
                 FROM CleverTap__Sync_Configuration__c
                 WHERE CleverTap__ConnectionId__c = :connectionId
+                WITH SECURITY_ENFORCED
                 ORDER BY CreatedDate DESC
             ];
             
             return wrapConfigurations(configs);
             
+        } catch (System.QueryException e) {
+            throw new AuraHandledException('Insufficient permissions to access the requested fields: ' + e.getMessage());
         } catch (Exception e) {
             throw new AuraHandledException('Error fetching sync configurations: ' + e.getMessage());
         }
@@ -73,10 +76,13 @@ public with sharing class SyncConfigurationManager {
                        CleverTap__Status__c
                 FROM CleverTap__Sync_Configuration__c
                 WHERE Id = :syncId
+                WITH SECURITY_ENFORCED
                 LIMIT 1
             ];
             
             return new SyncConfigWrapper(config);
+        } catch (System.QueryException e) {
+            throw new AuraHandledException('Insufficient permissions to access the requested fields: ' + e.getMessage());
         } catch (Exception e) {
             throw new AuraHandledException('Error fetching sync configuration: ' + e.getMessage());
         }
@@ -99,9 +105,11 @@ public with sharing class SyncConfigurationManager {
                 CleverTap__Status__c = 'Active'
             );
             
-            insert syncConfig;
+            Database.insert(syncConfig, AccessLevel.USER_MODE);
             return syncConfig.Id;
             
+        } catch (System.NoAccessException e) {
+            throw new AuraHandledException('Access denied: ' + e.getMessage());
         } catch (Exception e) {
             throw new AuraHandledException('Error creating sync configuration: ' + e.getMessage());
         }
@@ -112,11 +120,12 @@ public with sharing class SyncConfigurationManager {
             if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
                 throw new AuraHandledException('You do not have permission to update configurations');
             }
+
             if (!Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.Name.isUpdateable() ||
-            !Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.CleverTap__Sync_Type__c.isUpdateable() ||
-            !Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.CleverTap__Salesforce_Entity__c.isUpdateable() ||
-            !Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.CleverTap__Entity__c.isUpdateable()) {
-            throw new AuraHandledException('You do not have permission to update some fields');
+                !Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.CleverTap__Sync_Type__c.isUpdateable() ||
+                !Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.CleverTap__Salesforce_Entity__c.isUpdateable() ||
+                !Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.CleverTap__Entity__c.isUpdateable()) {
+                throw new AuraHandledException('You do not have permission to update some fields');
             }
             
             Map<String, Object> syncMap = (Map<String, Object>) JSON.deserializeUntyped(syncData);
@@ -132,9 +141,11 @@ public with sharing class SyncConfigurationManager {
             syncConfig.CleverTap__Salesforce_Entity__c = (String) syncMap.get('sourceEntity');
             syncConfig.CleverTap__Entity__c = (String) syncMap.get('targetEntity');
             
-            update syncConfig;
+            Database.update(syncConfig, AccessLevel.USER_MODE);
             
             return getSyncConfigurationById(syncId);
+        } catch (System.NoAccessException e) {
+            throw new AuraHandledException('Access denied: ' + e.getMessage());
         } catch (Exception e) {
             throw new AuraHandledException('Error updating sync configuration: ' + e.getMessage());
         }
@@ -145,15 +156,26 @@ public with sharing class SyncConfigurationManager {
             if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable()) {
                 throw new AuraHandledException('You do not have permission to update configurations');
             }
+            
             if (!Schema.SObjectType.CleverTap__Sync_Configuration__c.fields.CleverTap__Status__c.isUpdateable()) {
                 throw new AuraHandledException('You do not have permission to update the Status field');
             }
             
             CleverTap__Sync_Configuration__c config = [
-                SELECT Id, CleverTap__Status__c FROM CleverTap__Sync_Configuration__c WHERE Id = :syncId LIMIT 1
+                SELECT Id, CleverTap__Status__c 
+                FROM CleverTap__Sync_Configuration__c 
+                WHERE Id = :syncId 
+                WITH SECURITY_ENFORCED
+                LIMIT 1
             ];
             config.CleverTap__Status__c = status;
-            update config;
+            
+            Database.update(config, AccessLevel.USER_MODE);
+            
+        } catch (System.QueryException e) {
+            throw new AuraHandledException('Insufficient permissions to access the requested fields: ' + e.getMessage());
+        } catch (System.NoAccessException e) {
+            throw new AuraHandledException('Access denied: ' + e.getMessage());
         } catch (Exception e) {
             throw new AuraHandledException('Error updating sync status: ' + e.getMessage());
         }
@@ -166,9 +188,19 @@ public with sharing class SyncConfigurationManager {
             }
             
             CleverTap__Sync_Configuration__c config = [
-                SELECT Id FROM CleverTap__Sync_Configuration__c WHERE Id = :syncId LIMIT 1
+                SELECT Id 
+                FROM CleverTap__Sync_Configuration__c 
+                WHERE Id = :syncId 
+                WITH SECURITY_ENFORCED
+                LIMIT 1
             ];
-            delete config;
+            
+            Database.delete(config, AccessLevel.USER_MODE);
+            
+        } catch (System.QueryException e) {
+            throw new AuraHandledException('Insufficient permissions to access configuration: ' + e.getMessage());
+        } catch (System.NoAccessException e) {
+            throw new AuraHandledException('Access denied: ' + e.getMessage());
         } catch (Exception e) {
             throw new AuraHandledException('Error deleting sync configuration: ' + e.getMessage());
         }

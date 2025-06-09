@@ -25,7 +25,7 @@ public with sharing class EventLogController {
         }
         
         List<String> queryParts = new List<String>{
-            'SELECT Id, Name, CleverTap__Status__c, CleverTap__Response__c, CreatedDate',
+            'SELECT Id, Name, CleverTap__Status__c, CreatedDate',
             'FROM CleverTap__Event__c'
         };
         
@@ -44,6 +44,7 @@ public with sharing class EventLogController {
             queryParts.add('WHERE ' + String.join(whereConditions, ' AND '));
         }
 
+        queryParts.add('WITH SECURITY_ENFORCED');
         queryParts.add('ORDER BY CreatedDate DESC');
         queryParts.add('LIMIT :recordLimit');
 

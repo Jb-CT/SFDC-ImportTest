@@ -9,7 +9,6 @@ public with sharing class EntityTransformer {
      */
     public class ConnectionMapping {
         public String connectionId { get; set; }
-
         public Map<String, Object> payload { get; set; }
     }
     
@@ -117,29 +116,43 @@ public with sharing class EntityTransformer {
     }
 
     private List<CleverTap__Sync_Configuration__c> getAllSyncConfigurations(String recordType) {
-        if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+        // Enhanced security check with field-level access
+        if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() ||
+            !CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().get('clevertap__salesforce_entity__c').getDescribe().isAccessible() ||
+            !CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().get('clevertap__status__c').getDescribe().isAccessible()) {
             return new List<CleverTap__Sync_Configuration__c>();
         }
         
-        return [
-            SELECT Id, CleverTap__Entity__c, CleverTap__ConnectionId__c
-            FROM CleverTap__Sync_Configuration__c
-            WHERE CleverTap__Salesforce_Entity__c = :recordType
-            AND CleverTap__Status__c = 'Active'
-        ];
+        try {
+            return [
+                SELECT Id, CleverTap__Entity__c, CleverTap__ConnectionId__c
+                FROM CleverTap__Sync_Configuration__c
+                WHERE CleverTap__Salesforce_Entity__c = :recordType
+                AND CleverTap__Status__c = 'Active'
+                WITH SECURITY_ENFORCED
+            ];
+        } catch (System.NoAccessException e) {
+            return new List<CleverTap__Sync_Configuration__c>();
+        }
     }
 
     private List<CleverTap__Mapping__c> getFieldMappingsForConfig(Id configId) {
-        if (!CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
+        if (!CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() ||
+            !CleverTap__Mapping__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().get('clevertap__sync_mapping__c').getDescribe().isAccessible()) {
             return new List<CleverTap__Mapping__c>();
         }
         
-        return [
-            SELECT Id, CleverTap__Field__c, CleverTap__Salesforce_Field__c, 
-                   CleverTap__Data_Type__c, CleverTap__Is_Mandatory__c
-            FROM CleverTap__Mapping__c
-            WHERE CleverTap__Sync_mapping__c = :configId
-        ];
+        try {
+            return [
+                SELECT Id, CleverTap__Field__c, CleverTap__Salesforce_Field__c, 
+                       CleverTap__Data_Type__c, CleverTap__Is_Mandatory__c
+                FROM CleverTap__Mapping__c
+                WHERE CleverTap__Sync_mapping__c = :configId
+                WITH SECURITY_ENFORCED
+            ];
+        } catch (System.NoAccessException e) {
+            return new List<CleverTap__Mapping__c>();
+        }
     }
 
     private List<CleverTap__Mapping__c> getFieldMappings(String recordType) {
@@ -148,16 +161,21 @@ public with sharing class EntityTransformer {
             return new List<CleverTap__Mapping__c>();
         }
         
-        return [
-            SELECT Id, CleverTap__Field__c, CleverTap__Salesforce_Field__c, 
-                   CleverTap__Data_Type__c, CleverTap__Is_Mandatory__c
-            FROM CleverTap__Mapping__c
-            WHERE CleverTap__Sync_mapping__c IN (
-                SELECT Id FROM CleverTap__Sync_Configuration__c 
-                WHERE CleverTap__Salesforce_Entity__c = :recordType 
-                AND CleverTap__Status__c = 'Active'
-            )
-        ];
+        try {
+            return [
+                SELECT Id, CleverTap__Field__c, CleverTap__Salesforce_Field__c, 
+                       CleverTap__Data_Type__c, CleverTap__Is_Mandatory__c
+                FROM CleverTap__Mapping__c
+                WHERE CleverTap__Sync_mapping__c IN (
+                    SELECT Id FROM CleverTap__Sync_Configuration__c 
+                    WHERE CleverTap__Salesforce_Entity__c = :recordType 
+                    AND CleverTap__Status__c = 'Active'
+                )
+                WITH SECURITY_ENFORCED
+            ];
+        } catch (System.NoAccessException e) {
+            return new List<CleverTap__Mapping__c>();
+        }
     }
 
     private CleverTap__Sync_Configuration__c getSyncConfiguration(String recordType) {
@@ -165,15 +183,20 @@ public with sharing class EntityTransformer {
             return null;
         }
         
-        List<CleverTap__Sync_Configuration__c> configs = [
-            SELECT Id, CleverTap__Entity__c
-            FROM CleverTap__Sync_Configuration__c
-            WHERE CleverTap__Salesforce_Entity__c = :recordType
-            AND CleverTap__Status__c = 'Active'
-            LIMIT 1
-        ];
-        
-        return configs.isEmpty() ? null : configs[0];
+        try {
+            List<CleverTap__Sync_Configuration__c> configs = [
+                SELECT Id, CleverTap__Entity__c
+                FROM CleverTap__Sync_Configuration__c
+                WHERE CleverTap__Salesforce_Entity__c = :recordType
+                AND CleverTap__Status__c = 'Active'
+                WITH SECURITY_ENFORCED
+                LIMIT 1
+            ];
+            
+            return configs.isEmpty() ? null : configs[0];
+        } catch (System.NoAccessException e) {
+            return null;
+        }
     }
 
     private CleverTap__Mapping__c findIdentityMapping(List<CleverTap__Mapping__c> fieldMappings) {

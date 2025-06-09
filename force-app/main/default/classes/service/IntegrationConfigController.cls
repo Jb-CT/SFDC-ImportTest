@@ -7,8 +7,7 @@ public with sharing class IntegrationConfigController {
         'UAE' => 'https://mec1.api.clevertap.com/1/upload',
         'ID' => 'https://aps3.api.clevertap.com/1/upload'
     };
-    
-    // Singleton instance for credential validator
+
     private static CredentialValidator credentialValidator {
         get {
             if(credentialValidator == null) {
@@ -29,31 +28,28 @@ public with sharing class IntegrationConfigController {
     }
 
     private static List<CleverTap__Config__c> getConfigurationsWithSecurity() {
-        // Security check for object-level accessibility
         if (!Schema.sObjectType.CleverTap__Config__c.isAccessible()) {
             throw new AuraHandledException('You do not have access to CleverTap configurations');
         }
         
-        // Check field-level security for each field we're querying
         Map<String, Schema.SObjectField> fieldMap = Schema.SObjectType.CleverTap__Config__c.fields.getMap();
         List<String> fieldsToCheck = new List<String>{
             'Id', 'Name', 'CleverTap__Account_ID__c', 
             'CleverTap__Region__c', 'CleverTap__API_URL__c'
         };
         
-        // Validate each field's accessibility
         for (String field : fieldsToCheck) {
             if (!fieldMap.get(field.toLowerCase()).getDescribe().isAccessible()) {
                 throw new AuraHandledException('You do not have access to the ' + field + ' field');
             }
         }
         
-        // Only after both object and field level security checks pass, we perform the SOQL query
         return [
             SELECT Id, Name, CleverTap__Account_ID__c, 
                    CleverTap__Region__c, CleverTap__API_URL__c
             FROM CleverTap__Config__c
             WHERE Name != '[Deleted]%'
+            WITH SECURITY_ENFORCED
             ORDER BY Name
         ];
     }
