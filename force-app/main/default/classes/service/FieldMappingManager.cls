@@ -20,6 +20,7 @@ public with sharing class FieldMappingManager {
                    CleverTap__Data_Type__c, CleverTap__Is_Mandatory__c
             FROM CleverTap__Mapping__c
             WHERE CleverTap__Sync_mapping__c = :syncId
+            WITH SECURITY_ENFORCED
         ];
     }
 
@@ -98,6 +99,7 @@ public with sharing class FieldMappingManager {
             
             List<CleverTap__Mapping__c> mappingsToDelete = [
                 SELECT Id FROM CleverTap__Mapping__c WHERE CleverTap__Sync_mapping__c = :syncId
+                WITH SECURITY_ENFORCED
             ];
             
             if (!mappingsToDelete.isEmpty()) {

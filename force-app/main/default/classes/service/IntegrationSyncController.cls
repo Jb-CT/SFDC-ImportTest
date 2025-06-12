@@ -34,6 +34,24 @@ public with sharing class IntegrationSyncController {
         set;
     }
 
+    /**
+     * @description Validates that the current user has CleverTap integration access
+     * @throws AuraHandledException if user lacks required permissions
+     */
+    private static void validateCleverTapAccess() {
+        List<PermissionSetAssignment> assignments = [
+            SELECT Id 
+            FROM PermissionSetAssignment 
+            WHERE AssigneeId = :UserInfo.getUserId() 
+            AND PermissionSet.Name = 'CleverTapIntegrationAccess' 
+            LIMIT 1
+        ];
+        
+        if (assignments.isEmpty()) {
+            throw new AuraHandledException('You do not have permission to perform CleverTap integration operations.');
+        }
+    }
+
     @AuraEnabled(cacheable=true)
     public static List<SyncConfigurationManager.SyncConfigWrapper> getSyncConfigurations(String connectionId) {
         return syncConfigManager.getSyncConfigurations(connectionId);
@@ -46,11 +64,13 @@ public with sharing class IntegrationSyncController {
 
     @AuraEnabled
     public static void saveFieldMappings(String mappingData) {
+        validateCleverTapAccess();
         fieldMappingManager.saveFieldMappings(mappingData);
     }
 
     @AuraEnabled
     public static void deleteSyncConfiguration(String syncId) {
+        validateCleverTapAccess();
         syncConfigManager.deleteSyncConfiguration(syncId);
     }
 
@@ -61,11 +81,13 @@ public with sharing class IntegrationSyncController {
 
     @AuraEnabled
     public static void updateSyncStatus(String syncId, String status) {
+        validateCleverTapAccess();
         syncConfigManager.updateSyncStatus(syncId, status);
     }
 
     @AuraEnabled
     public static String createSyncConfiguration(String syncData) {
+        validateCleverTapAccess();
         return syncConfigManager.createSyncConfiguration(syncData);
     }
 
@@ -81,11 +103,13 @@ public with sharing class IntegrationSyncController {
 
     @AuraEnabled
     public static SyncConfigurationManager.SyncConfigWrapper updateSyncConfiguration(String syncId, String syncData) {
+        validateCleverTapAccess();
         return syncConfigManager.updateSyncConfiguration(syncId, syncData);
     }
 
     @AuraEnabled
     public static String runHistoricalSync(String syncId) {
+        validateCleverTapAccess();
         try {
             SyncConfigurationManager.SyncConfigWrapper config = getSyncConfigurationById(syncId);
             

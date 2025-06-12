@@ -3,11 +3,51 @@
     <description>Provides access to CleverTap tabs and objects</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>CleverTap Access</label>
+    
+    <!-- CleverTap__Event__c Field Permissions -->
     <fieldPermissions>
         <editable>false</editable>
         <field>CleverTap__Event__c.CleverTap__Response__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <!-- Note: CleverTap__Status__c is a required field and doesn't need explicit permissions -->
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CleverTap__Event__c.CleverTap__Contact__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CleverTap__Event__c.CleverTap__Lead__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    
+    <!-- CleverTap__Sync_Configuration__c Field Permissions -->
+    <!-- Note: All fields except ConnectionId are required fields -->
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CleverTap__Sync_Configuration__c.CleverTap__ConnectionId__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    
+    <!-- CleverTap__Mapping__c Field Permissions -->
+    <!-- Note: All fields are either required or master-detail except Is_Mandatory__c -->
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CleverTap__Mapping__c.CleverTap__Is_Mandatory__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    
+    <!-- Object Permissions -->
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>CleverTap__Config__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
     <objectPermissions>
         <allowCreate>true</allowCreate>
         <allowDelete>true</allowDelete>
@@ -17,6 +57,26 @@
         <object>CleverTap__Event__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>CleverTap__Sync_Configuration__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>CleverTap__Mapping__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    
+    <!-- Tab Settings -->
     <tabSettings>
         <tab>CleverTap_Settings</tab>
         <visibility>Visible</visibility>

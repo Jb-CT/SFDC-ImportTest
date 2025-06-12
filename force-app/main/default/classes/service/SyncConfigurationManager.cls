@@ -105,13 +105,13 @@ public with sharing class SyncConfigurationManager {
                 CleverTap__Status__c = 'Active'
             );
             
-            Database.insert(syncConfig, AccessLevel.USER_MODE);
+            Database.insert(syncConfig, System.AccessLevel.SYSTEM_MODE);
             return syncConfig.Id;
             
         } catch (System.NoAccessException e) {
             throw new AuraHandledException('Access denied: ' + e.getMessage());
         } catch (Exception e) {
-            throw new AuraHandledException('Error creating sync configuration: ' + e.getMessage());
+            throw new AuraHandledException('Error creating sync configuration');
         }
     }
 

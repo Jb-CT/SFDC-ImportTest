@@ -65,6 +65,7 @@ public with sharing class EventLogController {
                 SELECT Id, Name, CleverTap__Status__c, CleverTap__Response__c, CreatedDate
                 FROM CleverTap__Event__c
                 WHERE Id = :recordId
+                WITH SECURITY_ENFORCED
                 LIMIT 1
             ];
             

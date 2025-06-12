@@ -63,9 +63,6 @@ public with sharing class DataProcessorImpl implements DataProcessor {
             if (!eventDataList.isEmpty()) {
                 if (!Test.isRunningTest()) {
                     System.enqueueJob(new ResultLoggerJob(eventDataList));
-                } else {
-                    ResultLogger directLogger = new ResultLogger();
-                    directLogger.logEventBatch(eventDataList);
                 }
             }
         } catch (Exception e) {
@@ -75,9 +72,6 @@ public with sharing class DataProcessorImpl implements DataProcessor {
             
             if (!Test.isRunningTest()) {
                 System.enqueueJob(new ResultLoggerJob(errorData));
-            } else {
-                ResultLogger directLogger = new ResultLogger();
-                directLogger.logEventBatch(errorData); 
             }
         } finally {
             isProcessing = false;
@@ -99,6 +93,7 @@ public with sharing class DataProcessorImpl implements DataProcessor {
             FROM CleverTap__Sync_Configuration__c 
             WHERE CleverTap__Salesforce_Entity__c = :recordType 
             AND CleverTap__Status__c = 'Active'
+            WITH SECURITY_ENFORCED
             LIMIT 1
         ];
         
@@ -210,6 +205,7 @@ public with sharing class DataProcessorImpl implements DataProcessor {
             SELECT Id FROM CleverTap__Sync_Configuration__c 
             WHERE CleverTap__Salesforce_Entity__c = :recordType 
             AND CleverTap__Status__c = 'Active' 
+            WITH SECURITY_ENFORCED
             LIMIT 1
         ];
         return !syncConfigs.isEmpty();
@@ -267,6 +263,7 @@ public with sharing class DataProcessorImpl implements DataProcessor {
                 CleverTap__Region__c
             FROM CleverTap__Config__c
             WHERE Id = :connectionId OR Name = :connectionId
+            WITH SECURITY_ENFORCED
             LIMIT 1
         ];
         

@@ -119,7 +119,8 @@ public with sharing class EntityTransformer {
         // Enhanced security check with field-level access
         if (!CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() ||
             !CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().get('clevertap__salesforce_entity__c').getDescribe().isAccessible() ||
-            !CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().get('clevertap__status__c').getDescribe().isAccessible()) {
+            !CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().get('clevertap__status__c').getDescribe().isAccessible() || 
+            !CleverTap__Sync_Configuration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().get('cleverTap__connectionId__c').getDescribe().isAccessible()) {
             return new List<CleverTap__Sync_Configuration__c>();
         }
         

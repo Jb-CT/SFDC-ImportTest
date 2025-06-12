@@ -19,6 +19,7 @@ public with sharing class Config {
                    CleverTap__Region__c
             FROM CleverTap__Config__c 
             WHERE Name != '[Deleted]'
+            WITH SECURITY_ENFORCED
             LIMIT 1
         ];
 

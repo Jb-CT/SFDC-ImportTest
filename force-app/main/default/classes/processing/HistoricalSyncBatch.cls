@@ -110,6 +110,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
                         WHERE CleverTap__Salesforce_Entity__c = :queryObjectType
                         AND CleverTap__Status__c = 'Active'
                     )
+                    WITH SECURITY_ENFORCED
                 ];
                 
                 for (CleverTap__Mapping__c mapping : mappings) {
@@ -229,6 +230,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
             WHERE CleverTap__Salesforce_Entity__c = :objectName
             AND CleverTap__Status__c = 'Active'
             AND Id = :syncConfigId
+            WITH SECURITY_ENFORCED
             LIMIT 1
         ];
         
@@ -246,6 +248,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
                 CleverTap__Data_Type__c, CleverTap__Is_Mandatory__c
             FROM CleverTap__Mapping__c
             WHERE CleverTap__Sync_mapping__c = :syncConfigId
+            WITH SECURITY_ENFORCED
         ];
 
         for (CleverTap__Mapping__c mapping : cachedFieldMappings) {
@@ -365,6 +368,7 @@ public with sharing class HistoricalSyncBatch implements Database.Batchable<SObj
                        CleverTap__Region__c
                 FROM CleverTap__Config__c
                 WHERE Id = :connectionId OR Name = :connectionId
+                WITH SECURITY_ENFORCED
                 LIMIT 1
             ];
             

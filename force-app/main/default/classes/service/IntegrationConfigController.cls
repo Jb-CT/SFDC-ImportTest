@@ -23,7 +23,7 @@ public with sharing class IntegrationConfigController {
         try {
             return getConfigurationsWithSecurity();
         } catch (Exception e) {
-            throw new AuraHandledException('Error fetching configurations: ' + e.getMessage());
+            throw new AuraHandledException('Error fetching configurations');
         }
     }
 
@@ -113,7 +113,9 @@ public with sharing class IntegrationConfigController {
 
         if (Schema.sObjectType.CleverTap__Config__c.isAccessible()) {
             List<CleverTap__Config__c> configs = [
-                SELECT Id FROM CleverTap__Config__c WHERE Id = :configId LIMIT 1
+                SELECT Id FROM CleverTap__Config__c WHERE Id = :configId 
+                WITH SECURITY_ENFORCED
+                LIMIT 1
             ];
             
             if (configs.isEmpty()) {
@@ -166,7 +168,9 @@ public with sharing class IntegrationConfigController {
             
             // Query the record - same structure
             List<CleverTap__Config__c> configToDelete = [
-                SELECT Id FROM CleverTap__Config__c WHERE Id = :configId LIMIT 1
+                SELECT Id FROM CleverTap__Config__c WHERE Id = :configId 
+                WITH SECURITY_ENFORCED
+                LIMIT 1
             ];
             
             if (configToDelete.isEmpty()) {
